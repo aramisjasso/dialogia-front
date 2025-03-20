@@ -6,7 +6,7 @@ export default function AppDialogia() {
     return (
         <>
             <div id='div-app'>
-            <h1>Dialogia</h1>
+            {/*<h1>Dialogia</h1>*/}
                 <RouterProvider router={DialogiaRouter} />
                 <div id='div-footer'>
                     <Footer />

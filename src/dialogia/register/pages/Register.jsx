@@ -1,11 +1,11 @@
 // src/components/Register.jsx
 import React, { useState } from "react";
 import { Button, Box, Heading, Text, Input, Flex } from "@chakra-ui/react";
-import { registerWithGoogle, registerWithEmail } from "../firebase/auth.js";
+import { registerWithGoogle, registerWithEmail } from "../../../firebase/auth.js";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase/firebase";
-import { toaster } from "../components/ui/toaster"; // Importa toaster
+import { db } from "../../../firebase/firebase";
+import { toaster } from "../../../components/ui/toaster"; // Importa toaster
 
 const Register = () => {
   const [username, setUsername] = useState("");

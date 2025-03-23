@@ -1,9 +1,8 @@
-// src/components/Home.jsx
 import React from "react";
 import { Box, Heading, Button, Flex } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom"; // Para navegar entre pantallas
 
-const Home = () => {
+const Root = () => {
   const navigate = useNavigate();
 
   return (
@@ -22,4 +21,5 @@ const Home = () => {
   );
 };
 
-export default Home;
+
+export default Root;

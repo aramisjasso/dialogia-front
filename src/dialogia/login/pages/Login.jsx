@@ -1,7 +1,7 @@
 // src/components/Login.jsx
 import React, { useState } from "react";
 import { Box, Heading, Input, Button, Text, Flex, } from "@chakra-ui/react";
-import { login  } from "../firebase/auth.js";
+import { login  } from "../../../firebase/auth";
 
 import { useNavigate } from "react-router-dom";
 

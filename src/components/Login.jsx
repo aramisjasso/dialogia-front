@@ -1,15 +1,42 @@
 // src/components/Login.jsx
 import React, { useState } from "react";
-import { Box, Heading, Input, Button, Text } from "@chakra-ui/react";
+import { Box, Heading, Input, Button, Text, Flex, } from "@chakra-ui/react";
+import { login  } from "../firebase/auth.js";
+
+import { useNavigate } from "react-router-dom";
+
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+(false); // Para manejar el estado de carga
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Lógica de inicio de sesión (la implementaremos más adelante)
-    console.log("Iniciar sesión con:", email, password);
-  };
+  const handleLogin = async () => {
+
+  try {
+    // Autentica al usuario con Firebase
+    const userCredential = await login(
+      email,
+      password
+    );
+
+    // Si la autenticación es exitosa
+    const user = userCredential.user;
+    console.log("Usuario autenticado:", user);
+
+    navigate("/home")
+  } catch (error) {
+    // Si hay un error, muestra un mensaje
+    console.error("Error al iniciar sesión:", error);
+
+
+  }
+};
+
+  // Validar si los inputs están vacíos
+  const isDisabled = !email.trim() || !password.trim();
 
   return (
     <Box textAlign="center" mt={10}>
@@ -17,7 +44,7 @@ const Login = () => {
       <Text mt={4}>Ingresa tus credenciales</Text>
       <Input
         mt={4}
-        placeholder="Correo electrónico"
+        placeholder="Correo electrónico / Usuario"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -28,9 +55,20 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <Button mt={4} colorScheme="teal" onClick={handleLogin}>
+      <Flex justifyContent="center" mt={6} gap={4}>
+      <Button 
+        mt={4} 
+        colorScheme="teal" 
+        onClick={handleLogin}
+        disabled = {isDisabled}
+        >
         Iniciar Sesión
       </Button>
+      <Button mt={4} colorScheme="teal" onClick={() => navigate("/register")}>
+        Crea una cuenta.
+      </Button>
+      </Flex>
+      
     </Box>
   );
 };

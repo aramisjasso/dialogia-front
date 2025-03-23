@@ -3,6 +3,8 @@ import { createBrowserRouter } from "react-router-dom";
 import Error from "../share/errors/components/Error";
 import Register from "../dialogia/register/pages/Register";
 import Login from "../dialogia/login/pages/Login";
+import Recover from "../dialogia/recover/pages/Recover";
+import RecoverReset from "../dialogia/recover/pages/RecoverReset";
 import Home from "../dialogia/home/pages/Home";
 import Layout from "../share/components/Layout"; // Importa el Layout
 import ProtectedRoute from "./ProtectedRoute";
@@ -42,6 +44,28 @@ const NaviRoutersDialogia = (user) => {
         <ProtectedRoute user={user} requireAuth={false}>
           <Layout>
             <Login />
+            <Footer/>
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/recover",
+      element: (
+        <ProtectedRoute user={user} requireAuth={false}>
+          <Layout>
+            <Recover />
+            <Footer/>
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/recover-reset",
+      element: (
+        <ProtectedRoute user={user} requireAuth={false}>
+          <Layout>
+            <RecoverReset />
             <Footer/>
           </Layout>
         </ProtectedRoute>

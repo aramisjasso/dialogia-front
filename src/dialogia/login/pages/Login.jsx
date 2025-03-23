@@ -68,6 +68,14 @@ const Login = () => {
         Crea una cuenta.
       </Button>
       </Flex>
+      <Text 
+        mt={4} 
+        color="teal" 
+        cursor="pointer" 
+        onClick={() => navigate("/recover")}
+      >
+        ¿Olvidaste tu contraseña?
+      </Text>
       
     </Box>
   );

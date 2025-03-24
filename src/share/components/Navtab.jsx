@@ -18,11 +18,11 @@ const NavTab = () => {
   };
 
   return (
-    <Flex bg="teal.500" p={4} justifyContent="space-between" alignItems="center">
+    <Flex bg="gray.800" p={4} justifyContent="space-between" alignItems="center">
       <Link href="/" color="white" fontWeight="bold">
         Inicio
       </Link>
-      <Button colorScheme="red" onClick={handleLogout}>
+      <Button colorScheme="gray" onClick={handleLogout}>
         Cerrar Sesión
       </Button>
     </Flex>

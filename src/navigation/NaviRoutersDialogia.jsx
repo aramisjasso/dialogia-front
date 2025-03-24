@@ -9,7 +9,6 @@ import Home from "../dialogia/home/pages/Home";
 import Layout from "../share/components/Layout"; // Importa el Layout
 import ProtectedRoute from "./ProtectedRoute";
 import Root from "../dialogia/root/pages/Root";
-import Footer from "../share/footer/Footer";
 
 // Función para crear el router (recibe el estado del usuario como parámetro)
 const NaviRoutersDialogia = (user) => {
@@ -20,9 +19,7 @@ const NaviRoutersDialogia = (user) => {
         <ProtectedRoute user={user} requireAuth={false}>
           <Layout>
             <Root /> {/* Renderiza Root si el usuario no está autenticado */}
-            <Footer/>
           </Layout>
-          
         </ProtectedRoute>
       ),
       errorElement: <Error />,
@@ -33,7 +30,6 @@ const NaviRoutersDialogia = (user) => {
         <ProtectedRoute user={user} requireAuth={false}>
           <Layout>
             <Register />
-            <Footer/>
           </Layout>
         </ProtectedRoute>
       ),
@@ -44,7 +40,6 @@ const NaviRoutersDialogia = (user) => {
         <ProtectedRoute user={user} requireAuth={false}>
           <Layout>
             <Login />
-            <Footer/>
           </Layout>
         </ProtectedRoute>
       ),
@@ -55,7 +50,6 @@ const NaviRoutersDialogia = (user) => {
         <ProtectedRoute user={user} requireAuth={false}>
           <Layout>
             <Recover />
-            <Footer/>
           </Layout>
         </ProtectedRoute>
       ),
@@ -66,7 +60,6 @@ const NaviRoutersDialogia = (user) => {
         <ProtectedRoute user={user} requireAuth={false}>
           <Layout>
             <RecoverReset />
-            <Footer/>
           </Layout>
         </ProtectedRoute>
       ),

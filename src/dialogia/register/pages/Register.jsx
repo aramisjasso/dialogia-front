@@ -1,6 +1,6 @@
 // src/components/Register.jsx
 import React, { useState } from "react";
-import { Button, Box, Heading, Text, Input, Flex } from "@chakra-ui/react";
+import { Button, Box, Heading, Text, Input, Flex, Link } from "@chakra-ui/react";
 import { registerWithGoogle, registerWithEmail } from "../../../firebase/auth.js";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -112,44 +112,88 @@ const Register = () => {
     }
   };
 
-  return (
+   return (
     <Box
-      maxW="400px"
+      maxW="500px"
       mx="auto"
-      mt={10}
+      mt={5}
+      mb={5}
       p={6}
       borderWidth="1px"
-      borderRadius="lg"
       boxShadow="lg"
+      bg="blackAlpha.900" // Fondo negro
+      color="white" // Texto blanco en general
+    
     >
-      <Heading textAlign="center">Regístrate</Heading>
-      <Text mt={4} textAlign="center">
+      <Heading textAlign="left" color="white">
+        Regístrate
+      </Heading>
+      {/*<Text mt={4} textAlign="center">
         Crea una cuenta para continuar
-      </Text>
+      </Text>*/}
+
       <Flex direction="column" gap={4} mt={6}>
+        <Text color="white">Usuario</Text>
         <Input
           placeholder="Nombre de usuario"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          bg="blackAlpha.800" // Fondo oscuro para los inputs
+          color="white" // Texto blanco en los inputs
+          borderColor="gray.600" // Borde gris para contraste
         />
+        <Text color="white">Correo</Text>
         <Input
           placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          bg="blackAlpha.800"
+          color="white"
+          borderColor="gray.600"
         />
+        <Text color="white">Contraseña</Text>
         <Input
           type="password"
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          bg="blackAlpha.800"
+          color="white"
+          borderColor="gray.600"
         />
-        <Button colorScheme="teal" onClick={handleRegisterWithEmail}>
+      </Flex>
+
+      {/* Botones en fila y sin redondeo */}
+      <Flex direction="row" gap={4} mt={6} justifyContent="center">
+        <Button
+          colorScheme="teal"
+          variant="outline"
+          onClick={handleRegisterWithEmail}
+          borderRadius="0" // Sin redondeo
+          borderColor="white" // Borde blanco para contraste
+          color="white" // Texto blanco
+        >
           Registrarse con Correo
         </Button>
-        <Button colorScheme="blue" onClick={handleRegisterWithGoogle}>
+        <Button
+          colorScheme="blue"
+          variant="outline"
+          onClick={handleRegisterWithGoogle}
+          borderRadius="0"
+          borderColor="white"
+          color="white"
+        >
           Registrarse con Google
         </Button>
       </Flex>
+
+      {/* Enlace "Ya tengo una cuenta" */}
+      <Text mt={6} textAlign="center" color="white">
+        ¿Ya tienes una cuenta?{" "}
+        <Link color="teal.500" href="/login">
+          Inicia sesión
+        </Link>
+      </Text>
     </Box>
   );
 };

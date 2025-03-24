@@ -2,13 +2,16 @@
 // import { em } from "framer-motion/m";
 import { auth, provider, db } from "./firebase";
 import {  collection, query, where, getDocs } from "firebase/firestore";
-import { signInWithPopup, createUserWithEmailAndPassword,signInWithEmailAndPassword  } from "firebase/auth";
+import { signInWithPopup, createUserWithEmailAndPassword,signInWithEmailAndPassword,sendEmailVerification} from "firebase/auth";
 
 // Registro con Google
 export const registerWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
+    await sendEmailVerification(result.user);
+    
     return result.user;
+
   } catch (error) {
     throw new Error("Error en registro con Google: " + error.message);
   }
@@ -18,7 +21,9 @@ export const registerWithGoogle = async () => {
 export const registerWithEmail = async (email, password) => {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
+    await sendEmailVerification(result.user);
     return result.user;
+  
   } catch (error) {
     throw new Error("Error en registro con correo: " + error.message);
   }

@@ -1,6 +1,6 @@
 // src/components/Register.jsx
 import React, { useState } from "react";
-import { Button, Box, Heading, Text, Input, Flex, Link } from "@chakra-ui/react";
+import { Button, Box, Heading, Text, Input, Flex, Link,Field } from "@chakra-ui/react";
 import { registerWithGoogle, registerWithEmail } from "../../../firebase/auth.js";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmpassword,setconfirmpassword] = useState("");
   const navigate = useNavigate();
 
   // Verificar si el nombre de usuario ya existe
@@ -45,16 +46,36 @@ const Register = () => {
       });
       return;
     }
+    if (await checkUsernameExists(username)) {
+      toaster.create({
+        title: "Error",
+        description: "El nombre de usuario ya está en uso",
+        status: "error", // Si tu implementación de toaster soporta "status"
+      });
+      return;
+    }
+    if (username.includes('@') || username.includes('/') || username.includes('\\') || username.includes('.')) {
+      toaster.create({
+        title: "Error",
+        description: "El nombre de usuario no puede contener @, /, \\ o .",
+        status: "error",
+      });
+      return;
+    }
 
     try {
+      
       const user = await registerWithGoogle();
       await saveUserToFirestore(user, username);
+      navigate("/login");
+      window.location.reload();
       toaster.create({
         title: "Registro exitoso",
         description: "Tu cuenta ha sido creada con Google",
         status: "success", // Si tu implementación de toaster soporta "status"
+        onCloseComplete: () => navigate("/login")
       });
-      navigate("/login"); // Redirigir al login
+       // Redirigir al login
     } catch (error) {
       toaster.create({
         title: "Error",
@@ -62,6 +83,7 @@ const Register = () => {
         status: "error", // Si tu implementación de toaster soporta "status"
       });
     }
+    
   };
 
   const handleRegisterWithEmail = async () => {
@@ -70,6 +92,22 @@ const Register = () => {
         title: "Error",
         description: "Por favor, completa todos los campos",
         status: "error", // Si tu implementación de toaster soporta "status"
+      });
+      return;
+    }
+    if (password!=confirmpassword) {
+      toaster.create({
+        title: "Error",
+        description: "La contraseña no coincide",
+        status: "error", // Si tu implementación de toaster soporta "status"
+      });
+      return;
+    }
+    if (username.includes('@') || username.includes('/') || username.includes('\\') || username.includes('.')) {
+      toaster.create({
+        title: "Error",
+        description: "El nombre de usuario no puede contener @, /, \\ o .",
+        status: "error",
       });
       return;
     }
@@ -94,15 +132,17 @@ const Register = () => {
         });
         return;
       }
-
+    
       const user = await registerWithEmail(email, password);
       await saveUserToFirestore(user, username);
+      navigate("/login");
+      window.location.reload();
       toaster.create({
         title: "Registro exitoso",
         description: "Tu cuenta ha sido creada",
         status: "success", // Si tu implementación de toaster soporta "status"
       });
-      navigate("/login"); // Redirigir al login
+      
     } catch (error) {
       toaster.create({
         title: "Error",
@@ -134,6 +174,7 @@ const Register = () => {
 
       <Flex direction="column" gap={4} mt={6}>
         <Text color="white">Usuario</Text>
+        <Field.Root>
         <Input
           placeholder="Nombre de usuario"
           value={username}
@@ -142,7 +183,11 @@ const Register = () => {
           color="white" // Texto blanco en los inputs
           borderColor="gray.600" // Borde gris para contraste
         />
+        </Field.Root>
+
+        
         <Text color="white">Correo</Text>
+        <Field.Root>
         <Input
           placeholder="Correo electrónico"
           value={email}
@@ -151,6 +196,10 @@ const Register = () => {
           color="white"
           borderColor="gray.600"
         />
+        </Field.Root>
+
+        <Field.Root>
+
         <Text color="white">Contraseña</Text>
         <Input
           type="password"
@@ -161,6 +210,19 @@ const Register = () => {
           color="white"
           borderColor="gray.600"
         />
+        </Field.Root>
+
+        <Text color="white">Confirmar contraseña</Text>
+        <Input
+          type="password"
+          placeholder="Confirmar contraseña"
+          value={confirmpassword}
+          onChange={(e) => setconfirmpassword(e.target.value)}
+          bg="blackAlpha.800"
+          color="white"
+          borderColor="gray.600"
+        />
+
       </Flex>
 
       {/* Botones en fila y sin redondeo */}

@@ -9,25 +9,30 @@ import Home from "../dialogia/home/pages/Home";
 import Layout from "../share/components/Layout"; // Importa el Layout
 import ProtectedRoute from "./ProtectedRoute";
 import Root from "../dialogia/root/pages/Root";
+import Categories from "../dialogia/categories/pages/Categories";
 
 // Función para crear el router (recibe el estado del usuario como parámetro)
-const NaviRoutersDialogia = (user) => {
+const NaviRoutersDialogia = () => {
   return createBrowserRouter([
     {
       path: "/",
       element: (
-        <ProtectedRoute user={user} requireAuth={false}>
+        <ProtectedRoute  requireAuth={false}>
           <Layout>
             <Root /> {/* Renderiza Root si el usuario no está autenticado */}
           </Layout>
         </ProtectedRoute>
       ),
-      errorElement: <Error />,
+      errorElement: (
+        <Layout>
+          <Error />
+        </Layout>
+      ),
     },
     {
       path: "/register",
       element: (
-        <ProtectedRoute user={user} requireAuth={false}>
+        <ProtectedRoute  requireAuth={false}>
           <Layout>
             <Register />
           </Layout>
@@ -37,7 +42,7 @@ const NaviRoutersDialogia = (user) => {
     {
       path: "/login",
       element: (
-        <ProtectedRoute user={user} requireAuth={false}>
+        <ProtectedRoute requireAuth={false}>
           <Layout>
             <Login />
           </Layout>
@@ -47,7 +52,7 @@ const NaviRoutersDialogia = (user) => {
     {
       path: "/recover",
       element: (
-        <ProtectedRoute user={user} requireAuth={false}>
+        <ProtectedRoute requireAuth={false}>
           <Layout>
             <Recover />
           </Layout>
@@ -57,7 +62,7 @@ const NaviRoutersDialogia = (user) => {
     {
       path: "/recover-reset",
       element: (
-        <ProtectedRoute user={user} requireAuth={false}>
+        <ProtectedRoute requireAuth={false}>
           <Layout>
             <RecoverReset />
           </Layout>
@@ -67,9 +72,19 @@ const NaviRoutersDialogia = (user) => {
     {
       path: "/home",
       element: (
-        <ProtectedRoute user={user} requireAuth={true}>
+        <ProtectedRoute requireAuth={true}>
           <Layout>
             <Home />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/categories",
+      element: (
+        <ProtectedRoute requireAuth={true}>
+          <Layout>
+            <Categories />
           </Layout>
         </ProtectedRoute>
       ),

@@ -65,11 +65,14 @@ const Login = () => {
         <Field.Root>
           <Field.Label textStyle="sm" m={2}>Correo o Usuario</Field.Label>
           <Input
-          shadow="md"
-          variant="subtle"
-          placeholder="user@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+            shadow="md"
+            variant="subtle"
+            placeholder="user@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === " ") e.preventDefault(); // 🔥 Bloquea la tecla espacio
+            }}
           />
 
         </Field.Root>

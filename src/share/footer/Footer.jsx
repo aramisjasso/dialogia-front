@@ -6,7 +6,7 @@ const Footer = () => {
     <Box
       bg="blackAlpha.900" // Fondo negro
       color="white" // Texto blanco
-      py={6} // Padding vertical
+      py={2} // Padding vertical
       textAlign="center"
     >
       <Text fontSize="sm" color="gray.300">

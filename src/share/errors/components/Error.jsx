@@ -5,13 +5,14 @@ import { Link as RouterLink } from "react-router-dom";
   const error = useRouteError();
 
   return (
-    <Box textAlign="center" py={20} px={6}>
+    <Box textAlign="center" py={2} px={2}>
       <Image
-        src="vite.svg" // Reemplaza con tu ilustración
+        src="LOGO_ORIGINAL.png" // Reemplaza con tu ilustración
         alt="Error 404"
-        boxSize="150px"
+        boxSize="300px"
         mx="auto"
-        mb={6}
+        objectFit="contain" // Asegura que toda la imagen sea visible
+        mb={1}
       />
       <Heading as="h1" size="xl" mb={4}>
         ¡Vaya! Este debate no existe... o aún no.

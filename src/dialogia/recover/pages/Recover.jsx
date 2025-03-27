@@ -19,22 +19,30 @@ const Recover = () => {
       });
       return;
     }
-
+  
     try {
       await sendPasswordResetEmail(auth, email);
-      toaster.create({
-        title: "Éxito",
-        description: "Se ha enviado un enlace de recuperación a tu correo electrónico",
-        status: "success",
-      });
-      navigate("/login"); // Redirigir al login después de enviar el correo
     } catch (error) {
-      toaster.create({
-        title: "Error",
-        description: error.message,
-        status: "error",
-      });
+      if (error.code === "auth/invalid-email") {
+        // Solo muestra error si el formato es inválido.
+        toaster.create({
+          title: "Error",
+          description: "El formato del correo electrónico no es válido.",
+          status: "error",
+        });
+        return;
+      }
+      // Ignora otros errores (como "auth/user-not-found").
     }
+  
+    // Mensaje genérico para todos los casos.
+    toaster.create({
+      title: "Éxito",
+      description: "Si el correo está registrado, se ha enviado un enlace de recuperación.",
+      status: "success",
+    });
+  
+    navigate("/login");
   };
 
   return (
@@ -57,7 +65,7 @@ const Recover = () => {
       <Heading  size="3xl" mb={10}>Restablecer contraseña</Heading>
       <Flex direction="column" gap={4} my={10}> 
         <Field.Root>
-          <Field.Label textStyle="sm" m={2}>Correo o usuario</Field.Label>
+          <Field.Label textStyle="sm" m={2}>Correo electrónico</Field.Label>
           <Input
             shadow="md"
             variant="subtle"

@@ -15,8 +15,8 @@ const Root = () => {
               objectFit="contain" // Asegura que toda la imagen sea visible
               mb={0}
             />
-      <Heading>Bienvenido a Dialogia</Heading>
-      Elige una opción para continuar
+      {/* <Heading>Bienvenido a Dialogia</Heading>
+      Elige una opción para continuar */}
       <Flex justifyContent="center" mt={6} gap={4}>
         <Button 
         variant="outline"

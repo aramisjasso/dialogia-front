@@ -1,6 +1,6 @@
 // src/components/Recover.jsx
 import React, { useState } from "react";
-import { Box, Heading, Input, Button, Text, Flex } from "@chakra-ui/react";
+import { Box, Heading, Input, Button, Text, Flex, Field, Link } from "@chakra-ui/react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../../firebase/firebase"; // Asegúrate de importar auth desde Firebase
 import { useNavigate } from "react-router-dom";
@@ -38,33 +38,71 @@ const Recover = () => {
   };
 
   return (
-    <Box
-      maxW="400px"
-      mx="auto"
-      mt={10}
-      p={6}
-      borderWidth="1px"
-      borderRadius="lg"
-      boxShadow="lg"
-    >
-      <Heading textAlign="center">Recuperar Contraseña</Heading>
-      <Text mt={4} textAlign="center">
-        Ingresa tu correo electrónico para recibir un enlace de recuperación
-      </Text>
-      <Flex direction="column" gap={4} mt={6}>
-        <Input
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Button colorScheme="teal" onClick={handleRecoverPassword}>
-          Enviar Enlace
-        </Button>
-        <Button variant="link" onClick={() => navigate("/login")}>
-          Volver al Inicio de Sesión
-        </Button>
+    <Flex
+          justifyContent="center" // Centra horizontalmente
+          alignItems="center" // Centra verticalmente
+          p={8}
+          //minH="80vh"
+        >
+    <Box  
+      maxWidth="600px"
+      maxHeight="1200px"
+      width="100%"
+      height="100%"
+      borderWidth="1px" 
+      bg="bg" 
+      shadow="md" 
+      p={8} >
+
+      <Heading  size="3xl" mb={10}>Restablecer contraseña</Heading>
+      <Flex direction="column" gap={4} my={10}> 
+        <Field.Root>
+          <Field.Label textStyle="sm" m={2}>Correo o usuario</Field.Label>
+          <Input
+            shadow="md"
+            variant="subtle"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === " ") e.preventDefault(); // 🔥 Bloquea la tecla espacio 
+            }} 
+          />
+        </Field.Root>
+        <Flex
+              justifyContent="center" // Centra horizontalmente
+              alignItems="center" // Centra verticalmente
+              >
+          <Button 
+          colorScheme="teal" 
+          variant="outline"
+          p={8}
+          mt={10}
+          onClick={handleRecoverPassword}
+          borderRadius="0" // Sin redondeo
+          borderColor="black" // Borde blanco para contraste
+          borderWidth="1px"
+          textStyle="md"
+          >
+            Enviar correo
+          </Button>
+
+        </Flex>
+        <Flex
+              justifyContent="center" // Centra horizontalmente
+              alignItems="center" // Centra verticalmente
+              >
+          <Link 
+              color="teal" 
+              onClick={() => navigate("/login")}
+              cursor="pointer"
+              mb={16}>
+              Iniciar sesión
+            </Link>
+          </Flex>
       </Flex>
     </Box>
+    </Flex>
   );
 };
 

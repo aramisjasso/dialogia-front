@@ -61,7 +61,7 @@ const Login = () => {
 
         <Heading  size="3xl">Iniciar Sesión</Heading>
 
-        <Text m={2}>Ingresa tus credenciales</Text>
+        {/*<Text m={2}>Ingresa tus credenciales</Text>*/}
         <Field.Root>
           <Field.Label textStyle="sm" m={2}>Correo o Usuario</Field.Label>
           <Input

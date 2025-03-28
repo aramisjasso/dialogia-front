@@ -1,6 +1,6 @@
 // src/components/RecoverReset.jsx
 import React, { useState, useEffect } from "react";
-import { Box, Heading, Input, Button, Text, Flex, Spinner } from "@chakra-ui/react";
+import { Box, Heading, Input, Button, Text, Flex, Spinner, Field, Link } from "@chakra-ui/react";
 import { confirmPasswordReset, verifyPasswordResetCode, getAuth } from "firebase/auth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toaster } from "../../../components/ui/toaster";
@@ -98,37 +98,84 @@ const RecoverReset = () => {
   }
 
   return (
-    <Box
-      maxW="400px"
-      mx="auto"
-      mt={10}
-      p={6}
-      borderWidth="1px"
-      borderRadius="lg"
-      boxShadow="lg"
-    >
-      <Heading textAlign="center">Restablecer Contraseña</Heading>
-      <Text mt={4} textAlign="center">
-        Ingresa tu nueva contraseña
-      </Text>
-      <Flex direction="column" gap={4} mt={6}>
+    <Flex
+              justifyContent="center" // Centra horizontalmente
+              alignItems="center" // Centra verticalmente
+              p={8}
+              //minH="80vh"
+            >
+        <Box  
+          maxWidth="600px"
+          maxHeight="1200px"
+          width="100%"
+          height="100%"
+          borderWidth="1px" 
+          bg="bg" 
+          shadow="md" 
+          p={8} >
+      <Heading size="3xl" mb={10}>Nueva contraseña</Heading>
+      <Flex direction="column" gap={4} my={10}> 
+        <Field.Root>
+          <Field.Label textStyle="sm" m={2}>Contraseña</Field.Label>
         <Input
+          shadow="md"
+          variant="subtle"
+          onKeyDown={(e) => {
+            if (e.key === " ") e.preventDefault(); // 🔥 Bloquea la tecla espacio 
+          }} 
           type="password"
-          placeholder="Nueva contraseña"
+          placeholder="Escribe tu contraseña"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
         />
+        </Field.Root>
+        <Field.Root>
+          <Field.Label textStyle="sm" m={2}>Contraseña</Field.Label>
         <Input
+          shadow="md"
+          variant="subtle"
+          onKeyDown={(e) => {
+            if (e.key === " ") e.preventDefault(); // 🔥 Bloquea la tecla espacio 
+          }} 
           type="password"
-          placeholder="Confirmar contraseña"
+          placeholder="Escribe tu contraseña"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <Button colorScheme="teal" onClick={handleResetPassword}>
-          Restablecer Contraseña
+        </Field.Root>
+        </Flex>
+        <Flex
+                      justifyContent="center" // Centra horizontalmente
+                      alignItems="center" // Centra verticalmente
+                      >
+        <Button 
+        colorScheme="teal" 
+        onClick={handleResetPassword}
+        variant="outline"
+                  p={8}
+                  mt={10}
+                  mb={6}
+                  borderRadius="0" // Sin redondeo
+                  borderColor="black" // Borde blanco para contraste
+                  borderWidth="1px"
+                  textStyle="md">
+          Confirmar
         </Button>
       </Flex>
+      <Flex
+                    justifyContent="center" // Centra horizontalmente
+                    alignItems="center" // Centra verticalmente
+                    >
+                <Link 
+                    color="teal" 
+                    onClick={() => navigate("/login")}
+                    cursor="pointer"
+                    mb={16}>
+                    Iniciar sesión
+                  </Link>
+                </Flex>
     </Box>
+    </Flex>
   );
 };
 

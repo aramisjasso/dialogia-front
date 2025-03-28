@@ -1,7 +1,7 @@
 // src/components/Login.jsx
 import React, { useState } from "react";
 import { Box, Heading, Input, Button, Text, Flex,Field, Link  } from "@chakra-ui/react";
-import { login  } from "../../../firebase/auth";
+import { login, registerWithGoogle } from "../../../firebase/auth";
 import { toaster } from "../../../components/ui/toaster"
 import { useNavigate } from "react-router-dom";
 
@@ -39,7 +39,17 @@ const Login = () => {
 
   }
 };
+const handleRegisterWithGoogle = async () => {
+    try {
+      await registerWithGoogle();
+      navigate("/home");
 
+    } catch (error) {
+
+    } 
+  };
+
+  
   // Validar si los inputs están vacíos
   const isDisabled = !email.trim() || !password.trim();
 
@@ -106,14 +116,15 @@ const Login = () => {
         
 
       <Flex
-      justifyContent="center" // Centra horizontalmente
-      alignItems="center" // Centra verticalmente
+      direction="row" 
+      gap={4} 
+      mt={6} 
+      justifyContent="center"
       >
         <Button 
           colorScheme="teal"
           variant="outline"
           p={8}
-          mt={6} 
           onClick={handleLogin}
           disabled = {isDisabled}
           borderRadius="0" // Sin redondeo
@@ -122,6 +133,18 @@ const Login = () => {
           textStyle="md"
           >
           Iniciar Sesión
+        </Button>
+        <Button
+          colorScheme="teal"
+          variant="outline"
+          p={8}
+          onClick={handleRegisterWithGoogle}
+          borderRadius="0" // Sin redondeo
+          borderColor="black" // Borde blanco para contraste
+          borderWidth="1px"
+          textStyle="md"
+        >
+        Iniciar Sesión con Google
         </Button>
         </Flex>
     

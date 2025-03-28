@@ -1,7 +1,9 @@
 // src/components/Login.jsx
 import React, { useState } from "react";
-import { Box, Heading, Input, Button, Text, Flex,Field, Link  } from "@chakra-ui/react";
-import { login, registerWithGoogle } from "../../../firebase/auth";
+import { doc, getDoc } from "firebase/firestore"
+import { auth, db } from "../../../firebase/firebase";
+import { Box, Heading, Input, Button, Flex,Field, Link  } from "@chakra-ui/react";
+import { login, loginWithGoogle } from "../../../firebase/auth";
 import { toaster } from "../../../components/ui/toaster"
 import { useNavigate } from "react-router-dom";
 
@@ -29,6 +31,7 @@ const Login = () => {
     navigate("/home")
   } catch (error) {
     // Si hay un error, muestra un mensaje
+    error;
     toaster.create({
       title: "Error",
       description: "Credenciales Incorectas",
@@ -40,15 +43,34 @@ const Login = () => {
   }
 };
 const handleRegisterWithGoogle = async () => {
-    try {
-      await registerWithGoogle();
-      navigate("/home");
+  try {
+    // 1. Iniciar sesión con Google
+    await loginWithGoogle();
+    
+    // 2. Obtener el usuario actual
+    const user = auth.currentUser;
+    if (!user) throw new Error("No se pudo obtener el usuario");
 
-    } catch (error) {
+    // 3. Verificar en Firestore si existe
+    const userDocRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(userDocRef);
 
-    } 
-  };
+    // 4. Redirigir según si existe o no
+    if (userDoc.exists()) {
+      navigate("/home"); // Si ya está registrado, va a /home
+    } else {
+      navigate("/registeruser"); // Si no, va a completar registro
+    }
 
+  } catch (error) {
+    console.error(error);
+    toaster.create({
+      title: "Error",
+      description: "Error al iniciar sesión con Google",
+      type: "error",
+    });
+  }
+};
   
   // Validar si los inputs están vacíos
   const isDisabled = !email.trim() || !password.trim();

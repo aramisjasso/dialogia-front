@@ -10,6 +10,7 @@ import Layout from "../share/components/Layout"; // Importa el Layout
 import ProtectedRoute from "./ProtectedRoute";
 import Root from "../dialogia/root/pages/Root";
 import Categories from "../dialogia/categories/pages/Categories";
+import RegisterInLogin from "../dialogia/login/pages/RegisterInLogin";
 
 // Función para crear el router (recibe el estado del usuario como parámetro)
 const NaviRoutersDialogia = () => {
@@ -45,6 +46,16 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={false}>
           <Layout>
             <Login />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/registeruser",
+      element: (
+        <ProtectedRoute requireAuth={true}>
+          <Layout>
+            <RegisterInLogin />
           </Layout>
         </ProtectedRoute>
       ),

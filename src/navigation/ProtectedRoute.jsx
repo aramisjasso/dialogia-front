@@ -6,25 +6,32 @@ import { onAuthStateChanged } from "firebase/auth";
 
 const ProtectedRoute = ({ children, requireAuth }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Estado de carga
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false); // Ya terminó de verificar
     });
+
     return () => unsubscribe();
   }, []);
 
-  // Redirige a "/" si la ruta requiere autenticación y el usuario no está autenticado
+  if (loading) {
+    return <div>Cargando...</div>; // O un spinner
+  }
+
+  // Redirige si la ruta requiere autenticación y no hay usuario
   if (requireAuth && !user) {
     return <Navigate to="/" replace />;
   }
 
-  // Redirige a "/home" si la ruta NO requiere autenticación pero el usuario SÍ está autenticado
+  // Redirige si la ruta NO requiere autenticación pero hay usuario
   if (!requireAuth && user) {
     return <Navigate to="/home" replace />;
   }
 
-  // Si no se cumple ninguna de las condiciones anteriores, renderiza el contenido
+  // Si no, renderiza el contenido
   return children;
 };
 

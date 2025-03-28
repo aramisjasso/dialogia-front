@@ -8,6 +8,7 @@ import { signInWithPopup, createUserWithEmailAndPassword,signInWithEmailAndPassw
 export const registerWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
+    
     await sendEmailVerification(result.user);
     
     return result.user;
@@ -62,6 +63,17 @@ export const getEmailByUsername = async (username) => {
   }
 };
 
+export const loginWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    await sendEmailVerification(result.user);
+    
+    return result.user;
+
+  } catch (error) {
+    throw new Error("Error en registro con Google: " + error.message);
+  }
+};
 // Registro con correo y contraseña
 export const loginOut = async () => {
   auth.signOut()

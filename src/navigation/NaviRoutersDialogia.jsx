@@ -10,7 +10,7 @@ import Layout from "../share/components/Layout"; // Importa el Layout
 import ProtectedRoute from "./ProtectedRoute";
 import Root from "../dialogia/root/pages/Root";
 import Categories from "../dialogia/categories/pages/Categories";
-
+import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // Función para crear el router (recibe el estado del usuario como parámetro)
 const NaviRoutersDialogia = () => {
   return createBrowserRouter([
@@ -75,6 +75,16 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={true}>
           <Layout>
             <Home />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/Pruebas_CDAS",
+      element: (
+        <ProtectedRoute requireAuth={false}>
+          <Layout>
+            <Pruebas_CDAS />
           </Layout>
         </ProtectedRoute>
       ),

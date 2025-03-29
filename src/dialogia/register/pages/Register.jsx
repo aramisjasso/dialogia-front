@@ -1,18 +1,23 @@
 // src/components/Register.jsx
 import React, { useState } from "react";
-import { Button, Box, Heading, Text, Input, Flex, Link,Field } from "@chakra-ui/react";
+import { Button, Box, Heading, Text, Input, Flex, Link, Field } from "@chakra-ui/react";
 import { registerWithGoogle, registerWithEmail } from "../../../firebase/auth.js";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../../firebase/firebase";
-import { toaster } from "../../../components/ui/toaster"; // Importa toaster
+import { toaster } from "../../../components/ui/toaster";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmpassword,setconfirmpassword] = useState("");
+  const [confirmpassword, setConfirmpassword] = useState("");
   const navigate = useNavigate();
+
+  // Límites definidos
+  const USERNAME_MAX_LENGTH = 20;
+  const PASSWORD_MAX_LENGTH = 32;
+  const EMAIL_MAX_LENGTH = 254; // RFC estándar para emails
 
   // Verificar si el nombre de usuario ya existe
   const checkUsernameExists = async (username) => {
@@ -24,6 +29,12 @@ const Register = () => {
   const checkEmailExists = async (email) => {
     const userDoc = await getDoc(doc(db, "emails", email));
     return userDoc.exists();
+  };
+
+  // Validar formato de email
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
   };
 
   // Guardar usuario en Firestore
@@ -38,22 +49,34 @@ const Register = () => {
   };
 
   const handleRegisterWithGoogle = async () => {
+    // Validación de nombre de usuario
     if (!username) {
       toaster.create({
         title: "Error",
         description: "Por favor, ingresa un nombre de usuario",
-        status: "error", // Si tu implementación de toaster soporta "status"
+        status: "error",
       });
       return;
     }
+
+    if (username.length > USERNAME_MAX_LENGTH) {
+      toaster.create({
+        title: "Error",
+        description: `El nombre de usuario no puede tener más de ${USERNAME_MAX_LENGTH} caracteres`,
+        status: "error",
+      });
+      return;
+    }
+
     if (await checkUsernameExists(username)) {
       toaster.create({
         title: "Error",
         description: "El nombre de usuario ya está en uso",
-        status: "error", // Si tu implementación de toaster soporta "status"
+        status: "error",
       });
       return;
     }
+
     if (username.includes('@') || username.includes('/') || username.includes('\\') || username.includes('.')) {
       toaster.create({
         title: "Error",
@@ -64,7 +87,6 @@ const Register = () => {
     }
 
     try {
-      
       const user = await registerWithGoogle();
       await saveUserToFirestore(user, username);
       navigate("/login");
@@ -72,41 +94,81 @@ const Register = () => {
       toaster.create({
         title: "Registro exitoso",
         description: "Tu cuenta ha sido creada con Google",
-        status: "success", // Si tu implementación de toaster soporta "status"
+        status: "success",
         onCloseComplete: () => navigate("/login")
       });
-       // Redirigir al login
     } catch (error) {
       toaster.create({
         title: "Error",
         description: error.message,
-        status: "error", // Si tu implementación de toaster soporta "status"
+        status: "error",
       });
     }
-    
   };
 
   const handleRegisterWithEmail = async () => {
-    if (!username || !email || !password) {
+    // Validación de campos vacíos
+    if (!username || !email || !password || !confirmpassword) {
       toaster.create({
         title: "Error",
         description: "Por favor, completa todos los campos",
-        status: "error", // Si tu implementación de toaster soporta "status"
+        status: "error",
       });
       return;
     }
-    if (password!=confirmpassword) {
+
+    // Validación de nombre de usuario
+    if (username.length > USERNAME_MAX_LENGTH) {
       toaster.create({
         title: "Error",
-        description: "La contraseña no coincide",
-        status: "error", // Si tu implementación de toaster soporta "status"
+        description: `El nombre de usuario no puede tener más de ${USERNAME_MAX_LENGTH} caracteres`,
+        status: "error",
       });
       return;
     }
+
     if (username.includes('@') || username.includes('/') || username.includes('\\') || username.includes('.')) {
       toaster.create({
         title: "Error",
         description: "El nombre de usuario no puede contener @, /, \\ o .",
+        status: "error",
+      });
+      return;
+    }
+
+    // Validación de email
+    if (email.length > EMAIL_MAX_LENGTH) {
+      toaster.create({
+        title: "Error",
+        description: `El correo electrónico no puede tener más de ${EMAIL_MAX_LENGTH} caracteres`,
+        status: "error",
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toaster.create({
+        title: "Error",
+        description: "Por favor, ingresa un correo electrónico válido",
+        status: "error",
+      });
+      return;
+    }
+
+    // Validación de contraseña
+    if (password.length > PASSWORD_MAX_LENGTH) {
+      toaster.create({
+        title: "Error",
+        description: `La contraseña no puede tener más de ${PASSWORD_MAX_LENGTH} caracteres`,
+        status: "error",
+      });
+      return;
+    }
+
+    if (password !== confirmpassword) {
+      toaster.create({
+        title: "Error",
+        description: "Las contraseñas no coinciden",
         status: "error",
       });
       return;
@@ -118,7 +180,7 @@ const Register = () => {
         toaster.create({
           title: "Error",
           description: "El nombre de usuario ya está en uso",
-          status: "error", // Si tu implementación de toaster soporta "status"
+          status: "error",
         });
         return;
       }
@@ -128,7 +190,7 @@ const Register = () => {
         toaster.create({
           title: "Error",
           description: "El correo electrónico ya está registrado",
-          status: "error", // Si tu implementación de toaster soporta "status"
+          status: "error",
         });
         return;
       }
@@ -140,19 +202,67 @@ const Register = () => {
       toaster.create({
         title: "Registro exitoso",
         description: "Tu cuenta ha sido creada",
-        status: "success", // Si tu implementación de toaster soporta "status"
+        status: "success",
       });
-      
-    } catch (error) {
-      toaster.create({
-        title: "Error",
-        description: error.message,
-        status: "error", // Si tu implementación de toaster soporta "status"
-      });
+    // src/components/Register.jsx
+} catch (error) {
+  let errorMessage = "Error en el registro";
+  
+  if (error.message.includes("password-does-not-meet-requirements")) {
+    errorMessage = "La contraseña debe contener:";
+    const missingRequirements = [];
+    
+    if (error.message.includes("upper case character")) {
+      missingRequirements.push("una letra mayúscula (A-Z)");
+    }
+    if (error.message.includes("numeric character")) {
+      missingRequirements.push("un número (0-9)");
+    }
+    if (error.message.includes("non-alphanumeric character")) {
+      missingRequirements.push("un carácter especial (ej: !@#$%)");
+    }
+    
+    errorMessage += " " + missingRequirements.join(", ");
+  } else if (error.message.includes("email-already-in-use")) {
+    errorMessage = "El correo electrónico ya está registrado";
+  } else {
+    errorMessage = error.message;
+  }
+
+  toaster.create({
+    title: "Error",
+    description: errorMessage,
+    status: "error",
+  });
+}
+  };
+
+  // Manejar cambios con validación de longitud máxima
+  const handleUsernameChange = (e) => {
+    if (e.target.value.length <= USERNAME_MAX_LENGTH) {
+      setUsername(e.target.value);
     }
   };
 
-   return (
+  const handlePasswordChange = (e) => {
+    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
+      setPassword(e.target.value);
+    }
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
+      setConfirmpassword(e.target.value);
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    if (e.target.value.length <= EMAIL_MAX_LENGTH) {
+      setEmail(e.target.value);
+    }
+  };
+
+  return (
     <Box
       maxW="500px"
       mx="auto"
@@ -161,79 +271,92 @@ const Register = () => {
       p={6}
       borderWidth="1px"
       boxShadow="lg"
-      bg="blackAlpha.900" // Fondo negro
-      color="white" // Texto blanco en general
-    
+      bg="blackAlpha.900"
+      color="white"
     >
       <Heading textAlign="left" color="white">
         Regístrate
       </Heading>
-      {/*<Text mt={4} textAlign="center">
-        Crea una cuenta para continuar
-      </Text>*/}
+
 
       <Flex direction="column" gap={4} mt={6}>
-        <Text color="white">Usuario</Text>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Text color="white">Usuario</Text>
+          <Text color="gray.400" fontSize="sm">
+            {username.length}/{USERNAME_MAX_LENGTH}
+          </Text>
+        </Flex>
         <Field.Root>
-        <Input
-          placeholder="Nombre de usuario"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          bg="blackAlpha.800" // Fondo oscuro para los inputs
-          color="white" // Texto blanco en los inputs
-          borderColor="gray.600" // Borde gris para contraste
-        />
+          <Input
+            placeholder="Nombre de usuario"
+            value={username}
+            onChange={handleUsernameChange}
+            bg="blackAlpha.800"
+            color="white"
+            borderColor="gray.600"
+          />
         </Field.Root>
 
-        
-        <Text color="white">Correo</Text>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Text color="white">Correo</Text>
+          <Text color="gray.400" fontSize="sm">
+            {email.length}/{EMAIL_MAX_LENGTH}
+          </Text>
+        </Flex>
         <Field.Root>
-        <Input
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          bg="blackAlpha.800"
-          color="white"
-          borderColor="gray.600"
-        />
+          <Input
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={handleEmailChange}
+            bg="blackAlpha.800"
+            color="white"
+            borderColor="gray.600"
+          />
         </Field.Root>
 
+        <Flex justifyContent="space-between" alignItems="center">
+          <Text color="white">Contraseña</Text>
+          <Text color="gray.400" fontSize="sm">
+            {password.length}/{PASSWORD_MAX_LENGTH}
+          </Text>
+        </Flex>
         <Field.Root>
-
-        <Text color="white">Contraseña</Text>
-        <Input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          bg="blackAlpha.800"
-          color="white"
-          borderColor="gray.600"
-        />
+          <Input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={handlePasswordChange}
+            bg="blackAlpha.800"
+            color="white"
+            borderColor="gray.600"
+          />
         </Field.Root>
 
-        <Text color="white">Confirmar contraseña</Text>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Text color="white">Confirmar contraseña</Text>
+          <Text color="gray.400" fontSize="sm">
+            {confirmpassword.length}/{PASSWORD_MAX_LENGTH}
+          </Text>
+        </Flex>
         <Input
           type="password"
           placeholder="Confirmar contraseña"
           value={confirmpassword}
-          onChange={(e) => setconfirmpassword(e.target.value)}
+          onChange={handleConfirmPasswordChange}
           bg="blackAlpha.800"
           color="white"
           borderColor="gray.600"
         />
-
       </Flex>
 
-      {/* Botones en fila y sin redondeo */}
       <Flex direction="row" gap={4} mt={6} justifyContent="center">
         <Button
           colorScheme="teal"
           variant="outline"
           onClick={handleRegisterWithEmail}
-          borderRadius="0" // Sin redondeo
-          borderColor="white" // Borde blanco para contraste
-          color="white" // Texto blanco
+          borderRadius="0"
+          borderColor="white"
+          color="white"
         >
           Registrarse con Correo
         </Button>
@@ -249,7 +372,6 @@ const Register = () => {
         </Button>
       </Flex>
 
-      {/* Enlace "Ya tengo una cuenta" */}
       <Text mt={6} textAlign="center" color="white">
         ¿Ya tienes una cuenta?{" "}
         <Link color="teal.500" href="/login">

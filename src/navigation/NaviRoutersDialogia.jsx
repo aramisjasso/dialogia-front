@@ -13,6 +13,8 @@ import Categories from "../dialogia/categories/pages/Categories";
 import RegisterInLogin from "../dialogia/login/pages/RegisterInLogin";
 import RecommendView from '../dialogia/views debate/RecommendView'
 import Debate from '../dialogia/debate/Debate';
+import Category from "../dialogia/categories/pages/Category";
+
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // Función para crear el router (recibe el estado del usuario como parámetro)
@@ -116,9 +118,19 @@ const NaviRoutersDialogia = () => {
     {
       path: "/categories",
       element: (
-        <ProtectedRoute requireAuth={true}>
+        <ProtectedRoute requireAuth={false}>
           <Layout>
             <Categories />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/category",
+      element: (
+        <ProtectedRoute requireAuth={false}>
+          <Layout>
+            <Category />
           </Layout>
         </ProtectedRoute>
       ),

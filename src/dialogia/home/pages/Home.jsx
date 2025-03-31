@@ -1,18 +1,10 @@
-// src/components/Home.jsx
-import React from "react";
-import { Box, Heading } from "@chakra-ui/react";
-
+import React from 'react';
+import RecommendView from '../../views debate/RecommendView';
+import ActiveView from '../../views debate/ActiveView';
+import CategoryView from '../../views debate/CategoryView';
 
 const Home = () => {
-
-
-  return (
-    <Box textAlign="center" mt={10}>
-      <Heading>Está pagina no se debe ver si no se ha logeado Dialogia Página Home</Heading>
-        
-      
-    </Box>
-  );
+  return <RecommendView />;
 };
 
 export default Home;

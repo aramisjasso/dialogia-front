@@ -1,5 +1,5 @@
 // src/router.js
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import Error from "../share/errors/components/Error";
 import Register from "../dialogia/register/pages/Register";
 import Login from "../dialogia/login/pages/Login";
@@ -11,6 +11,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import Root from "../dialogia/root/pages/Root";
 import Categories from "../dialogia/categories/pages/Categories";
 import RegisterInLogin from "../dialogia/login/pages/RegisterInLogin";
+import RecommendView from '../dialogia/views debate/RecommendView'
+import Debate from '../dialogia/debate/Debate';
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // Función para crear el router (recibe el estado del usuario como parámetro)
@@ -87,6 +89,16 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={true}>
           <Layout>
             <Home />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "debate/:id",
+      element: (
+        <ProtectedRoute requireAuth={true}>
+          <Layout>
+            <Debate />
           </Layout>
         </ProtectedRoute>
       ),

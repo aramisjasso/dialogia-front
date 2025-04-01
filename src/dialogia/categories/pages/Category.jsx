@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useEffect } from 'react';
+import React, { useState,  } from "react";
 import { Box, Heading, Text, Image, Flex, Button } from "@chakra-ui/react";
 import { FaEye, FaCommentAlt, FaPlus, FaSearch } from "react-icons/fa";
-import { useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import CategoryView from '../../views debate/CategoryView';
 import CreateDebateDialog from "../components/CreateDebateDialog"; // Ajusta la ruta según tu estructura
@@ -32,6 +32,7 @@ const posts = [
 
 const Category = () => {
   const { id } = useParams(); // Obtiene el ID de la URL
+
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
 

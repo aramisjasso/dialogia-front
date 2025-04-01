@@ -55,6 +55,7 @@ const Category = () => {
 
   const [isHovered, setIsHovered] = useState(false);
   const [activeButton, setActiveButton] = useState("activos");
+  const [index, setIndex]=useState(1);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -137,7 +138,7 @@ const Category = () => {
               bg={activeButton === btn ? "rgba(5, 5, 5, 0.7)" : "transparent"}
               color="white"
               _hover={{ bg: "rgba(10, 10, 10, 0.4)" }}
-              onClick={() => setActiveButton(btn)}
+              onClick={() => {setActiveButton(btn); setIndex(index)}}
               borderTopLeftRadius={index === 0 ? "full" : 0}
               borderBottomLeftRadius={index === 0 ? "full" : 0}
               borderTopRightRadius={index === buttons.length - 1 ? "full" : 0}
@@ -196,7 +197,7 @@ const Category = () => {
       </Box>
 
       {/* Posts */}
-      <CategoryView category ={category.id}/>
+      <CategoryView category ={category.id} sortType = {index}/>
       {/* <Box ml={[4, 6, 8]}>
         {posts.map((post) => (
           <Box

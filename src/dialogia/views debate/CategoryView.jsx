@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Heading, Text, Spinner, Flex, Stack } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaCommentAlt } from "react-icons/fa";
 
@@ -7,6 +8,7 @@ const CategoryView = () => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDebates = async () => {
@@ -52,6 +54,7 @@ const CategoryView = () => {
             borderRadius="3xl"
             bg="#F0F0F0"
             p={2}
+            onClick={() => navigate(`/debate/${debate.idDebate}`)}
           >
             <Flex justify="space-between">
                 <Flex>

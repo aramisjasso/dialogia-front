@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Box, Heading, Text, Spinner, Flex } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const ActiveView = () => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDebates = async () => {
@@ -46,7 +48,7 @@ const ActiveView = () => {
 
       {debates.map((debate) => (
         <React.Fragment key={debate.idDebate}>
-          <Box p={4} _hover={{ bg: "gray.50" }}>
+          <Box p={4} _hover={{ bg: "gray.50" }} onClick={() => navigate(`/debate/${debate.idDebate}`)}>
             <Flex align="center" mb={2}>
               <Box
                 display="inline-block"

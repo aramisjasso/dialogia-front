@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import RecommendView from '../../views debate/RecommendView';
 import ActiveView from '../../views debate/ActiveView';
+import CategoryView from '../../views debate/CategoryView';
 import { toaster } from "../../../components/ui/toaster";
 import { Box, Link, For , Stack, Text, Image, Flex } from "@chakra-ui/react";
 

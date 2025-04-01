@@ -12,7 +12,7 @@ const ActiveView = () => {
   useEffect(() => {
     const fetchDebates = async () => {
       try {
-        const response = await axios.get("http://localhost:3020/api/v1/debates");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates`);
         setDebates(response.data);
       } catch (err) {
         setError("Error al cargar los debates");

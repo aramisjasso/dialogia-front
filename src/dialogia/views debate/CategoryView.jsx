@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaCommentAlt } from "react-icons/fa";
 
-const CategoryView = () => {
+const CategoryView = ({category}) => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ const CategoryView = () => {
   useEffect(() => {
     const fetchDebates = async () => {
       try {
-        const response = await axios.get("http://localhost:3020/api/v1/debates");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/category/${category}`);
         setDebates(response.data);
       } catch (err) {
         setError("Error al cargar los debates");
@@ -43,9 +43,7 @@ const CategoryView = () => {
 
   return (
     <Box maxW="auto" mx="auto" p={4}>
-      <Heading as="h1" size="xl" textAlign="center" mb={6}>
-        Debates por Categoría
-      </Heading>
+
 
       <Stack spacing={6}>
         {debates.map((debate) => (

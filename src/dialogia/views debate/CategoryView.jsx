@@ -41,9 +41,7 @@ const CategoryView = ({category}) => {
 
   return (
     <Box maxW="auto" mx="auto" p={4}>
-      <Heading as="h1" size="xl" textAlign="center" mb={6}>
-        Debates por Categoría
-      </Heading>
+
 
       <Stack spacing={6}>
         {debates.map((debate) => (

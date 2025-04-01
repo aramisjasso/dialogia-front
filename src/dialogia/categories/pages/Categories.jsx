@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Grid, Heading, Text, Image, Flex } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { toaster } from "../../../components/ui/toaster";
 
 // Datos de ejemplo para 10 categorías
 const categoriesData = [
@@ -104,9 +105,7 @@ const CategoryCard = ({ category }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (category.id === 1) {
-      navigate('/category');
-    }
+    navigate(`/category/${category.id}`);
   };
 
   return (
@@ -163,6 +162,30 @@ const CategoryCard = ({ category }) => {
 };
 
 const Categories = () => {
+  const [categories, setCategories] = useState([]);
+
+
+  // Obtener categorías desde la API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/category`);
+        if (!response.ok) throw new Error("Error al obtener categorías");
+        const data = await response.json();
+        const sortedData = [...data].sort((a, b) => a.order - b.order);  // Ordenar copia por id
+        setCategories(sortedData);
+      } catch (error) {
+        toaster.create({
+          title: "Error",
+          description: error.message,
+          status: "error",
+          type: "error",
+        });
+      }
+    };
+    fetchCategories();
+
+  }, []);
   return (
     <Box p={[4, 8, 12]}>
       {/* Sección del título */}
@@ -194,7 +217,7 @@ const Categories = () => {
         ]}
         gap={[4, 6, 8]}
       >
-        {categoriesData.map((category) => (
+        {categories.map((category) => (
           <Box key={category.id}>
             {/* Nombre de la categoría */}
             <Text

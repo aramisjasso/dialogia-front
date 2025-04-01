@@ -3,7 +3,7 @@ import { Box, Heading, Text, Spinner, Flex, Stack } from "@chakra-ui/react";
 import axios from "axios";
 import { FaEye, FaCommentAlt } from "react-icons/fa";
 
-const CategoryView = () => {
+const CategoryView = ({category}) => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +11,7 @@ const CategoryView = () => {
   useEffect(() => {
     const fetchDebates = async () => {
       try {
-        const response = await axios.get("http://localhost:3020/api/v1/debates");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/category/${category}`);
         setDebates(response.data);
       } catch (err) {
         setError("Error al cargar los debates");

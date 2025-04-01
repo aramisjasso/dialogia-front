@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Box, Heading, Text, Image, Flex, Button } from "@chakra-ui/react";
 import { FaEye, FaCommentAlt, FaPlus, FaSearch } from "react-icons/fa";
 import { useEffect } from 'react';
-
+import { useParams } from "react-router-dom";
+import CategoryView from '../../views debate/CategoryView';
+import CreateDebateDialog from "../components/CreateDebateDialog"; // Ajusta la ruta según tu estructura
 const posts = [
   {
     id: 1,
@@ -29,6 +31,27 @@ const posts = [
 ];
 
 const Category = () => {
+  const { id } = useParams(); // Obtiene el ID de la URL
+  const [category, setCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/category/${id}`);
+        if (!response.ok) throw new Error("Error al cargar la categoría");
+        const data = await response.json();
+        setCategory(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategory();
+  }, [id]); // Se ejecuta cuando el ID cambi
+
   const [isHovered, setIsHovered] = useState(false);
   const [activeButton, setActiveButton] = useState("activos");
 
@@ -39,9 +62,11 @@ const Category = () => {
   // Lista de botones a mostrar
   const buttons = ["activos", "recientes", "populares", "antiguos"];
 
+  if (!category) return <div>Cargando...</div>;
   return (
     <Box>
       {/* Main Category Card */}
+
       <Box
         position="relative"
         overflow="hidden"
@@ -55,7 +80,7 @@ const Category = () => {
       >
         {/* Category Image */}
         <Image
-          src="https://images.ecestaticos.com/YWOXT_EZ1_zgJzlO_Oc955aHT9g=/0x0:2145x1398/1200x900/filters:fill(white):format(jpg)/f.elconfidencial.com%2Foriginal%2F77a%2Fa2c%2Fc80%2F77aa2cc80d18747df1cfcbc1ba70eccc.jpg"
+          src= {category.background}
           alt="watafak"
           maxH={["40vh", "50vh", "70vh"]}
           objectFit="cover"
@@ -134,15 +159,21 @@ const Category = () => {
             <Text fontWeight="bold" color="gray.500" fontSize={["sm", "md", "lg"]}>
               5024 resultados.
             </Text>
-            <Button
+            <CreateDebateDialog
+            triggerButton={
+              <Button
               bg="black"
               color="white"
               _hover={{ bg: "gray.800" }}
               fontSize={["sm", "md", "lg"]}
               mb={[2, 0]}
-            >
-              Agregar debate <FaPlus color="white" style={{ marginLeft: "4px" }} />
-            </Button>
+              >
+                Agregar debate <FaPlus color="white" style={{ marginLeft: "4px" }} />
+              </Button>
+            }
+            categoryId={id}
+          />
+            
           </Flex>
           {/* Right search bar */}
           <Flex align="center" mb={[2, 0]}>
@@ -164,7 +195,8 @@ const Category = () => {
       </Box>
 
       {/* Posts */}
-      <Box ml={[4, 6, 8]}>
+      <CategoryView category ={category.id}/>
+      {/* <Box ml={[4, 6, 8]}>
         {posts.map((post) => (
           <Box
             key={post.id}
@@ -215,7 +247,7 @@ const Category = () => {
             </Flex>
           </Box>
         ))}
-      </Box>
+      </Box> */}
     </Box>
   );
 };

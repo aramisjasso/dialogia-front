@@ -61,7 +61,7 @@ const RecommendView = () => {
                 fontSize="sm"
                 fontWeight="500"
               >
-                {debate.category.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                {debate.category.toLowerCase().split(' ').map(word => word.charAt(0).toLowerCase() + word.slice(1)).join(' ')}
               </Box>
               <Text fontSize="sm" color="gray.500" ml={3}>
                 {new Date(debate.datareg).toLocaleDateString("es-ES", {

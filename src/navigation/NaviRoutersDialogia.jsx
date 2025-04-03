@@ -118,7 +118,7 @@ const NaviRoutersDialogia = () => {
     {
       path: "/categories",
       element: (
-        <ProtectedRoute requireAuth={false}>
+        <ProtectedRoute requireAuth={true}>
           <Layout>
             <Categories />
           </Layout>
@@ -128,7 +128,7 @@ const NaviRoutersDialogia = () => {
     {
       path: "/category/:id",
       element: (
-        <ProtectedRoute requireAuth={false}>
+        <ProtectedRoute requireAuth={true}>
           <Layout>
             <Category />
           </Layout>

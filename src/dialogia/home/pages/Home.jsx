@@ -5,8 +5,8 @@ import RecommendView from '../../views debate/RecommendView';
 import ActiveView from '../../views debate/ActiveView';
 import CategoryView from '../../views debate/CategoryView';
 import { toaster } from "../../../components/ui/toaster";
-import { Box, Link, For , Stack, Text, Image, Flex } from "@chakra-ui/react";
-
+import { Box, Link, For , Stack, Text, Button, Flex } from "@chakra-ui/react";
+import CreateDebateDialog from '../../categories/components/CreateDebateDialog';
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
@@ -58,6 +58,11 @@ const Home = () => {
             </Link>
           )}
         </For>
+        <CreateDebateDialog
+            triggerButton={
+              <Button colorScheme="blue">Crear Debate</Button>
+            }
+          />
       </Flex>
       <RecommendView />
     </Box>

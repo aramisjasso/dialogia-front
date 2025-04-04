@@ -4,6 +4,7 @@ import { HiCog } from "react-icons/hi"
 import { auth } from '../../firebase/firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from "react-router-dom";
+import { LuSearch } from "react-icons/lu"
 
 const NavTab = () => {
   const navigate = useNavigate();
@@ -41,6 +42,10 @@ const NavTab = () => {
           </Link>
         )}
       </For>
+      <LuSearch
+      style={{ cursor: "pointer" }}       // Para que parezca un enlace
+      color='white'
+      onClick={() => navigate('/search')}/>
       <Flex bg="gray.800" justifyContent="space-between" alignItems="center">
         
         <Avatar.Root colorPalette="gray">

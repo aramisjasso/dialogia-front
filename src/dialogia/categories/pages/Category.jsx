@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useEffect } from 'react';
+import React, { useState,  } from "react";
 import { Box, Heading, Text, Image, Flex, Button } from "@chakra-ui/react";
 import { FaEye, FaCommentAlt, FaPlus, FaSearch } from "react-icons/fa";
-import { useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import CategoryView from '../../views debate/CategoryView';
 import CreateDebateDialog from "../components/CreateDebateDialog"; // Ajusta la ruta según tu estructura
@@ -32,6 +32,7 @@ const posts = [
 
 const Category = () => {
   const { id } = useParams(); // Obtiene el ID de la URL
+
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,6 +55,7 @@ const Category = () => {
 
   const [isHovered, setIsHovered] = useState(false);
   const [activeButton, setActiveButton] = useState("activos");
+  const [index, setIndex]=useState(1);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -136,7 +138,7 @@ const Category = () => {
               bg={activeButton === btn ? "rgba(5, 5, 5, 0.7)" : "transparent"}
               color="white"
               _hover={{ bg: "rgba(10, 10, 10, 0.4)" }}
-              onClick={() => setActiveButton(btn)}
+              onClick={() => {setActiveButton(btn); setIndex(index)}}
               borderTopLeftRadius={index === 0 ? "full" : 0}
               borderBottomLeftRadius={index === 0 ? "full" : 0}
               borderTopRightRadius={index === buttons.length - 1 ? "full" : 0}
@@ -195,7 +197,7 @@ const Category = () => {
       </Box>
 
       {/* Posts */}
-      <CategoryView category ={category.id}/>
+      <CategoryView category ={category.id} sortType = {index}/>
       {/* <Box ml={[4, 6, 8]}>
         {posts.map((post) => (
           <Box

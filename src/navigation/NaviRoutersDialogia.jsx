@@ -14,6 +14,7 @@ import RegisterInLogin from "../dialogia/login/pages/RegisterInLogin";
 import RecommendView from '../dialogia/views debate/RecommendView'
 import Debate from '../dialogia/debate/Debate';
 import Category from "../dialogia/categories/pages/Category";
+import Search from "../dialogia/search/pages/Search";
 
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
@@ -118,7 +119,7 @@ const NaviRoutersDialogia = () => {
     {
       path: "/categories",
       element: (
-        <ProtectedRoute requireAuth={false}>
+        <ProtectedRoute requireAuth={true}>
           <Layout>
             <Categories />
           </Layout>
@@ -128,9 +129,19 @@ const NaviRoutersDialogia = () => {
     {
       path: "/category/:id",
       element: (
-        <ProtectedRoute requireAuth={false}>
+        <ProtectedRoute requireAuth={true}>
           <Layout>
             <Category />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/search",
+      element: (
+        <ProtectedRoute requireAuth={true}>
+          <Layout>
+            <Search />
           </Layout>
         </ProtectedRoute>
       ),

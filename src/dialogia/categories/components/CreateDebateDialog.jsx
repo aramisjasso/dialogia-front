@@ -37,7 +37,8 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/category`);
         if (!response.ok) throw new Error("Error al obtener categorías");
         const data = await response.json();
-        setCategories(data);
+        const sortedData = [...data].sort((a, b) => a.order - b.order);  // Ordenar copia por id
+        setCategories(sortedData);
       } catch (error) {
         toaster.create({
           title: "Error",

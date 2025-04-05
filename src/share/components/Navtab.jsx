@@ -48,10 +48,10 @@ const NavTab = () => {
       onClick={() => navigate('/search')}/>
       <Flex bg="gray.800" justifyContent="space-between" alignItems="center">
         
-        <Avatar.Root colorPalette="gray">
+        <Avatar.Root colorPalette="gray" style={{ cursor: "pointer" }} onClick={() => navigate('/profile')}>
           <Avatar.Fallback />
           <Avatar.Image src="https://bit.ly/broken-link" />
-        </Avatar.Root>
+        </Avatar.Root >
         <Button colorScheme="gray" onClick={handleLogout}>
           Cerrar Sesión
         </Button>

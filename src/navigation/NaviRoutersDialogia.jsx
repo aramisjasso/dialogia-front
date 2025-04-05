@@ -15,7 +15,8 @@ import RecommendView from '../dialogia/views debate/RecommendView'
 import Debate from '../dialogia/debate/Debate';
 import Category from "../dialogia/categories/pages/Category";
 import Search from "../dialogia/search/pages/Search";
-
+import SelectInterests from "../dialogia/categories/pages/SelectInterests";
+import Profile from "../dialogia/profile/pages/Profile";
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // Función para crear el router (recibe el estado del usuario como parámetro)
@@ -89,7 +90,7 @@ const NaviRoutersDialogia = () => {
     {
       path: "/home",
       element: (
-        <ProtectedRoute requireAuth={true}>
+        <ProtectedRoute requireAuth={true} checkInterests={true}>
           <Layout>
             <Home />
           </Layout>
@@ -132,6 +133,26 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={true}>
           <Layout>
             <Category />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/select-interests",
+      element: (
+        <ProtectedRoute requireAuth={true} checkInterests={false}>
+          <Layout>
+            <SelectInterests />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/profile",
+      element: (
+        <ProtectedRoute requireAuth={true} checkInterests={true}>
+          <Layout>
+            <Profile />
           </Layout>
         </ProtectedRoute>
       ),

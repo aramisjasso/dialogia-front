@@ -3,16 +3,28 @@ import { useParams } from 'react-router-dom';
 import { Box, Heading, Text, Spinner, Flex, Link } from '@chakra-ui/react';
 import axios from 'axios';
 import { FaEye, FaBell, FaUser } from "react-icons/fa";
+import ChoosePosition from './ChoosePosition';
+import { useAuth } from '../../contexts/hooks/useAuth';
 
 const Debate = () => {
   const { id } = useParams();
   const [debate, setDebate] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { currentUser, loading: authLoading } = useAuth();
+
+  // Calcula userPosition solo cuando debate y currentUser estén disponibles
+  const userPosition = debate && currentUser 
+    ? debate.peopleInFavor.includes(currentUser.username) 
+      ? "InFavor" 
+      : debate.peopleAgaist.includes(currentUser.username) 
+        ? "Agaist" 
+        : null
+    : null;
 
   useEffect(() => {
     const fetchDebate = async () => {
       try {
-        const response = await axios.get(`http://localhost:3020/api/v1/debates/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/${id}`);
         setDebate(response.data);
       } catch (error) {
         console.error('Error fetching debate:', error);
@@ -23,15 +35,18 @@ const Debate = () => {
     fetchDebate();
   }, [id]);
 
-  if (loading) {
+  if (loading  || authLoading) {
     return (
       <Box textAlign="center" mt={10}>
         <Spinner size="xl" />
       </Box>
     );
-}
+  }
 
   if (!debate) return <Text>Debate no encontrado</Text>;
+
+  const isCreator = currentUser && debate.username === currentUser.username; 
+  //console.log(userPosition);
 
   // Función para detectar y formatear URLs
   const formatRefs = (refs) => {
@@ -72,7 +87,7 @@ const Debate = () => {
 
   return (
     <Box maxW="auto" mx="auto" p={6} >
-    <Box maxW="auto" mx="auto" p={6} borderWidth="1px"
+    <Box maxW="auto" mx="auto" p={6} borderWidth="1px" mb={6}
 borderRadius="3xl" >
       {/* Sección superior */}
       <Flex justify="space-between" align="flex-start" mb={6}>
@@ -137,6 +152,17 @@ borderRadius="3xl" >
         {formatRefs(debate.refs)}
       </Box>
       </Box>
+      <ChoosePosition
+        isCreator={isCreator}
+        //isCreator = {false} //testear postura sin ser creador
+        initialUserVoted={userPosition !== null}
+        initialPosition={userPosition}
+        peopleInFavor={debate.peopleInFavor || []}
+        peopleAgaist={debate.peopleAgaist || []}
+        comments={debate.comments || []}
+        username={currentUser?.username}
+        id = {id}
+      />
     </Box>
   );
 };

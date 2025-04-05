@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Heading, Text, Spinner, Flex, Link } from '@chakra-ui/react';
+import { Box, Heading, Text, Spinner, Flex, Link, Badge } from '@chakra-ui/react';
 import axios from 'axios';
 import { FaEye, FaBell, FaUser } from "react-icons/fa";
 import ChoosePosition from './ChoosePosition';
@@ -11,21 +11,22 @@ const Debate = () => {
   const [debate, setDebate] = useState(null);
   const [loading, setLoading] = useState(true);
   const { currentUser, loading: authLoading } = useAuth();
-
-  // Calcula userPosition solo cuando debate y currentUser estén disponibles
-  const userPosition = debate && currentUser 
-    ? debate.peopleInFavor.includes(currentUser.username) 
-      ? "InFavor" 
-      : debate.peopleAgaist.includes(currentUser.username) 
-        ? "Agaist" 
-        : null
-    : null;
+  const [userPosition, setUserPosition] = useState(null);
 
   useEffect(() => {
     const fetchDebate = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/${id}`);
         setDebate(response.data);
+
+        if (response.data && currentUser) {
+          const initialPosition = 
+            response.data.peopleInFavor.includes(currentUser.username) ? "InFavor" :
+            response.data.peopleAgaist.includes(currentUser.username) ? "Agaist" :
+            null;
+          setUserPosition(initialPosition);
+        }
+
       } catch (error) {
         console.error('Error fetching debate:', error);
       } finally {
@@ -33,7 +34,11 @@ const Debate = () => {
       }
     };
     fetchDebate();
-  }, [id]);
+  }, [id, currentUser]);
+
+  const handlePositionChange = (newPosition) => {
+    setUserPosition(newPosition);
+  };
 
   if (loading  || authLoading) {
     return (
@@ -86,9 +91,11 @@ const Debate = () => {
   };
 
   return (
-    <Box maxW="auto" mx="auto" p={6} >
+    <Box  maxW="100vw" mx="auto" p={6} position={"relative"} overflowX="hidden"> 
+
     <Box maxW="auto" mx="auto" p={6} borderWidth="1px" mb={6}
-borderRadius="3xl" >
+      borderRadius="3xl" position={"relative"}>
+
       {/* Sección superior */}
       <Flex justify="space-between" align="flex-start" mb={6}>
         {/* Columna izquierda (Usuario) */}
@@ -154,15 +161,41 @@ borderRadius="3xl" >
       </Box>
       <ChoosePosition
         isCreator={isCreator}
-        //isCreator = {false} //testear postura sin ser creador
         initialUserVoted={userPosition !== null}
         initialPosition={userPosition}
+        onPositionChange={handlePositionChange}
         peopleInFavor={debate.peopleInFavor || []}
         peopleAgaist={debate.peopleAgaist || []}
         comments={debate.comments || []}
         username={currentUser?.username}
         id = {id}
       />
+
+      {userPosition !== null && ( 
+        <Box
+          position="absolute"
+          top={1}
+          right={0}
+          transform="translateX(10%)"
+          zIndex={1}
+        >
+          <Badge 
+            bg={userPosition === "InFavor" ? "#00A76C" : "#C60000"} 
+            color="white"
+            variant="solid"
+            fontSize="lg"
+            pl={0}
+            py={2.5}
+            minWidth="200px"
+            display="inline-flex" 
+            justifyContent="center"
+            borderRadius="full"
+            boxShadow="md"
+          >
+            {userPosition === "InFavor" ? "A FAVOR" : "EN CONTRA"}
+          </Badge>
+        </Box>
+      )}
     </Box>
   );
 };

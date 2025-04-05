@@ -1,13 +1,14 @@
 import { Button, Flex, Text, Badge, Box, Image  } from "@chakra-ui/react";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { toaster } from "../../components/ui/toaster";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { ConfirmDialog } from "./modals/ConfirmDialog"
 
 const ChoosePosition = ({ 
   isCreator, 
   initialUserVoted, 
   initialPosition, 
+  onPositionChange,
   peopleInFavor = [], 
   peopleAgaist = [], 
   comments = [],
@@ -20,31 +21,15 @@ const ChoosePosition = ({
   const [totalInFavor, setTotalInFavor] = useState(peopleInFavor.length);
   const [totalAgaist, setTotalAgaist] = useState(peopleAgaist.length);
 
-  console.log(isCreator, initialUserVoted, initialPosition, peopleInFavor, peopleAgaist, comments, username)
-
-  // Lógica para determinar si el usuario ya votó
-  const hasUserVoted = () => {
-    return userVoted || peopleInFavor.includes(username) || peopleAgaist.includes(username);
-  };
+  useEffect(() => {
+    setCurrentPosition(initialPosition);
+    setUserVoted(initialUserVoted);
+  }, [initialPosition, initialUserVoted]);
 
   const handleVote = async (position) => {
     setUserVoted(true);
-    // Actualizar contadores según la posición
-    if (position === "InFavor") {
-      setTotalInFavor(prev => prev + 1);
-      // Si estaba en contra, restar del otro contador
-      if (currentPosition === "Agaist") {
-        setTotalAgaist(prev => prev - 1);
-      }
-    } else {
-      setTotalAgaist(prev => prev + 1);
-      // Si estaba a favor, restar del otro contador
-      if (currentPosition === "InFavor") {
-        setTotalInFavor(prev => prev - 1);
-      }
-    }
-
     setCurrentPosition(position);
+    onPositionChange(position);
 
     toaster.create({
       title: "¡Postura registrada!",
@@ -62,36 +47,30 @@ const ChoosePosition = ({
   };
 
   const handleReset = async () => {
-    if (currentPosition === "InFavor") {
-      setTotalInFavor(prev => prev - 1);
-    } else if (currentPosition === "Agaist") {
-      setTotalAgaist(prev => prev - 1);
-    }
-
     setUserVoted(false);
     setCurrentPosition(null);
+    onPositionChange(null);
+
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}/vote`, {
+      username: username,
+      position: null 
+    });
+
+    setTotalInFavor(response.data.peopleInFavor.length);
+    setTotalAgaist(response.data.peopleAgaist.length);
 
     toaster.create({
       title: "Postura reiniciada",
       status: "success",
       duration: 2000,
     });
-
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}/vote`, {
-      username: username,
-      position: null  // Indica reset
-    });
-
-    setTotalInFavor(response.data.peopleInFavor.length);
-    setTotalAgaist(response.data.peopleAgaist.length);
   };
 
-  const handleChangePosition = () => {
+  const handleChangePosition = async () => {
     const newPosition = currentPosition === "InFavor" ? "Agaist" : "InFavor";
-    handleVote(newPosition);
+    await handleVote(newPosition);
   };
 
-  // Contadores
   const commentsInFavor = comments.filter(c => c.position).length;
   const commentsAgaist = comments.filter(c => !c.position).length;
 
@@ -129,9 +108,9 @@ const ChoosePosition = ({
 
   </Flex>
 
-  {/* Componente central (dinámico) */}
+  {/* Componente central */}
   <Box flex="none" width="25%">
-    {hasUserVoted() || isCreator ? (
+    {userVoted || isCreator ? (
       <Flex direction="column" align="center" gap={3} width="100%">
         {/* Postura actual */}
         <Flex align="center">
@@ -156,36 +135,53 @@ const ChoosePosition = ({
         {/* Botones de acción */}
         {!isCreator && (
           <>
-            <Button
-              colorScheme={currentPosition === "InFavor" ? "blackAlpha" : "gray"}
-              variant={currentPosition === "InFavor" ? "solid" : "outline"}
-              size="md"
-              width="60%"  // 80% del contenedor padre
-              minWidth="200px"  // Ancho mínimo fijo
-              borderRadius="lg" 
-              borderColor={currentPosition === "InFavor" ? undefined : "black"}
-              _hover={{
-                borderColor: currentPosition === "InFavor" ? undefined : "black",
-              }}
-              onClick={handleChangePosition}
+            <ConfirmDialog
+              title="Cambiar postura"
+              message="¿Estás seguro de cambiar tu voto?"
+              confirmText="Sí, cambiar"
+              onConfirm={handleChangePosition}
             >
-              {currentPosition === "InFavor" ? "VOTAR EN CONTRA" : "VOTAR A FAVOR"}
-            </Button>
+              <Box width="100%" display="flex" justifyContent="center">
+                <Button
+                  colorScheme={currentPosition === "InFavor" ? "blackAlpha" : "gray"}
+                  variant={currentPosition === "InFavor" ? "solid" : "outline"}
+                  size="md"
+                  width="60%"  // 80% del contenedor padre
+                  minWidth="300px"  // Ancho mínimo fijo
+                  borderRadius="lg" 
+                  borderColor={currentPosition === "InFavor" ? undefined : "black"}
+                  _hover={{
+                    borderColor: currentPosition === "InFavor" ? undefined : "black",
+                  }}
+                  mx="auto"
+                >
+                  {currentPosition === "InFavor" ? "VOTAR EN CONTRA" : "VOTAR A FAVOR"}
+                </Button>
+              </Box>
+            </ConfirmDialog>
 
-            <Button 
-              colorScheme="gray" 
-              variant="ghost"
-              size="md"
-              width="60%"  // 80% del contenedor padre
-              minWidth="200px"  // Ancho mínimo fijo
-              borderColor="#6B6B6B" // Color gris oscuro para el borde
-              bg="#B3B3B3" // Color gris claro para el texto
-              color="white"
-              borderRadius="lg" 
-              onClick={handleReset}
+            <ConfirmDialog
+              title="Reiniciar postura"
+              message="¿Quieres eliminar tu voto?"
+              onConfirm={handleReset}
             >
-              REINICIAR POSTURA
-            </Button>
+              <Box width="100%" display="flex" justifyContent="center">
+                <Button 
+                  colorScheme="gray" 
+                  variant="ghost"
+                  size="md"
+                  width="60%"  // 80% del contenedor padre
+                  minWidth="300px"  // Ancho mínimo fijo
+                  borderColor="#6B6B6B" // Color gris oscuro para el borde
+                  bg="#B3B3B3" // Color gris claro para el texto
+                  color="white"
+                  borderRadius="lg" 
+                  mx="auto"
+                >
+                  REINICIAR POSTURA
+                </Button>
+              </Box>
+            </ConfirmDialog>
           </>
         )}
 
@@ -194,10 +190,9 @@ const ChoosePosition = ({
           variant={currentPosition === "InFavor" ? "outline" : "solid"}
           size="md"
           width="60%"  // 80% del contenedor padre
-          minWidth="200px"  // Ancho mínimo fijo
+          minWidth="300px"  // Ancho mínimo fijo
           borderColor="black" 
           borderRadius="lg" 
-          //onClick={handleReset}
         >
           AGREGAR UN COMENTARIO
         </Button>
@@ -211,7 +206,6 @@ const ChoosePosition = ({
             colorScheme="gray" 
             variant="outline"
             onClick={() => handleVote("InFavor")}
-            //leftIcon={<FaThumbsUp />}
             height="72px"          // Altura fija
             minWidth="160px"       // Ancho mínimo
             borderRadius="3xl"    // Bordes completamente redondos
@@ -232,7 +226,6 @@ const ChoosePosition = ({
             colorScheme="blackAlpha" 
             variant="solid"
             onClick={() => handleVote("Agaist")}
-            //leftIcon={<FaThumbsDown />}
             height="72px"          // Misma altura
             minWidth="160px"       // Mismo ancho mínimo  
             borderRadius="3xl"    // Bordes igualmente redondos

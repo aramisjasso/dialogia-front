@@ -1,5 +1,5 @@
 "use client"
-import { Button, Dialog, Portal, useDialog, Box } from "@chakra-ui/react"
+import { Button, Dialog, Portal, useDialog, Box, CloseButton } from "@chakra-ui/react"
 import { useRef } from 'react';
 
 export const ConfirmDialog = ({ 
@@ -7,7 +7,6 @@ export const ConfirmDialog = ({
   message,
   onConfirm,
   confirmText = "Confirmar",
-  cancelText = "Cancelar",
   children
 }) => {
   const dialog = useDialog();
@@ -34,16 +33,16 @@ export const ConfirmDialog = ({
             
             <Dialog.Body>{message}</Dialog.Body>
             
-            <Dialog.Footer gap={3}>
-              <Dialog.CloseTrigger asChild>
-                <Button variant="outline" ref={closeButtonRef}>
-                  {cancelText}
-                </Button>
-              </Dialog.CloseTrigger>
+            <Dialog.Footer> {/* ← Esta línea */}
+            <Dialog.ActionTrigger asChild>
               <Button onClick={handleConfirm}>
                 {confirmText}
               </Button>
+              </Dialog.ActionTrigger>
             </Dialog.Footer>
+            <Dialog.CloseTrigger asChild>
+                    <CloseButton size="sm" />
+                  </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>

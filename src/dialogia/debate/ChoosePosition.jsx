@@ -137,8 +137,8 @@ const ChoosePosition = ({
           <>
             <ConfirmDialog
               title="Cambiar postura"
-              message="¿Estás seguro de cambiar tu voto?"
-              confirmText="Sí, cambiar"
+              message="¿Estás seguro de cambiar tu postura?"
+              confirmText="Confirmar"
               onConfirm={handleChangePosition}
             >
               <Box width="100%" display="flex" justifyContent="center">
@@ -162,7 +162,7 @@ const ChoosePosition = ({
 
             <ConfirmDialog
               title="Reiniciar postura"
-              message="¿Quieres eliminar tu voto?"
+              message="¿Estás seguro de reiniciar tu postura?"
               onConfirm={handleReset}
             >
               <Box width="100%" display="flex" justifyContent="center">

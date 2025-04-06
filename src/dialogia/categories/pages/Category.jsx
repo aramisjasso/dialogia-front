@@ -97,7 +97,7 @@ const Category = () => {
             ml={["20px", "30px", "40px"]}
             mb={["20px", "30px", "40px"]}
           >
-            FILOSOFIA
+            {category.name.toUpperCase()}
           </Heading>
           <Text
             fontSize={["14px", "16px", "18px"]}
@@ -105,7 +105,7 @@ const Category = () => {
             ml={["20px", "30px", "45px"]}
             maxW={["300px", "350px", "400px"]}
           >
-            Foro para todos los debates relacionados a la filosofía, el cuestionamiento del pensamiento humano y el razonamiento profundo.
+            {category.description}
           </Text>
         </Box>
 

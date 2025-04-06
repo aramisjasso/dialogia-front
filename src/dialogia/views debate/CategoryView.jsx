@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaCommentAlt } from "react-icons/fa";
 
-const CategoryView = ({category, sortType }) => {
+const CategoryView = ({category, sortType, search }) => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -15,7 +15,7 @@ const CategoryView = ({category, sortType }) => {
   useEffect(() => {
     const fetchDebates = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/category/${category}?sort=${querry[sortType]}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/category/${category}?sort=${querry[sortType]}&search=${search}`);
         setDebates(response.data);
       } catch (err) {
         setError("Error al cargar los debates");
@@ -25,7 +25,7 @@ const CategoryView = ({category, sortType }) => {
       }
     };
     fetchDebates();
-  }, [sortType]);
+  }, [sortType, search]);
 
   if (loading) {
     return (

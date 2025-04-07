@@ -12,6 +12,7 @@ const Category = () => {
 
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(0);
 
   const [inputValue, setInputValue] = useState(""); // Estado temporal para el input
   const [searchQuery, setSearchQuery] = useState("");
@@ -75,7 +76,7 @@ const Category = () => {
         {/* Category Image */}
         <Image
           src= {category.background}
-          alt="watafak"
+          alt={category.name}
           maxH={["40vh", "50vh", "70vh"]}
           objectFit="cover"
           width="100%"
@@ -151,7 +152,7 @@ const Category = () => {
               Publicaciones encontradas
             </Text>
             <Text fontWeight="bold" color="gray.500" fontSize={["sm", "md", "lg"]}>
-              5024 resultados.
+              {quantity} resultados.
             </Text>
             <CreateDebateDialog
             triggerButton={
@@ -196,7 +197,7 @@ const Category = () => {
       </Box>
 
       {/* Posts */}
-      <CategoryView category ={category.id} sortType = {index} search={searchQuery} />
+      <CategoryView category ={category.id} sortType = {index} search={searchQuery} quantity= {setQuantity} />
       {/* <Box ml={[4, 6, 8]}>
         {posts.map((post) => (
           <Box

@@ -13,13 +13,35 @@ const RegisterInLogin= ()=>{
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [user, setUser] = useState(null);
+    const USERNAME_MAX_LENGTH = 20; // Máximo 20 caracteres
 
-        useEffect(() => {
-          const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-          });
-          return () => unsubscribe();
-        }, []);
+    const blockInvalidChars = (e) => {
+      // Bloquea caracteres prohibidos: espacio, @, /, \, .
+      if ([' ', '@', '/', '\\', '.'].includes(e.key)) {
+        e.preventDefault();
+      }
+      // Bloquea si ya se alcanzó el límite y no es una tecla de control (como Backspace)
+      if (username.length >= USERNAME_MAX_LENGTH && e.key !== 'Backspace' && e.key !== 'Delete') {
+        e.preventDefault();
+      }
+    };
+
+    const handleUsernameChange = (e) => {
+      const inputValue = e.target.value;
+      // Filtra caracteres no permitidos y trunca si es necesario
+      const filteredValue = inputValue
+        .replace(/[@\/\\ .]/g, '') // Elimina @, /, \, ., y espacios
+        .slice(0, USERNAME_MAX_LENGTH); // Corta a 20 caracteres
+      setUsername(filteredValue);
+    };
+
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+      });
+      return () => unsubscribe();
+    }, []);
+    
     const checkUsernameExists = async (username) => {
         const userDoc = await getDoc(doc(db, "usernames", username));
         return userDoc.exists();
@@ -106,12 +128,18 @@ const RegisterInLogin= ()=>{
           </Text>*/}
     
           <Flex direction="column" gap={4} mt={6}>
+          <Flex justifyContent="space-between" alignItems="center">
             <Text color="white">Usuario</Text>
+            <Text color="gray.400" fontSize="sm">
+              {username.length}/{USERNAME_MAX_LENGTH}
+            </Text>
+          </Flex>
             <Field.Root>
             <Input
               placeholder="Nombre de usuario"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleUsernameChange}
+              onKeyDown={blockInvalidChars} // <- Bloquea al teclear
               bg="blackAlpha.800" // Fondo oscuro para los inputs
               color="white" // Texto blanco en los inputs
               borderColor="gray.600" // Borde gris para contraste

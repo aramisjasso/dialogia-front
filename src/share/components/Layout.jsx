@@ -1,7 +1,7 @@
 // src/components/Layout.jsx
 import React from "react";
 import { Flex, Box } from "@chakra-ui/react";
-import NavTab from "./Navtab";
+import NavTab from "./Navtab.jsx";
 import Footer from "../../share/footer/Footer.jsx"; // Importa el Footer
 const Layout = ({ children }) => {
   return (

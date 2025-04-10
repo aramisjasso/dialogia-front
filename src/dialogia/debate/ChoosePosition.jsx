@@ -51,7 +51,7 @@ const ChoosePosition = ({
     setCurrentPosition(null);
     onPositionChange(null);
 
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}/vote`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}/position`, {
       username: username,
       position: null 
     });

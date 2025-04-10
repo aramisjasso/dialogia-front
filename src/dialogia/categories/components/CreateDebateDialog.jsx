@@ -263,7 +263,6 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
                   Imagen (opcional)
                   <Input
                     type="file"
-                    disabled
                     placeholder="Funcionalidad pendiente"
                   />
                 </Box>

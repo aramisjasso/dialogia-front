@@ -19,6 +19,8 @@ import SelectInterests from "../dialogia/categories/pages/SelectInterests";
 import Profile from "../dialogia/profile/pages/Profile";
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
+// import ImageUploader from "../dialogia/testing/ImageUploader";
+import ParentComponent from "../dialogia/testing/ParentComponent";
 // Función para crear el router (recibe el estado del usuario como parámetro)
 const NaviRoutersDialogia = () => {
   return createBrowserRouter([
@@ -163,6 +165,16 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={true}>
           <Layout>
             <Search />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/test",
+      element: (
+        <ProtectedRoute requireAuth={true}>
+          <Layout>
+            <ParentComponent />
           </Layout>
         </ProtectedRoute>
       ),

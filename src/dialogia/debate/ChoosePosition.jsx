@@ -97,7 +97,7 @@ const ChoosePosition = ({
     </Flex>
 
     <Image 
-      src="../../../public/A_FAVOR.png"
+      src="/A_FAVOR.png"
       ml={16}
       height="120px"      
       width="auto"        
@@ -243,7 +243,7 @@ const ChoosePosition = ({
   {/* Sección EN CONTRA (derecha) */}
   <Flex gap={2} align="flex-end">
       <Image 
-          src="../../../public/EN_CONTRA.png"
+          src="/EN_CONTRA.png"
           mr={16}
           height="120px"      
           width="auto"        

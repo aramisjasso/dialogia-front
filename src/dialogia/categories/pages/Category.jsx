@@ -5,57 +5,50 @@ import { FaEye, FaCommentAlt, FaPlus, FaSearch } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import CategoryView from '../../views debate/CategoryView';
 import CreateDebateDialog from "../components/CreateDebateDialog"; // Ajusta la ruta según tu estructura
-const posts = [
-  {
-    id: 1,
-    user: "Mark Wayne",
-    date: "13/02/2024  7:40pm",
-    text: "Nadie en realidad tiene el control sobre sus decisiones",
-    avatar:
-      "https://cdn-icons-png.flaticon.com/512/10337/10337609.png",
-    views: 193,
-    favor: 39,
-    against: 32,
-  },
-  {
-    id: 2,
-    user: "Sasha Smith",
-    date: "13/02/2024   6:10 am",
-    text: "La consciencia humana está evolucionando colectivamente",
-    avatar:
-      "https://cdn-icons-png.flaticon.com/512/10337/10337609.png",
-    views: 323,
-    favor: 22,
-    against: 13,
-  },
-];
+
 
 const Category = () => {
   const { id } = useParams(); // Obtiene el ID de la URL
 
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(0);
+
+  const [inputValue, setInputValue] = useState(""); // Estado temporal para el input
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchQuery(inputValue); // Fija el valor final
+  };
+
+  // Manejar Enter en el input
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" ) {
+      setSearchQuery(inputValue); // Fija el valor final
+    }
+  };
 
   useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/category/${id}`);
-        if (!response.ok) throw new Error("Error al cargar la categoría");
-        const data = await response.json();
-        setCategory(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCategory();
   }, [id]); // Se ejecuta cuando el ID cambi
-
+  
+  const fetchCategory = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/category/${id}`);
+      if (!response.ok) throw new Error("Error al cargar la categoría");
+      const data = await response.json();
+      console.log(searchQuery)
+      setCategory(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const [isHovered, setIsHovered] = useState(false);
   const [activeButton, setActiveButton] = useState("activos");
-  const [index, setIndex]=useState(1);
+  const [index, setIndex]=useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -83,7 +76,7 @@ const Category = () => {
         {/* Category Image */}
         <Image
           src= {category.background}
-          alt="watafak"
+          alt={category.name}
           maxH={["40vh", "50vh", "70vh"]}
           objectFit="cover"
           width="100%"
@@ -105,7 +98,7 @@ const Category = () => {
             ml={["20px", "30px", "40px"]}
             mb={["20px", "30px", "40px"]}
           >
-            FILOSOFIA
+            {category.name.toUpperCase()}
           </Heading>
           <Text
             fontSize={["14px", "16px", "18px"]}
@@ -113,7 +106,7 @@ const Category = () => {
             ml={["20px", "30px", "45px"]}
             maxW={["300px", "350px", "400px"]}
           >
-            Foro para todos los debates relacionados a la filosofía, el cuestionamiento del pensamiento humano y el razonamiento profundo.
+            {category.description}
           </Text>
         </Box>
 
@@ -159,7 +152,7 @@ const Category = () => {
               Publicaciones encontradas
             </Text>
             <Text fontWeight="bold" color="gray.500" fontSize={["sm", "md", "lg"]}>
-              5024 resultados.
+              {quantity} resultados.
             </Text>
             <CreateDebateDialog
             triggerButton={
@@ -178,26 +171,33 @@ const Category = () => {
             
           </Flex>
           {/* Right search bar */}
-          <Flex align="center" mb={[2, 0]}>
-            <FaSearch color="gray" style={{ marginRight: "8px" }} />
-            <Box
-              as="input"
-              placeholder="Buscar un debate"
-              border="1px solid"
-              borderColor="gray.300"
-              borderRadius="md"
-              px={4}
-              py={1}
-              width={["70vw", "50vw", "50vw"]}
-              textAlign="left"
-              fontSize={["sm", "md", "lg"]}
-            />
-          </Flex>
+          <form onSubmit={handleSearch}>
+            <Box display="flex" alignItems="center">
+              <button type="submit">
+                <FaSearch color="gray" style={{ marginRight: "8px" }} />
+              </button>
+              <Box
+                as="input"
+                placeholder="Buscar un debate"
+                border="1px solid"
+                borderColor="gray.300"
+                borderRadius="md"
+                px={4}
+                py={1}
+                width={["70vw", "30vw", "50vw"]}
+                textAlign="left"
+                fontSize={["sm", "md", "lg"]}
+                value={inputValue} // Usa inputValue, no searchQuery
+                onChange={(e) => setInputValue(e.target.value)} // Actualiza solo el estado temporal
+                onKeyDown={handleKeyDown}
+              />
+            </Box>
+          </form>
         </Flex>
       </Box>
 
       {/* Posts */}
-      <CategoryView category ={category.id} sortType = {index}/>
+      <CategoryView category ={category.id} sortType = {index} search={searchQuery} quantity= {setQuantity} />
       {/* <Box ml={[4, 6, 8]}>
         {posts.map((post) => (
           <Box

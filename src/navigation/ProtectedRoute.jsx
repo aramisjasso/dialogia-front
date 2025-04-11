@@ -33,6 +33,8 @@ const ProtectedRoute = ({ children, requireAuth, checkInterests = false }) => {
 
           const data = await response.json();
           setUserData(data);
+          localStorage.setItem("username", data.username);
+          console.log(data.username);
         } catch (error) {
           console.error("Error fetching user data:", error);
           setUserData(null);

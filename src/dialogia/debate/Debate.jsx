@@ -5,6 +5,7 @@ import axios from 'axios';
 import { FaEye, FaBell, FaUser } from "react-icons/fa";
 import ChoosePosition from './ChoosePosition';
 import { useAuth } from '../../contexts/hooks/useAuth';
+import Comments from './Comments';
 
 const Debate = () => {
   const { id } = useParams();
@@ -171,7 +172,7 @@ const Debate = () => {
         username={currentUser?.username}
         id = {id}
       />
-
+      <Comments/>
       {userPosition !== null && ( 
         <Box
           position="absolute"

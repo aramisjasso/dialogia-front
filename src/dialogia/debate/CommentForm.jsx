@@ -15,35 +15,36 @@ import { toaster } from "../../components/ui/toaster";
 const MAX_REFERENCES = 5;
 const REFERENCE_MAX_LENGTH = 200;
 
-export default function CommentForm({ isVisible, onCancel, isInFavor }) {
-  // Se extrae el ID del debate desde la URL con useParams.
+export default function CommentForm({
+  isVisible,
+  onCancel,
+  isInFavor,
+  onNewComment,      // callback del padre
+}) {
   const { id } = useParams();
-
   const [argument, setArgument] = useState("");
   const [newRef, setNewRef] = useState("");
   const [refs, setRefs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const getUsername = () => localStorage.getItem("username") || "usuario-ejemplo";
+  const getUsername = () =>
+    localStorage.getItem("username") || "usuario-ejemplo";
 
   if (!isVisible) return null;
 
   const bgColor = isInFavor ? "white" : "gray.800";
   const textColor = isInFavor ? "black" : "white";
 
-  // Manejador para actualizar el comentario
   const handleArgumentChange = (e) => {
     setArgument(e.target.value);
   };
 
-  // Manejador para actualizar el input de la nueva referencia
   const handleNewRefChange = (e) => {
     if (e.target.value.length <= REFERENCE_MAX_LENGTH) {
       setNewRef(e.target.value);
     }
   };
 
-  // Agrega una referencia al arreglo si cumple los límites
   const handleAddRef = () => {
     const trimmed = newRef.trim();
     if (!trimmed) return;
@@ -67,12 +68,10 @@ export default function CommentForm({ isVisible, onCancel, isInFavor }) {
     setNewRef("");
   };
 
-  // Quita una referencia del arreglo
   const handleRemoveRef = (index) => {
     setRefs(refs.filter((_, i) => i !== index));
   };
 
-  // Publica el comentario utilizando la ruta correcta: /[id]/comments
   const handlePublish = async () => {
     if (!argument.trim()) {
       toaster.create({
@@ -84,10 +83,13 @@ export default function CommentForm({ isVisible, onCancel, isInFavor }) {
     }
 
     setIsLoading(true);
+
+    // Incluir 'position' según isInFavor
     const payload = {
       username: getUsername(),
-      argument,
-      refs
+      argument,            // coincide con el controlador
+      position: isInFavor, // true o false
+      refs,
     };
 
     console.debug("DEBUG: Payload a enviar al API:", payload);
@@ -103,28 +105,28 @@ export default function CommentForm({ isVisible, onCancel, isInFavor }) {
           body: JSON.stringify(payload),
         }
       );
-
       if (!response.ok) throw new Error("Error al publicar el comentario");
 
-      console.log("Comentario publicado:", payload);
+      const newComment = await response.json(); // comentario creado
+
       toaster.create({
         title: "Comentario publicado",
         status: "success",
         duration: 2000,
       });
-      // Limpiar los campos
+
+      // Limpia el formulario
       setArgument("");
       setRefs([]);
       onCancel();
+
+      // Notifica al padre para actualizar contadores
+      onNewComment(newComment);
     } catch (error) {
-      console.error(
-        "Error al publicar el comentario:",
-        error.response?.status,
-        error.response?.data || error.message
-      );
+      console.error("Error al publicar el comentario:", error);
       toaster.create({
-        title: `Error al publicar (${error.response?.status || ""})`,
-        description: error.response?.data?.error || error.message,
+        title: `Error al publicar`,
+        description: error.message,
         status: "error",
         duration: 3000,
       });
@@ -154,7 +156,7 @@ export default function CommentForm({ isVisible, onCancel, isInFavor }) {
         width="90%"
         shadow="lg"
       >
-        <Text fontSize="2xl" mb={4}>
+        <Text fontSize="2xl" mb={4} fontWeight="bold">
           Deja un comentario
         </Text>
 
@@ -167,7 +169,15 @@ export default function CommentForm({ isVisible, onCancel, isInFavor }) {
               onChange={handleArgumentChange}
             />
           </Box>
-
+                          {/* Imagen */}
+                          <Box fontWeight={"bold"}>
+                            Imagen (opcional)
+                            <Input
+                              type="file"
+                              disabled
+                              placeholder="Funcionalidad pendiente"
+                            />
+                          </Box>
           <Box>
             <Text fontWeight="bold">
               Referencias (máx. {MAX_REFERENCES})
@@ -186,11 +196,19 @@ export default function CommentForm({ isVisible, onCancel, isInFavor }) {
             {refs.length > 0 && (
               <Box mt={2} borderWidth="1px" p={2} borderRadius="md">
                 {refs.map((r, idx) => (
-                  <Flex key={idx} justify="space-between" align="center" py={1}>
+                  <Flex
+                    key={idx}
+                    justify="space-between"
+                    align="center"
+                    py={1}
+                  >
                     <Text isTruncated maxW="80%">
                       {r}
                     </Text>
-                    <CloseButton size="sm" onClick={() => handleRemoveRef(idx)} />
+                    <CloseButton
+                      size="sm"
+                      onClick={() => handleRemoveRef(idx)}
+                    />
                   </Flex>
                 ))}
               </Box>
@@ -202,7 +220,11 @@ export default function CommentForm({ isVisible, onCancel, isInFavor }) {
           <Button onClick={onCancel} isDisabled={isLoading}>
             Cancelar
           </Button>
-          <Button colorScheme="blue" onClick={handlePublish} isLoading={isLoading}>
+          <Button
+            colorScheme="blue"
+            onClick={handlePublish}
+            isLoading={isLoading}
+          >
             Publicar
           </Button>
         </Flex>

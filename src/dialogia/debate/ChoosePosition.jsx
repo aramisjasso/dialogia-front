@@ -14,13 +14,15 @@ const ChoosePosition = ({
   peopleAgaist = [],
   comments = [],
   username,
-  id,
-  onNewComment,
+  id
 }) => {
   const [userVoted, setUserVoted] = useState(initialUserVoted);
   const [currentPosition, setCurrentPosition] = useState(initialPosition);
   const [totalInFavor, setTotalInFavor] = useState(peopleInFavor.length);
   const [totalAgaist, setTotalAgaist] = useState(peopleAgaist.length);
+
+  // Local state para comentarios, para actualizar en caliente
+  const [localComments, setLocalComments] = useState(comments);
 
   // Estado para mostrar/ocultar el formulario
   const [showForm, setShowForm] = useState(false);
@@ -29,6 +31,11 @@ const ChoosePosition = ({
     setCurrentPosition(initialPosition);
     setUserVoted(initialUserVoted);
   }, [initialPosition, initialUserVoted]);
+
+    // recalcular si la prop comments cambia desde el padre
+    useEffect(() => {
+      setLocalComments(comments);
+    }, [comments]);
 
   const handleVote = async (position) => {
     setUserVoted(true);
@@ -82,24 +89,30 @@ const ChoosePosition = ({
     await handleVote(newPosition);
   };
 
-  const commentsInFavor = comments.filter((c) => c.position).length; 
-  const commentsAgaist = comments.filter((c) => !c.position).length;
+  // Calcula contadores a partir de localComments
+  const commentsInFavor = localComments.filter((c) => c.position).length;
+  const commentsAgaist = localComments.filter((c) => !c.position).length;
 
-  // Envío de comentario a la API y actualización en caliente
-  const handleSubmitComment = async ({ comentario, referencia }) => {
-    const positionBool = currentPosition === "InFavor";
-    const payload = {
-      username,
-      text: comentario,
-      refs: referencia ? [referencia] : [],
-      position: positionBool,
+    // Callback que pasamos a CommentForm
+    const handleNewComment = (newComment) => {
+      setLocalComments((prev) => [...prev, newComment]);
     };
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/debates/${id}/comments`,
-      payload
-    );
-    onNewComment(res.data);
-  };
+
+  // // Envío de comentario a la API y actualización en caliente
+  // const handleSubmitComment = async ({ comentario, referencia }) => {
+  //   const positionBool = currentPosition === "InFavor";
+  //   const payload = {
+  //     username,
+  //     text: comentario,
+  //     refs: referencia ? [referencia] : [],
+  //     position: positionBool,
+  //   };
+  //   const res = await axios.post(
+  //     `${import.meta.env.VITE_API_URL}/debates/${id}/comments`,
+  //     payload
+  //   );
+  //   onNewComment(res.data);
+  // };
 
   return (
     <Box p={4} display="flex" justifyContent="center" alignItems="center" gap={8}>
@@ -315,7 +328,7 @@ const ChoosePosition = ({
       <CommentForm
         isVisible={showForm}
         onCancel={() => setShowForm(false)}
-        onSubmit={handleSubmitComment}
+        onNewComment={handleNewComment} 
         isInFavor={currentPosition === "InFavor"}
       />
     </Box>

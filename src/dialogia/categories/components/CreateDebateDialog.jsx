@@ -143,16 +143,18 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
     }
     
     setIsLoading(true);
-    if (uploaderRef.current?.hasFile){
+   
+    let finalImage = image; // Valor por defecto (puede ser '')
+    
+    if (uploaderRef.current?.hasFile) {
       try {
         const fileData = await uploaderRef.current.uploadFile();
-        setImage(fileData.url);
-        console.log('Archivo subido:', fileData);
-        // Aquí puedes guardar fileData en tu base de datos
+        finalImage = fileData.url; // Usamos una variable, no el estado
+        setImage(finalImage); // Actualizamos el estado (pero no lo esperamos)
       } catch (error) {
         console.error('Error al subir:', error);
       }
-    }     
+    }
 
     try {
       const debateData = {
@@ -161,8 +163,9 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
         category: selectedCategory || categoryId,
         username: getUsername(),
         refs: references,
-        image: image,
+        image: finalImage,
       };
+      console.debug("DEBUG: Payload a enviar al API:", debateData);
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/debates`, {
         method: "POST",

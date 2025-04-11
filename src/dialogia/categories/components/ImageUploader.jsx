@@ -1,11 +1,11 @@
 import { useState, useImperativeHandle, forwardRef, useContext } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref as ref_2, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Progress, Button, Box, Image, Text } from '@chakra-ui/react';
 import imageCompression from 'browser-image-compression';
 import { toaster } from "../../../components/ui/toaster";
 import { useAuth } from "../../../contexts/hooks/useAuth";
 
-const ImageUploader = forwardRef(({ folderPath = 'uploads' }, refe) => {
+const ImageUploader = forwardRef(({ folderPath = 'uploads' }, ref) => {
   const { currentUser } = useAuth();
   const [file, setFile] = useState(null);
   const [compressedFile, setCompressedFile] = useState(null);
@@ -74,7 +74,7 @@ const ImageUploader = forwardRef(({ folderPath = 'uploads' }, refe) => {
       const fileExtension = compressedFile.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
 
-      const storageRef = ref(storage, `${folderPath}/${fileName}`);
+      const storageRef = ref_2(storage, `${folderPath}/${fileName}`);
 
       return new Promise((resolve, reject) => {
         const uploadTask = uploadBytesResumable(storageRef, compressedFile);
@@ -110,7 +110,7 @@ const ImageUploader = forwardRef(({ folderPath = 'uploads' }, refe) => {
   };
 
   // Exponemos la función uploadFile al componente padre
-  useImperativeHandle(refe, () => ({
+  useImperativeHandle(ref, () => ({
     uploadFile,
     hasFile: !!compressedFile,
     isLoading,

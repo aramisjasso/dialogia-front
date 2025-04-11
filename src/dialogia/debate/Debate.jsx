@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Heading, Text, Spinner, Flex, Link, Badge } from '@chakra-ui/react';
+import { Box, Heading, Text, Spinner, Flex, Link, Badge, Image } from '@chakra-ui/react';
 import axios from 'axios';
 import { FaEye, FaBell, FaUser } from "react-icons/fa";
 import ChoosePosition from './ChoosePosition';
@@ -146,6 +146,7 @@ const Debate = () => {
           <Text color="#676767" fontSize="md" mb={6}>
             {debate.argument}
           </Text>
+          <Image src={debate.image}/>
         </Box>
       </Flex>
 

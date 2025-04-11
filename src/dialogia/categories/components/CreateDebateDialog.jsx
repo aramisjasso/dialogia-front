@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
   ButtonGroup,
@@ -14,6 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { toaster } from "../../../components/ui/toaster";
+import ImageUploader from "./ImageUploader";
 
 // Constantes para los límites
 const TITLE_MAX_LENGTH = 100;
@@ -28,8 +29,12 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
   const [categories, setCategories] = useState([]);
   const [references, setReferences] = useState([]);
   const [newReference, setNewReference] = useState("");
+  const [imagen, setImagen] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const uploaderRef = useRef();
+  
+  
+    
   // Obtener categorías desde la API
   useEffect(() => {
     const fetchCategories = async () => {
@@ -138,6 +143,16 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
     }
 
     setIsLoading(true);
+    if (uploaderRef.current?.hasFile){
+      try {
+        const fileData = await uploaderRef.current.uploadFile();
+        setImagen(fileData.url);
+        console.log('Archivo subido:', fileData);
+        // Aquí puedes guardar fileData en tu base de datos
+      } catch (error) {
+        console.error('Error al subir:', error);
+      }
+    }     
 
     try {
       const debateData = {
@@ -146,7 +161,7 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
         category: selectedCategory || categoryId,
         username: getUsername(),
         refs: references,
-        image: "",
+        image: imagen,
       };
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/debates`, {
@@ -261,10 +276,10 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
                 {/* Imagen */}
                 <Box>
                   Imagen (opcional)
-                  <Input
-                    type="file"
-                    placeholder="Funcionalidad pendiente"
-                  />
+                  <ImageUploader ref={uploaderRef} folderPath="debate"/>
+
+
+
                 </Box>
 
                 {/* Referencias */}

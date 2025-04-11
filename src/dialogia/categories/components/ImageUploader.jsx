@@ -1,10 +1,12 @@
-import { useState, useImperativeHandle, forwardRef } from 'react';
+import { useState, useImperativeHandle, forwardRef, useContext } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Progress, Button, Box, Image, Text } from '@chakra-ui/react';
 import imageCompression from 'browser-image-compression';
-import { toaster } from "../../components/ui/toaster";
+import { toaster } from "../../../components/ui/toaster";
+import { useAuth } from "../../../contexts/hooks/useAuth";
 
 const ImageUploader = forwardRef(({ folderPath = 'uploads' }, refe) => {
+  const { currentUser } = useAuth();
   const [file, setFile] = useState(null);
   const [compressedFile, setCompressedFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -45,6 +47,15 @@ const ImageUploader = forwardRef(({ folderPath = 'uploads' }, refe) => {
   };
 
   const uploadFile = async () => {
+    if (!currentUser) {
+      toaster.create({ 
+        title: 'Error', 
+        description: 'Debes iniciar sesión para subir imágenes', 
+        status: 'error' 
+      });
+      return null;
+    }
+
     if (!compressedFile) {
       toaster.create({ 
         title: 'Error', 
@@ -58,8 +69,11 @@ const ImageUploader = forwardRef(({ folderPath = 'uploads' }, refe) => {
       setIsLoading(true);
       setUploadProgress(0);
       const storage = getStorage();
+      
+      // Mantener el nombre original del archivo
       const fileExtension = compressedFile.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
+
       const storageRef = ref(storage, `${folderPath}/${fileName}`);
 
       return new Promise((resolve, reject) => {
@@ -111,19 +125,26 @@ const ImageUploader = forwardRef(({ folderPath = 'uploads' }, refe) => {
         accept="image/*" 
         style={{ display: 'none' }}
         id="file-upload"
+        disabled={!currentUser}
       />
-      
-      
       
       <label htmlFor="file-upload">
         <Button 
           as="span" 
           isLoading={isLoading}
           colorScheme={previewUrl ? 'green' : 'blue'}
+          disabled={!currentUser}
         >
           {previewUrl ? 'Cambiar imagen' : 'Seleccionar imagen'}
         </Button>
       </label>
+      
+      {!currentUser && (
+        <Text mt={2} color="red.500" fontSize="sm">
+          Debes iniciar sesión para subir imágenes
+        </Text>
+      )}
+      
       {previewUrl && (
         <Box mb={4} textAlign="center">
           <Text mb={2} fontWeight="medium">Vista previa:</Text>

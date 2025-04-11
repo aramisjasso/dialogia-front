@@ -20,7 +20,7 @@ import Profile from "../dialogia/profile/pages/Profile";
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // import ImageUploader from "../dialogia/testing/ImageUploader";
-import ParentComponent from "../dialogia/testing/ParentComponent";
+// import ParentComponent from "../dialogia/testing/ParentComponent";
 // Función para crear el router (recibe el estado del usuario como parámetro)
 const NaviRoutersDialogia = () => {
   return createBrowserRouter([
@@ -169,16 +169,16 @@ const NaviRoutersDialogia = () => {
         </ProtectedRoute>
       ),
     },
-    {
-      path: "/test",
-      element: (
-        <ProtectedRoute requireAuth={true}>
-          <Layout>
-            <ParentComponent />
-          </Layout>
-        </ProtectedRoute>
-      ),
-    },
+    // {
+    //   path: "/test",
+    //   element: (
+    //     <ProtectedRoute requireAuth={true}>
+    //       <Layout>
+    //         <ParentComponent />
+    //       </Layout>
+    //     </ProtectedRoute>
+    //   ),
+    // },
   ]);
 };
 

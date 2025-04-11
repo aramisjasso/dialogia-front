@@ -298,6 +298,7 @@ export default function Comments() {
                       <Text mt={1} color="gray.700" fontSize={['sm', 'md', 'lg']}>
                         {c.argument}
                       </Text>
+                      <Image src={c.image}/>
                       {c.refs && c.refs.length > 0 && (
                         <Box mt={2}>
                           <Text fontSize="sm" fontWeight="semibold">
@@ -426,6 +427,7 @@ export default function Comments() {
                     <Text mt={1} color="gray.700" fontSize={['sm', 'md', 'lg']}>
                       {c.argument}
                     </Text>
+                    <Image src={c.image}/>
                     {c.refs && c.refs.length > 0 && (
                       <Box mt={2}>
                         <Text fontSize="sm" fontWeight="semibold">

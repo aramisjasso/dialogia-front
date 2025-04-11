@@ -29,7 +29,7 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
   const [categories, setCategories] = useState([]);
   const [references, setReferences] = useState([]);
   const [newReference, setNewReference] = useState("");
-  const [imagen, setImagen] = useState("");
+  const [image, setImage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const uploaderRef = useRef();
   
@@ -141,12 +141,12 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
       });
       return;
     }
-
+    
     setIsLoading(true);
     if (uploaderRef.current?.hasFile){
       try {
         const fileData = await uploaderRef.current.uploadFile();
-        setImagen(fileData.url);
+        setImage(fileData.url);
         console.log('Archivo subido:', fileData);
         // Aquí puedes guardar fileData en tu base de datos
       } catch (error) {
@@ -161,7 +161,7 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
         category: selectedCategory || categoryId,
         username: getUsername(),
         refs: references,
-        image: imagen,
+        image: image,
       };
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/debates`, {
@@ -277,9 +277,6 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
                 <Box>
                   Imagen (opcional)
                   <ImageUploader ref={uploaderRef} folderPath="debate"/>
-
-
-
                 </Box>
 
                 {/* Referencias */}

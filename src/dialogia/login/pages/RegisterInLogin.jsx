@@ -88,15 +88,15 @@ const RegisterInLogin= ()=>{
   
       try {
         
-        await saveUserToFirestore(user, username);
-        navigate("/home");
-        
+        await saveUserToFirestore(user, username).then();
+        navigate("/select-interests");
         toaster.create({
           title: "Registro exitoso",
           description: "Tu usuario ha sido registrado",
-          status: "success", // Si tu implementación de toaster soporta "status"
-          onCloseComplete: () => navigate("/home")
+          status: "success", // Si tu implementación de toaster soporta "status" 
         });
+        // Redirigimos inmediatamente después de guardar
+        
          // Redirigir al login
       } catch (error) {
         toaster.create({

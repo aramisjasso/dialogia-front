@@ -92,7 +92,7 @@ const NaviRoutersDialogia = () => {
     {
       path: "/home",
       element: (
-        <ProtectedRoute requireAuth={true} checkInterests={true}>
+        <ProtectedRoute requireAuth={true}>
           <Layout>
             <Home />
           </Layout>

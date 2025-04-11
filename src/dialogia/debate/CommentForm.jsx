@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   Flex,
@@ -11,6 +11,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { toaster } from "../../components/ui/toaster";
+import ImageUploader from "../categories/components/ImageUploader";
 
 const MAX_REFERENCES = 5;
 const REFERENCE_MAX_LENGTH = 200;
@@ -25,6 +26,8 @@ export default function CommentForm({
   const [argument, setArgument] = useState("");
   const [newRef, setNewRef] = useState("");
   const [refs, setRefs] = useState([]);
+  const [image, setImage] = useState("");  
+  const uploaderRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
 
   const getUsername = () => {
@@ -84,13 +87,26 @@ export default function CommentForm({
     }
 
     setIsLoading(true);
+    let finalImage = image; // Valor por defecto (puede ser '')
+    
+    if (uploaderRef.current?.hasFile) {
+      try {
+        const fileData = await uploaderRef.current.uploadFile();
+        finalImage = fileData.url; // Usamos una variable, no el estado
+        setImage(finalImage); // Actualizamos el estado (pero no lo esperamos)
+      } catch (error) {
+        console.error('Error al subir:', error);
+      }
+    }
+
 
     // Incluir 'position' según isInFavor
     const payload = {
       username: getUsername(),
-      argument,            // coincide con el controlador
-      position: isInFavor, // true o false
+      argument,
+      position: isInFavor,
       refs,
+      image: finalImage, // Aquí sí tendrá el valor correcto
     };
 
     console.debug("DEBUG: Payload a enviar al API:", payload);
@@ -174,15 +190,11 @@ export default function CommentForm({
               onChange={handleArgumentChange}
             />
           </Box>
-                          {/* Imagen */}
-                          <Box fontWeight={"bold"}>
-                            Imagen (opcional)
-                            <Input
-                              type="file"
-                              disabled
-                              placeholder="Funcionalidad pendiente"
-                            />
-                          </Box>
+          {/* Imagen */}
+          <Box fontWeight={"bold"}>
+            Imagen (opcional)
+            <ImageUploader ref={uploaderRef} folderPath="debate"/>
+          </Box>
           <Box>
             <Text fontWeight="bold">
               Referencias (máx. {MAX_REFERENCES})

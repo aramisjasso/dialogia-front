@@ -1,7 +1,7 @@
 // src/components/Register.jsx
 import React, { useState } from "react";
 import { Button, Box, Heading, Text, Input, Flex, Link, Field } from "@chakra-ui/react";
-import { registerWithGoogle, registerWithEmail } from "../../../firebase/auth.js";
+import { loginWithGoogle, registerWithEmail } from "../../../firebase/auth.js";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../../firebase/firebase";
@@ -49,62 +49,33 @@ const Register = () => {
   };
 
   const handleRegisterWithGoogle = async () => {
-    // Validación de nombre de usuario
-    if (!username) {
-      toaster.create({
-        title: "Error",
-        description: "Por favor, ingresa un nombre de usuario",
-        status: "error",
-      });
-      return;
-    }
-
-    if (username.length > USERNAME_MAX_LENGTH) {
-      toaster.create({
-        title: "Error",
-        description: `El nombre de usuario no puede tener más de ${USERNAME_MAX_LENGTH} caracteres`,
-        status: "error",
-      });
-      return;
-    }
-
-    if (await checkUsernameExists(username)) {
-      toaster.create({
-        title: "Error",
-        description: "El nombre de usuario ya está en uso",
-        status: "error",
-      });
-      return;
-    }
-
-    if (username.includes('@') || username.includes('/') || username.includes('\\') || username.includes('.')) {
-      toaster.create({
-        title: "Error",
-        description: "El nombre de usuario no puede contener @, /, \\ o .",
-        status: "error",
-      });
-      return;
-    }
-
     try {
-      const user = await registerWithGoogle();
-      await saveUserToFirestore(user, username);
-      navigate("/login");
-      window.location.reload();
-      toaster.create({
-        title: "Registro exitoso",
-        description: "Tu cuenta ha sido creada con Google",
-        status: "success",
-        onCloseComplete: () => navigate("/login")
-      });
+      // 1. Iniciar sesión con Google
+      await loginWithGoogle();
+      
+      // 2. Obtener el usuario actual
+      // const user = auth.currentUser;
+      // if (!user) throw new Error("No se pudo obtener el usuario");
+  
+      // 3. Verificar en Firestore si existe
+      // const userDocRef = doc(db, "users", user.uid);
+      // const userDoc = await getDoc(userDocRef);
+  
+      // 4. Redirigir según si existe o no
+
+         // Si ya está registrado, va a /home
+
+  
     } catch (error) {
+      console.error(error);
       toaster.create({
         title: "Error",
-        description: error.message,
-        status: "error",
+        description: "Error al iniciar sesión con Google",
+        type: "error",
       });
     }
   };
+  
 
   const handleRegisterWithEmail = async () => {
     // Validación de campos vacíos

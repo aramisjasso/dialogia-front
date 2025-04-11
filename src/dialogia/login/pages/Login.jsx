@@ -46,21 +46,9 @@ const handleRegisterWithGoogle = async () => {
   try {
     // 1. Iniciar sesión con Google
     await loginWithGoogle();
+      
+    navigate("/home"); // Si ya está registrado, va a /home
     
-    // 2. Obtener el usuario actual
-    const user = auth.currentUser;
-    if (!user) throw new Error("No se pudo obtener el usuario");
-
-    // 3. Verificar en Firestore si existe
-    const userDocRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userDocRef);
-
-    // 4. Redirigir según si existe o no
-    if (userDoc.exists()) {
-      navigate("/home"); // Si ya está registrado, va a /home
-    } else {
-      navigate("/registeruser"); // Si no, va a completar registro
-    }
 
   } catch (error) {
     console.error(error);

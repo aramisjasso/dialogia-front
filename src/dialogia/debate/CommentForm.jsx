@@ -27,8 +27,9 @@ export default function CommentForm({
   const [refs, setRefs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const getUsername = () =>
-    localStorage.getItem("username") || "usuario-ejemplo";
+  const getUsername = () => {
+    return localStorage.getItem("username") || "usuario-ejemplo";
+  };
 
   if (!isVisible) return null;
 
@@ -122,6 +123,10 @@ export default function CommentForm({
 
       // Notifica al padre para actualizar contadores
       onNewComment(newComment);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error al publicar el comentario:", error);
       toaster.create({

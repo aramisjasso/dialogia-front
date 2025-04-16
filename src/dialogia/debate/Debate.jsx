@@ -6,6 +6,7 @@ import { FaEye, FaBell, FaUser } from "react-icons/fa";
 import ChoosePosition from './ChoosePosition';
 import { useAuth } from '../../contexts/hooks/useAuth';
 import Comments from './Comments';
+import BestComment from './BestComment';
 
 const Debate = () => {
   const { id } = useParams();
@@ -19,6 +20,7 @@ const Debate = () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/${id}`);
         setDebate(response.data);
+        console.log(response.data.bestArgument);
 
         if (response.data && currentUser) {
           const initialPosition = 
@@ -102,7 +104,14 @@ const Debate = () => {
         {/* Columna izquierda (Usuario) */}
         <Box width="80px" textAlign="center">
           <Flex direction="column" align="center">
-            <FaUser size={64} color="#727272" />
+            <Image
+              src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
+              maxH="100px"
+              maxW="100px"
+              objectFit="cover"
+              />
+            {/* <FaUser size={64} color="#727272" /> */}
+
             <Text size="md" fontWeight="bold" mt={2}>
               {debate.username}
             </Text>
@@ -161,6 +170,12 @@ const Debate = () => {
         {formatRefs(debate.refs)}
       </Box>
       </Box>
+      {debate.bestArgument && (
+        <BestComment 
+          comment={debate.bestArgument} 
+          debateId={id} 
+        />
+      )}
       <ChoosePosition
         isCreator={isCreator}
         initialUserVoted={userPosition !== null}

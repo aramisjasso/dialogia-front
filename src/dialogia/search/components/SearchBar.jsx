@@ -9,7 +9,7 @@ const SearchBar = ({ onInputChange, onSearch, inputValue }) => {
     };
 
     return (
-        <Box display="flex" alignItems="stretch" width="100%">
+        <Box display="flex" alignItems="stretch" width="50%">
         {/* Input con altura personalizada */}
         <Input
             placeholder="Buscar debates por título o argumento"
@@ -18,11 +18,12 @@ const SearchBar = ({ onInputChange, onSearch, inputValue }) => {
             onKeyDown={handleKeyDown}
             size="lg" // Base "lg" (48px)
             height="48px" // Altura personalizada (+8px)
-            borderRadius="0"
+            borderLeftRadius="30px"
             borderWidth="1px"
             borderRight="none"
             flex="1"
             fontSize="lg" // Asegura proporción texto/altura
+            background="white"
         />
         
         {/* Botón con MISMA altura */}
@@ -35,6 +36,7 @@ const SearchBar = ({ onInputChange, onSearch, inputValue }) => {
             alignItems="center"
             justifyContent="center"
             border="1px solid gray.300"
+            borderRightRadius="30px"
             borderLeft="none"
             _hover={{ bg: "gray.800" }}
             _active={{ bg: "gray.700" }}

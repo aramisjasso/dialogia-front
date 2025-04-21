@@ -161,12 +161,6 @@ export default function BestComment({ comment, debateId }) {
                 .toLowerCase()}
             </Text>
             <Flex ml={6} mr={6} color="gray.500">
-              <Box _hover={{ color: 'gray.800', cursor: 'pointer' }}>
-                <FaReply />
-              </Box>
-              <Text ml={2} fontWeight="bold">
-                Responder
-              </Text>
             </Flex>
           </Flex>
           <Text mt={1} color="gray.700" fontSize={['sm', 'md', 'lg']}>

@@ -18,26 +18,26 @@ const Search = () => {
     };
 
     return (
-        <Container maxW="container.lg" py={8} centerContent>
-            <Box w="100%" mb={8}>
-                <Heading as="h1" size="xl" mb={6} textAlign="center">
-                    Buscar Debates
-                </Heading>
-                
-                <SearchBar 
-                    onInputChange={handleInputChange} 
-                    onSearch={triggerSearch} 
-                    inputValue={inputValue}
-                />
-            </Box>
-
+        <Box as="section" w="full">
+        <Container maxW="full" centerContent bg="gray.200" py={14}>
+        <Heading mb={6} fontSize="2rem">
+        {finalSearch
+            ? `Resultados encontrados para "${finalSearch}"`
+            : 'Buscar Debates'}
+        </Heading>
+          <SearchBar
+            inputValue    = {inputValue}
+            onInputChange = {handleInputChange}
+            onSearch      = {triggerSearch}
+          />
+        </Container>
             {finalSearch && (
                 <Box w="100%">
-                    <DebatesSearch search={finalSearch} />
+                        <DebatesSearch search={finalSearch} />
                 </Box>
-            )}
-        </Container>
-    );
-};
+        )}   
+      </Box>       
+    )
+}
 
 export default Search;

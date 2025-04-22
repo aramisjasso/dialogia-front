@@ -26,7 +26,9 @@ const PreferencesSection = () => {
         const categoriesResponse = await fetch(`${import.meta.env.VITE_API_URL}/category`);
         if (!categoriesResponse.ok) throw new Error("Error al obtener categorías");
         const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData);
+        // Ordenar las categorías por el campo 'order'
+        const sortedCategories = [...categoriesData].sort((a, b) => a.order - b.order);
+        setCategories(sortedCategories);
 
         // Obtener intereses del usuario
         const user = auth.currentUser;
@@ -117,18 +119,18 @@ const PreferencesSection = () => {
       </Heading>
       
       <Wrap spacing={4} mb={8}>
-        {categories.map((category) => (
-          <WrapItem key={category.id}>
-            <Button
-              size="lg"
-              variant={selectedInterests.includes(category.id) ? "solid" : "outline"}
-              colorScheme={selectedInterests.includes(category.id) ? "blue" : "gray"}
-              onClick={() => toggleInterest(category.id)}
-            >
-              {category.name}
-            </Button>
-          </WrapItem>
-        ))}
+      {[...sortedCategoriescategories].sort((a, b) => a.order - b.order).map((category) => (
+        <WrapItem key={category.id}>
+          <Button
+            size="lg"
+            variant={selectedInterests.includes(category.id) ? "solid" : "outline"}
+            colorScheme={selectedInterests.includes(category.id) ? "blue" : "gray"}
+            onClick={() => toggleInterest(category.id)}
+          >
+            {category.name}
+          </Button>
+        </WrapItem>
+      ))}
       </Wrap>
       
       <Flex justify="flex-end">

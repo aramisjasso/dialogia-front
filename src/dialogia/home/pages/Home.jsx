@@ -15,6 +15,7 @@ const Home = () => {
   const navigate = useNavigate();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const currentDate = new Date();
+    const [showCreateDebate, setshowCreateDebate] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -142,6 +143,7 @@ const Home = () => {
 
         {/* Botón Crear Debate - siempre visible */}
         <Box minW="120px" textAlign="right">
+            
           <CreateDebateDialog
             triggerButton={
               <Button 

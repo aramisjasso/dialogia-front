@@ -32,6 +32,7 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
   const [image, setImage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const uploaderRef = useRef();
+  const [isOpen, setIsOpen] = useState(false);
   
   
     
@@ -189,6 +190,7 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
       setArgument("");
       setReferences([]);
       if (!categoryId) setSelectedCategory(null);
+      setIsOpen(false);
     } catch (error) {
       toaster.create({
         title: "Error",
@@ -201,8 +203,12 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
   };
 
   return (
-    <Dialog.Root>
-      <Dialog.Trigger asChild>{triggerButton}</Dialog.Trigger>
+    <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+          <Dialog.Trigger asChild>
+      <span onClick={() => setIsOpen(true)}>
+        {triggerButton}
+      </span>
+    </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
@@ -210,9 +216,15 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
             <Dialog.Header>
               <Dialog.Title>Crear nuevo debate</Dialog.Title>
             </Dialog.Header>
-            <Dialog.CloseTrigger asChild>
-              <CloseButton size="sm" position="absolute" right="2" top="2" />
-            </Dialog.CloseTrigger>
+            
+              <CloseButton
+                size="sm"
+                position="absolute"
+                right="2"
+                top="2"
+                onClick={() => setIsOpen(false)}
+              />
+            
 
             <Dialog.Body>
               <VStack spacing={4} align="stretch">
@@ -330,11 +342,13 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
             </Dialog.Body>
 
             <Dialog.Footer>
-              <Dialog.ActionTrigger asChild>
-                <Button variant="outline" mr={2}>
-                  Cancelar
-                </Button>
-              </Dialog.ActionTrigger>
+            <Button
+                variant="outline"
+                mr={2}
+                onClick={() => setIsOpen(false)}
+              >
+                Cancelar
+              </Button>
               <Button
                 colorScheme="blue"
                 onClick={handleSubmit}

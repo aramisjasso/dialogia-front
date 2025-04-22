@@ -123,7 +123,16 @@ export default function ReplyCommentForm({
           body: JSON.stringify(payload),
         }
       );
-      if (!response.ok) throw new Error("Error al publicar la respuesta");
+      if (!response.ok) {
+        // Intentamos parsear el error como JSON para ver si es el caso específico
+        const errorData = await response.json().catch(() => null);
+        
+        if (errorData?.error.includes("viola nuestras normas") ) {
+          throw new Error(errorData.reason || errorData.error);
+        } else {
+          throw new Error("Error al publicar la respuesta");
+        }
+      }
 
       const newReply = await response.json();
 
@@ -145,12 +154,13 @@ export default function ReplyCommentForm({
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error("Error al publicar la respuesta:", error);
+      
       toaster.create({
-        title: `Error al publicar`,
+        title: `Error al responder`,
         description: error.message,
         status: "error",
         duration: 3000,
+        type: "error",
       });
     } finally {
       setIsLoading(false);

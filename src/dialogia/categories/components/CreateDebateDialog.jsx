@@ -176,7 +176,16 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
         body: JSON.stringify(debateData),
       });
 
-      if (!response.ok) throw new Error("Error al crear el debate");
+      if (!response.ok) {
+        // Intentamos parsear el error como JSON para ver si es el caso específico
+        const errorData = await response.json().catch(() => null);
+        
+        if (errorData?.error.includes("viola nuestras normas") ) {
+          throw new Error(errorData.reason || errorData.error);
+        } else {
+          throw new Error("Error al publicar el debate");
+        }
+      }
 
       toaster.create({
         title: "Éxito",
@@ -193,9 +202,10 @@ const CreateDebateDialog = ({ triggerButton, categoryId = null }) => {
       setIsOpen(false);
     } catch (error) {
       toaster.create({
-        title: "Error",
+        title: "Error al publicar",
         description: error.message,
         status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);

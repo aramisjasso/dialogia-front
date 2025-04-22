@@ -33,8 +33,14 @@ const Profile = () => {
         const categoriesResponse = await fetch(`${import.meta.env.VITE_API_URL}/category`);
         if (!categoriesResponse.ok) throw new Error("Error al obtener categorías");
         const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData);
-        
+        // Ordenar las categorías por el campo 'order' y luego por nombre
+      const sortedCategories = [...categoriesData].sort((a, b) => {
+        const orderA = Number(a.order);
+        const orderB = Number(b.order);
+        return orderA - orderB || a.name.localeCompare(b.name);
+      });
+      
+      setCategories(sortedCategories);
         // Obtener intereses del usuario
         const user = auth.currentUser;
         if (user) {

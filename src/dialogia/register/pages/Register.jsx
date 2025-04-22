@@ -17,7 +17,7 @@ const Register = () => {
   // Límites definidos
   const USERNAME_MAX_LENGTH = 20;
   const PASSWORD_MAX_LENGTH = 32;
-  const EMAIL_MAX_LENGTH = 254; // RFC estándar para emails
+  const EMAIL_MAX_LENGTH = 254;
 
   // Verificar si el nombre de usuario ya existe
   const checkUsernameExists = async (username) => {
@@ -75,10 +75,8 @@ const Register = () => {
       });
     }
   };
-  
 
   const handleRegisterWithEmail = async () => {
-    // Validación de campos vacíos
     if (!username || !email || !password || !confirmpassword) {
       toaster.create({
         title: "Error",
@@ -88,7 +86,6 @@ const Register = () => {
       return;
     }
 
-    // Validación de nombre de usuario
     if (username.length > USERNAME_MAX_LENGTH) {
       toaster.create({
         title: "Error",
@@ -98,16 +95,6 @@ const Register = () => {
       return;
     }
 
-    if (username.includes('@') || username.includes('/') || username.includes('\\') || username.includes('.')) {
-      toaster.create({
-        title: "Error",
-        description: "El nombre de usuario no puede contener @, /, \\ o .",
-        status: "error",
-      });
-      return;
-    }
-
-    // Validación de email
     if (email.length > EMAIL_MAX_LENGTH) {
       toaster.create({
         title: "Error",
@@ -126,7 +113,6 @@ const Register = () => {
       return;
     }
 
-    // Validación de contraseña
     if (password.length > PASSWORD_MAX_LENGTH) {
       toaster.create({
         title: "Error",
@@ -146,7 +132,6 @@ const Register = () => {
     }
 
     try {
-      // Verificar si el nombre de usuario ya existe
       if (await checkUsernameExists(username)) {
         toaster.create({
           title: "Error",
@@ -156,7 +141,6 @@ const Register = () => {
         return;
       }
 
-      // Verificar si el correo ya está registrado
       if (await checkEmailExists(email)) {
         toaster.create({
           title: "Error",
@@ -175,55 +159,68 @@ const Register = () => {
         description: "Tu cuenta ha sido creada",
         status: "success",
       });
-    // src/components/Register.jsx
-} catch (error) {
-  let errorMessage = "Error en el registro";
-  
-  if (error.message.includes("password-does-not-meet-requirements")) {
-    errorMessage = "La contraseña debe contener:";
-    const missingRequirements = [];
-    
-    if (error.message.includes("upper case character")) {
-      missingRequirements.push("una letra mayúscula (A-Z)");
-    }
-    if (error.message.includes("numeric character")) {
-      missingRequirements.push("un número (0-9)");
-    }
-    if (error.message.includes("non-alphanumeric character")) {
-      missingRequirements.push("un carácter especial (ej: !@#$%)");
-    }
-    
-    errorMessage += " " + missingRequirements.join(", ");
-  } else if (error.message.includes("email-already-in-use")) {
-    errorMessage = "El correo electrónico ya está registrado";
-  } else {
-    errorMessage = error.message;
-  }
+    } catch (error) {
+      let errorMessage = "Error en el registro";
+      
+      if (error.message.includes("password-does-not-meet-requirements")) {
+        errorMessage = "La contraseña debe contener:";
+        const missingRequirements = [];
+        
+        if (error.message.includes("upper case character")) {
+          missingRequirements.push("una letra mayúscula (A-Z)");
+        }
+        if (error.message.includes("numeric character")) {
+          missingRequirements.push("un número (0-9)");
+        }
+        if (error.message.includes("non-alphanumeric character")) {
+          missingRequirements.push("un carácter especial (ej: !@#$%)");
+        }
+        
+        errorMessage += " " + missingRequirements.join(", ");
+      } else if (error.message.includes("email-already-in-use")) {
+        errorMessage = "El correo electrónico ya está registrado";
+      } else {
+        errorMessage = error.message;
+      }
 
-  toaster.create({
-    title: "Error",
-    description: errorMessage,
-    status: "error",
-  });
-}
+      toaster.create({
+        title: "Error",
+        description: errorMessage,
+        status: "error",
+      });
+    }
   };
 
-  // Manejar cambios con validación de longitud máxima
+  // Manejar cambios en el nombre de usuario (bloquea caracteres especiales)
   const handleUsernameChange = (e) => {
-    if (e.target.value.length <= USERNAME_MAX_LENGTH) {
-      setUsername(e.target.value);
+    const value = e.target.value;
+    // Eliminar caracteres no permitidos
+    const cleanedValue = value.replace(/[@\/\\\.\s]/g, '');
+    
+    if (cleanedValue.length <= USERNAME_MAX_LENGTH) {
+      setUsername(cleanedValue);
     }
   };
 
+  // Manejar cambios en la contraseña (elimina espacios)
   const handlePasswordChange = (e) => {
-    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
-      setPassword(e.target.value);
+    const value = e.target.value;
+    // Eliminar espacios
+    const cleanedValue = value.replace(/\s/g, '');
+    
+    if (cleanedValue.length <= PASSWORD_MAX_LENGTH) {
+      setPassword(cleanedValue);
     }
   };
 
+  // Manejar cambios en la confirmación de contraseña (elimina espacios)
   const handleConfirmPasswordChange = (e) => {
-    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
-      setConfirmpassword(e.target.value);
+    const value = e.target.value;
+    // Eliminar espacios
+    const cleanedValue = value.replace(/\s/g, '');
+    
+    if (cleanedValue.length <= PASSWORD_MAX_LENGTH) {
+      setConfirmpassword(cleanedValue);
     }
   };
 
@@ -248,7 +245,6 @@ const Register = () => {
       <Heading textAlign="left" color="white">
         Regístrate
       </Heading>
-
 
       <Flex direction="column" gap={4} mt={6}>
         <Flex justifyContent="space-between" alignItems="center">

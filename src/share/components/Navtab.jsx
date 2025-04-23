@@ -30,7 +30,7 @@ const NavTab = () => {
     { name: "INICIO", path: "/home", icon: <LuLayoutDashboard size={16} /> },
     { name: "CATEGORIAS", path: "/categories", icon: <LuList size={16} /> },
     { name: "ACERCA DE NOSOTROS", path: "/aboutus", icon: <LuInfo size={16} /> },
-    { name: "POLITICAS DE USO", path: "/politic", icon: <LuFile size={16} /> }
+    { name: "POLITICAS DE USO", path: "/policies", icon: <LuFile size={16} /> }
   ];
 
   return (

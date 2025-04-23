@@ -17,6 +17,8 @@ import Category from "../dialogia/categories/pages/Category";
 import Search from "../dialogia/search/pages/Search";
 import SelectInterests from "../dialogia/categories/pages/SelectInterests";
 import Profile from "../dialogia/profile/pages/Profile";
+import AboutUs from "../dialogia/company/pages/AboutUs";
+import Policies from "../dialogia/company/pages/Policies";
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // import ImageUploader from "../dialogia/testing/ImageUploader";
@@ -55,6 +57,26 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={false}>
           <Layout>
             <Login />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/aboutus",
+      element: (
+        <ProtectedRoute requireAuth={false}>
+          <Layout>
+            <AboutUs />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/policies",
+      element: (
+        <ProtectedRoute requireAuth={false}>
+          <Layout>
+            <Policies />
           </Layout>
         </ProtectedRoute>
       ),

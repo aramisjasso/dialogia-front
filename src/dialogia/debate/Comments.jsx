@@ -81,6 +81,8 @@ export default function Comments() {
     return comments.find(c => c.idComment === paidCommentId);
   };
 
+console.log(comments);
+
   const handleLike = async idComment => {
     try {
       if (likesState[idComment]?.liked) {

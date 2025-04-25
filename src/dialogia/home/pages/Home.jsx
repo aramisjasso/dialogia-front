@@ -15,9 +15,9 @@ const Home = () => {
   const navigate = useNavigate();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const currentDate = new Date();
-    const [showCreateDebate, setshowCreateDebate] = useState(false);
 
   useEffect(() => {
+    
     const fetchCategories = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/category`);
@@ -36,6 +36,7 @@ const Home = () => {
     };
     fetchCategories();
   }, []);
+
 
   return (
     <Box maxW="100vw" overflowX="hidden">

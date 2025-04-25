@@ -17,13 +17,15 @@ import { toaster } from "../../../components/ui/toaster";
 import {
     useColorModeValue,
   } from "../../../components/ui/color-mode"
+import DeleteAccount from "./DeleteAccount";
+
 const Profile = () => {
   const [activeSection, setActiveSection] = useState("preferences");
   const [categories, setCategories] = useState([]);
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Obtener categorías disponibles
   useEffect(() => {
     const fetchCategoriesAndInterests = async () => {
@@ -233,7 +235,13 @@ const Profile = () => {
                   >
                     Guardar preferencias
                   </Button>
+
+                  <DeleteAccount 
+                    auth={auth}
+                  >
+                  </DeleteAccount>
                 </Box>
+          
               )}
             </>
           )}

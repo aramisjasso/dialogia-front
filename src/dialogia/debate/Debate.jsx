@@ -7,6 +7,7 @@ import ChoosePosition from './ChoosePosition';
 import { useAuth } from '../../contexts/hooks/useAuth';
 import Comments from './Comments';
 import BestComment from './BestComment';
+import { toaster } from "../../components/ui/toaster";
 
 const Debate = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const Debate = () => {
   const [loading, setLoading] = useState(true);
   const { currentUser, loading: authLoading } = useAuth();
   const [userPosition, setUserPosition] = useState(null);
+  const [following, setFollowing] = useState(false);
 
   useEffect(() => {
     const fetchDebate = async () => {
@@ -29,7 +31,10 @@ const Debate = () => {
             null;
           setUserPosition(initialPosition);
         }
-
+        if (debate && currentUser) {
+          const isFollowing = Array.isArray(debate.followers) && debate.followers.includes(currentUser.username);
+          setFollowing(isFollowing);
+        }
       } catch (error) {
         console.error('Error fetching debate:', error);
       } finally {
@@ -93,6 +98,51 @@ const Debate = () => {
     });
   };
 
+  const handleFollowToggle = async () => {
+    setLoading(true)
+    try {
+      const endpoint = `${import.meta.env.VITE_API_URL}/debates/${id}/follow`
+      const method = following ? 'DELETE' : 'POST'
+      const payload = { username: currentUser.username }
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        // parseamos el error si viene JSON
+        const errorData = await response.json().catch(() => null)
+        const message = errorData?.error || 'Error al actualizar seguimiento'
+        throw new Error(message)
+      }
+
+      // todo OK: mostramos notificación
+      toaster.create({
+        title: following
+          ? 'Has dejado de seguir el debate'
+          : 'Ahora sigues el debate',
+        status: following ? 'info' : 'success',
+        duration: 2000,
+      })
+
+      // invertimos el estado
+      setFollowing(prev => !prev)
+
+    } catch (error) {
+      console.error('Error al (de)seguir debate:', error)
+      toaster.create({
+        title: 'Error al actualizar seguimiento',
+        description: error.message,
+        status: 'error',
+        duration: 3000,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <Box  maxW="100vw" mx="auto" p={6} position={"relative"} overflowX="hidden"> 
 
@@ -139,7 +189,13 @@ const Debate = () => {
                   hour12: true
                 }).toLowerCase()}
               </Text>
-              <FaBell size={24} style={{ marginRight: "16px", color: "#727272" }} />
+              <FaBell
+                  className={'bell-icon'}
+                  onClick={handleFollowToggle}
+                  style={{ color: following ? 'blue' : 'gray' }}
+                  cursor='pointer'
+              />
+
             </Flex>
             <Flex align="center">
               <Flex align="center">
@@ -156,7 +212,7 @@ const Debate = () => {
           <Text color="#676767" fontSize="md" mb={6}>
             {debate.argument}
           </Text>
-          <Image src={debate.image}/>
+          {debate.image ? <Image src={debate.image} /> : null}
         </Box>
       </Flex>
 

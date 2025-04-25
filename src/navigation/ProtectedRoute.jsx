@@ -4,7 +4,7 @@ import { auth, db } from "../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-const ProtectedRoute = ({ children, requireAuth, checkInterests = false }) => {
+const ProtectedRoute = ({ children, requireAuth }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);

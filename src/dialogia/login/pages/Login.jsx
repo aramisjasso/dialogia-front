@@ -1,7 +1,5 @@
 // src/components/Login.jsx
 import React, { useState } from "react";
-import { doc, getDoc } from "firebase/firestore"
-import { auth, db } from "../../../firebase/firebase";
 import { Box, Heading, Input, Button, Flex,Field, Link  } from "@chakra-ui/react";
 import { login, loginWithGoogle } from "../../../firebase/auth";
 import { toaster } from "../../../components/ui/toaster"

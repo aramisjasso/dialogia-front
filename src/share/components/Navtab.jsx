@@ -180,7 +180,7 @@ const handleBellClick = () => {
 
       {/* User actions */}
       <Flex gap={2} alignItems="center">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/search')}>
+        <Button variant="ghost" size="sm" color="white" _hover={{bg:"white", color:"black"}} onClick={() => navigate('/search')}>
           <LuSearch size={18} />
         </Button>
 
@@ -189,9 +189,9 @@ const handleBellClick = () => {
           <Image src={auth.currentUser?.photoURL || 'https://static-00.iconduck.com/assets.00/profile-default-icon-512x511-v4sw4m29.png'} alt="Avatar" objectFit="cover" />
         </Box>
 
-        <Button variant="ghost" size="sm" onClick={handleBellClick}>
-          <Box position="relative">
-            <FaBell size={18} color={blink ? 'lime' : 'white'} />
+        <Button variant="ghost" size="sm" color="white" _hover={{bg:"white", color:"black"}} onClick={handleBellClick}>
+          <Box position="relative" color={blink ? 'lime' : undefined}>
+            <FaBell size={18} style={{ color: 'inherit' }}  />
             {unreadCount > 0 && (
               <Badge
                 pos="absolute"
@@ -211,7 +211,7 @@ const handleBellClick = () => {
           {!isMobile && 'Cerrar Sesión'}
         </Button>
 
-        <Button variant="ghost" size="sm" onClick={() => navigate('/settings')}>
+        <Button variant="ghost" size="sm" color="white" _hover={{bg:"white", color:"black"}} onClick={() => navigate('/settings')}>
           <LuSettings size={18} />
         </Button>
       </Flex>

@@ -6,15 +6,23 @@ import {
   Flex,
   VStack,
   Image,
-  Heading,
   Link
 } from '@chakra-ui/react';
 import { FaReply, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
+import ReplyCommentForm from './ReplyCommentForm';
 
-export default function BestComment({ comment, debateId }) {
+export default function BestComment({ comment, debateId, userPosition }) {
   const [likesState, setLikesState] = useState({ liked: false, disliked: false });
   const [currentComment, setCurrentComment] = useState(comment);
+  const [selectedComment, setSelectedComment] = useState(null);
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [comments, setComments] = useState([]);
+
+  const handleReplyClick = (comment) => {
+    setSelectedComment(comment);
+    setShowReplyForm(true);
+  };
 
   useEffect(() => {
     // Inicializar el estado de likes
@@ -161,6 +169,13 @@ export default function BestComment({ comment, debateId }) {
                 .toLowerCase()}
             </Text>
             <Flex ml={6} mr={6} color="gray.500">
+              <Flex _hover={{ color: 'gray.800', cursor: 'pointer' }}
+                onClick={() => handleReplyClick(currentComment)} >
+                <FaReply />
+                <Text ml={2} fontWeight="bold" >
+                    Responder
+                  </Text>
+              </Flex >
             </Flex>
           </Flex>
           <Text mt={1} color="gray.700" fontSize={['sm', 'md', 'lg']}>
@@ -213,6 +228,16 @@ export default function BestComment({ comment, debateId }) {
           </Box>
         </Flex>
       </Box>
+      <ReplyCommentForm
+        isVisible={showReplyForm}
+        onCancel={() => setShowReplyForm(false)}
+        isInFavor={userPosition}
+        onNewComment={(newComment) => {
+          setComments(prev => [...prev, newComment]);
+          setShowReplyForm(false);
+        }}
+        parentComment={selectedComment}
+      />
     </Box>
   );
 }

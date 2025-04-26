@@ -230,6 +230,7 @@ const Debate = () => {
         <BestComment 
           comment={debate.bestArgument} 
           debateId={id} 
+          userPosition={userPosition === "InFavor" ? true : userPosition === "Against" ? false : null} 
         />
       )}
       <ChoosePosition

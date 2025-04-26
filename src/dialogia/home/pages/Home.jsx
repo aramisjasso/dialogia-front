@@ -2,22 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { 
   Box, Link, Stack, Text, Button, Flex, 
-  useBreakpointValue
+  useBreakpointValue, Grid, GridItem, Heading
 } from "@chakra-ui/react";
 import { FiMenu } from "react-icons/fi";
 import RecommendView from '../../views debate/RecommendView';
+import PopularView from '../../views debate/PopularView';
 import { toaster } from "../../../components/ui/toaster";
 import CreateDebateDialog from '../../categories/components/CreateDebateDialog';
+import { useAuth } from '../../../contexts/hooks/useAuth';
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const user = useAuth();
   const navigate = useNavigate();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const currentDate = new Date();
 
+
   useEffect(() => {
-    
     const fetchCategories = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/category`);
@@ -160,7 +163,35 @@ const Home = () => {
       </Flex>
 
       <Box p={{ base: 2, md: 4 }}>
-        <RecommendView />
+        <Grid
+          templateColumns={{
+            base: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "30% 30% 20% 20%"
+          }}
+          gap={{ base: 4, md: 6 }}
+        >
+          <GridItem>
+            <Heading as="h1" size="2xl" textAlign="center" mb={6}  fontWeight="bold">
+              Tus Favoritos
+            </Heading>
+            <Text textAlign="center" fontStyle="italic" color="gray.500">Próximamente...</Text>
+          </GridItem>
+          <GridItem>
+            <RecommendView
+              interests={user.currentUser.interests} 
+            />
+          </GridItem>
+          <GridItem>
+            <PopularView />
+          </GridItem>
+          <GridItem>
+            <Heading as="h1" size="2xl" textAlign="center" mb={6}  fontWeight="bold">
+              Ranking
+            </Heading>
+            <Text textAlign="center"  fontStyle="italic" color="gray.500">Próximamente...</Text>
+          </GridItem>
+        </Grid>
       </Box>
     </Box>
   );

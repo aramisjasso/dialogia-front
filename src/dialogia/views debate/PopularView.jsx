@@ -3,7 +3,7 @@ import { Box, Heading, Text, Spinner, Flex, Link } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const RecommendView = ( { interests } ) => {
+const PopularView = () => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,19 +11,8 @@ const RecommendView = ( { interests } ) => {
 
   useEffect(() => {
     const fetchDebates = async () => {
-      console.log(interests)
       try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/debates/recommend`, // Quitamos el /${uid} de la URL
-          {
-            interests: interests  // Tu arreglo de intereses
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        );
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/popular`);
         setDebates(response.data);
       } catch (err) {
         setError("Error al cargar los debates");
@@ -54,14 +43,13 @@ const RecommendView = ( { interests } ) => {
   return (
     <Box maxW="800px" mx="auto" p={4}>
       <Heading as="h1" size="2xl" textAlign="center" mb={6}  fontWeight="bold">
-        Recomendados para ti
+        Debates más activos
       </Heading>
 
       {debates.map((debate, index) => (
 
         <React.Fragment key={debate.idDebate}>
-
-          <Box p={4} _hover={{ bg: "gray.50" }} onClick={() => navigate(`/debate/${debate.idDebate}`)}>
+          <Box p={4} _hover={{ bg: "gray.50" }} onClick={() => navigate(`/debate/${debate.idDebate}`)} cursor="pointer"> 
             <Flex align="center" mb={2}>
               <Box
                 display="inline-block"
@@ -83,38 +71,23 @@ const RecommendView = ( { interests } ) => {
               </Text>
             </Flex>
             
-            <Heading as="h1" mb={2} fontSize="xl">  
+            <Heading as="h1" fontSize="lg">  
               {debate.nameDebate}
             </Heading>
-
-            <Text mb={2} color="#A9A9A9" fontSize="md"> 
-              {debate.argument}
-            </Text>
             <Text 
               display="inline-block" 
               color="#979797" 
               textDecoration="underline" 
-              mt={2}
-              fontSize="md"
+              fontSize="sm"
               fontWeight="bold"
             >
               Ver más
             </Text>
           </Box>
-
-          {index < debates.length - 1 && (
-            <Box 
-              h="1px"
-              bgImage="linear-gradient(to right, gray 50%, transparent 50%)"
-              bgSize="4px 1px"
-              bgRepeat="repeat-x"
-              my={2}
-            />
-          )}
         </React.Fragment>
       ))}
     </Box>
   );
 };
 
-export default RecommendView;
+export default PopularView;

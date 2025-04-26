@@ -238,8 +238,7 @@ const Profile = () => {
 
                   <DeleteAccount 
                     auth={auth}
-                  >
-                  </DeleteAccount>
+                  />
                 </Box>
           
               )}

@@ -24,6 +24,7 @@ export default function Comments() {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
   const [userPosition, setUserPosition] = useState(null);
+  const username = localStorage.getItem('username');
 
   const handleReplyClick = (comment) => {
     setSelectedComment(comment);
@@ -33,14 +34,20 @@ export default function Comments() {
   const fetchDebate = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/debates/${id}`
+        `${import.meta.env.VITE_API_URL}/debates/${id}`,
+        {
+          method: 'POST',  
+          headers: {
+            'Content-Type': 'application/json',  
+          },
+          body: '{}' 
+        }
       );
       if (!response.ok) throw new Error('Error al obtener debate');
       const data = await response.json();
       setComments(data.comments || []);
       
       // Verifica si el usuario actual ha votado y su posición
-      const username = localStorage.getItem('username');
       if (username) {
         const isInFavor = data.peopleInFavor.includes(username);
         const isAgainst = data.peopleAgaist.includes(username);
@@ -91,7 +98,7 @@ console.log(comments);
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'like', method: 'remove' }),
+            body: JSON.stringify({ action: 'like', method: 'remove', username: username }),
           }
         );
         if (!res.ok) throw new Error('Error al remover like');
@@ -113,7 +120,7 @@ console.log(comments);
             {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'dislike', method: 'remove' }),
+              body: JSON.stringify({ action: 'dislike', method: 'remove', username: username  }),
             }
           );
         }
@@ -122,7 +129,7 @@ console.log(comments);
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'like', method: 'add' }),
+            body: JSON.stringify({ action: 'like', method: 'add', username: username }),
           }
         );
         if (!res.ok) throw new Error('Error al agregar like');
@@ -157,7 +164,7 @@ console.log(comments);
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'dislike', method: 'remove' }),
+            body: JSON.stringify({ action: 'dislike', method: 'remove', username: username  }),
           }
         );
         if (!res.ok) throw new Error('Error al remover dislike');
@@ -179,7 +186,7 @@ console.log(comments);
             {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'like', method: 'remove' }),
+              body: JSON.stringify({ action: 'like', method: 'remove', username: username  }),
             }
           );
         }
@@ -188,7 +195,7 @@ console.log(comments);
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'dislike', method: 'add' }),
+            body: JSON.stringify({ action: 'dislike', method: 'add', username: username  }),
           }
         );
         if (!res.ok) throw new Error('Error al agregar dislike');

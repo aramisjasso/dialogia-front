@@ -20,7 +20,8 @@ const Debate = () => {
   useEffect(() => {
     const fetchDebate = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/${id}`);
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}`,
+          { username: currentUser.username });
         setDebate(response.data);
         console.log(response.data.bestArgument);
 

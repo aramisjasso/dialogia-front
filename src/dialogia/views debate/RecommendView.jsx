@@ -61,7 +61,7 @@ const RecommendView = ( { interests } ) => {
 
         <React.Fragment key={debate.idDebate}>
 
-          <Box p={4} _hover={{ bg: "gray.50" }} onClick={() => navigate(`/debate/${debate.idDebate}`)}>
+          <Box p={4} _hover={{ bg: "gray.50" }} onClick={() => navigate(`/debate/${debate.idDebate}`)} cursor="pointer">
             <Flex align="center" mb={2}>
               <Box
                 display="inline-block"

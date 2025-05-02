@@ -10,11 +10,13 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { auth } from "../../../firebase/firebase";
 
 const DebatesSearch = ({ search }) => {
   const [debates, setDebates]           = useState([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);
+  const [censorship, setCensorship] = useState(false);
   const [currentPage, setCurrentPage]   = useState(1);
   const [sortFavor, setSortFavor]       = useState("recent");
   const debatesPerPage                  = 10;
@@ -25,12 +27,30 @@ const DebatesSearch = ({ search }) => {
     const fetchDebates = async () => {
       try {
         setLoading(true);
+        const user = auth.currentUser;
+        if (user) {
+          const token = await user.getIdToken();
+          const userResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/user/${user.uid}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            console.log(userData)
+            setCensorship(userData.censorship);
+          }
+        }
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/debates/search?term=${search}`
+          `${import.meta.env.VITE_API_URL}/debates/search?term=${search}&censored=${censorship}`
         );
         setDebates(data);
         setCurrentPage(1); // reset
-      } catch (err) {
+      }catch (err) {
         console.error(err);
         setError("Error al cargar los debates");
       } finally {

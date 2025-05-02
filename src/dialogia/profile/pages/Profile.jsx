@@ -18,6 +18,7 @@ import {
     useColorModeValue,
   } from "../../../components/ui/color-mode"
 import DeleteAccount from "./DeleteAccount";
+import CensorshipToggle from "../components/CensorshipToggle";
 
 const Profile = () => {
   const [activeSection, setActiveSection] = useState("preferences");
@@ -25,6 +26,8 @@ const Profile = () => {
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [censorship, setCensorship] = useState(false);
+  
 
   // Obtener categorías disponibles
   useEffect(() => {
@@ -58,6 +61,8 @@ const Profile = () => {
           
           if (userResponse.ok) {
             const userData = await userResponse.json();
+            console.log(userData)
+            setCensorship(userData.censorship);
             setSelectedInterests(userData.interests || []);
           }
         }
@@ -239,6 +244,7 @@ const Profile = () => {
                   <DeleteAccount 
                     auth={auth}
                   />
+                  <CensorshipToggle censorshipValue={censorship} CensorshipChange= {setCensorship}auth={auth} />
                 </Box>
           
               )}

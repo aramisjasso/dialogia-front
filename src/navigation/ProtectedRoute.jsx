@@ -43,6 +43,11 @@ const ProtectedRoute = ({ children, requireAuth }) => {
             const data = await response.json();
             setUserData(data);
             localStorage.setItem("username", data.username);
+            // Censura
+            localStorage.setItem("censorship", data?.censorship || true);
+
+            // Ahora, para obtener el username:
+            const usernameGuardado = localStorage.getItem("username");
 
             // Redirigir a /home si ya tiene username y está en /registeruser
             if (data.username && location.pathname === "/registeruser") {

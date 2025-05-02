@@ -52,6 +52,7 @@ const RegisterInLogin= ()=>{
           uid: user.uid,
           email: user.email,
           username: username,
+          censorship: true,
         });
         await setDoc(doc(db, "usernames", username), { uid: user.uid });
         await setDoc(doc(db, "emails", user.email), { uid: user.uid });

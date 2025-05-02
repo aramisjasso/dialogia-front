@@ -8,20 +8,37 @@ import { useAuth } from '../../contexts/hooks/useAuth';
 import Comments from './Comments';
 import BestComment from './BestComment';
 import { toaster } from "../../components/ui/toaster";
+import { auth } from "../../firebase/firebase";
 
 const Debate = () => {
   const { id } = useParams();
   const [debate, setDebate] = useState(null);
   const [loading, setLoading] = useState(true);
   const { currentUser, loading: authLoading } = useAuth();
+  const [censorship, setCensorship] = useState(false);
   const [userPosition, setUserPosition] = useState(null);
   const [following, setFollowing] = useState(false);
 
   useEffect(() => {
     const fetchDebate = async () => {
       try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}`,
+        const user = auth.currentUser;
+        if (user) {
+          
+          const userResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/user/${currentUser.uid}`,
+          );
+        
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            console.log(userData)
+
+            setCensorship(userData.censorship);
+          }
+        }
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censorship}`,
           { username: currentUser.username });
+        console.log(response.data)
         setDebate(response.data);
         console.log(response.data.bestArgument);
 

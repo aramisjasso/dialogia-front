@@ -41,7 +41,7 @@ const PopularView = () => {
   }
 
   return (
-    <Box maxW="800px" mx="auto" p={4}>
+    <Box maxW="800px" mx="auto">
       <Heading as="h1" size="2xl" textAlign="center" mb={6}  fontWeight="bold">
         Debates más activos
       </Heading>

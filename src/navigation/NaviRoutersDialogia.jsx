@@ -19,6 +19,7 @@ import SelectInterests from "../dialogia/categories/pages/SelectInterests";
 import Profile from "../dialogia/profile/pages/Profile";
 import AboutUs from "../dialogia/company/pages/AboutUs";
 import Policies from "../dialogia/company/pages/Policies";
+import RankingGlobal from "../dialogia/ranking/pages/RankingGlobal";
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // import ImageUploader from "../dialogia/testing/ImageUploader";
@@ -64,21 +65,17 @@ const NaviRoutersDialogia = () => {
     {
       path: "/aboutus",
       element: (
-        <ProtectedRoute requireAuth={false}>
-          <Layout>
-            <AboutUs />
-          </Layout>
-        </ProtectedRoute>
+        <Layout>
+          <AboutUs />
+        </Layout>
       ),
     },
     {
       path: "/policies",
       element: (
-        <ProtectedRoute requireAuth={false}>
-          <Layout>
-            <Policies />
-          </Layout>
-        </ProtectedRoute>
+        <Layout>
+          <Policies />
+        </Layout>
       ),
     },
     {
@@ -191,6 +188,16 @@ const NaviRoutersDialogia = () => {
         </ProtectedRoute>
       ),
     },
+    {
+      path: "/ranking",
+      element: (
+        <ProtectedRoute requireAuth={true}>
+          <Layout>
+            <RankingGlobal />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    }
     // {
     //   path: "/test",
     //   element: (

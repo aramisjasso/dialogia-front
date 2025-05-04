@@ -25,6 +25,16 @@ const RankingGlobal = ({ categories }) => {
       .get(import.meta.env.VITE_API_URL+'/user/ranking')
       .then((res) => {
         setRanking(res.data);
+        const currentUserRank = res.data.find(user => 
+          user.uid === currentUser.uid || 
+          user.username === currentUser.username
+        );
+
+        if (currentUserRank) {
+          currentUser.rank = currentUserRank.rank;
+          currentUser.classification = currentUserRank.classification;
+        }
+
         setLoading(false);
       })
       .catch((err) => {

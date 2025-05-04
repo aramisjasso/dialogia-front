@@ -19,16 +19,10 @@ const Home = () => {
           templateColumns={{
             base: "1fr",
             sm: "repeat(2, 1fr)",
-            md: "30% 30% 20% 20%"
+            md: "45% 35% 20%"
           }}
           gap={{ base: 4, md: 6 }}
         >
-          <GridItem>
-            <Heading as="h1" size="2xl" textAlign="center" mb={6}  fontWeight="bold">
-              Tus Favoritos
-            </Heading>
-            <Text textAlign="center" fontStyle="italic" color="gray.500">Próximamente...</Text>
-          </GridItem>
           <GridItem>
             <RecommendView
               interests={user.currentUser.interests} 

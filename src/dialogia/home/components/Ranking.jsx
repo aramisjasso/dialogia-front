@@ -21,7 +21,7 @@ const Ranking = () => {
   useEffect(() => {
     const fetchRanking = async () => {
       try {
-        const response = await fetch('http://localhost:3020/api/v1/user/ranking?global=false');
+        const response = await fetch(import.meta.env.VITE_API_URL+'/user/ranking?global=false');
         if (!response.ok) {
           throw new Error('Error al obtener el ranking');
         }

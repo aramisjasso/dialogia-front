@@ -13,6 +13,8 @@ import {
 import { FaReply, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
 import ReplyCommentForm from './ReplyCommentForm';
+import { useAuth } from '../../contexts/hooks/useAuth';
+
 export default function Comments() {
   const { id } = useParams();
   const [comments, setComments] = useState([]);
@@ -24,7 +26,8 @@ export default function Comments() {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
   const [userPosition, setUserPosition] = useState(null);
-  const username = localStorage.getItem('username');
+  const user = useAuth();
+  const username = user.currentUser.username; 
 
   const handleReplyClick = (comment) => {
     setSelectedComment(comment);

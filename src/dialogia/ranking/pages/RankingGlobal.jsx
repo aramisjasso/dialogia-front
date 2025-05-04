@@ -1,21 +1,14 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Heading,
-  Text,
-  Flex,
-  Spinner,
-  Badge,
-  Stack,
-  useBreakpointValue,
-  Image
-} from "@chakra-ui/react";
+import { Box, Heading, Text, Flex, Spinner, Stack, useBreakpointValue, Image } from "@chakra-ui/react";
 import CategoriesBar from "../../home/components/CategoriesBar";
 import axios from "axios";
+import { useAuth } from '../../../contexts/hooks/useAuth';
 
 const RankingGlobal = ({ categories }) => {
   const [ranking, setRanking] = useState([]);
   const [loading, setLoading] = useState(true);
+  const user = useAuth();
+  const currentUser = user.currentUser;
 
   const imageSize = useBreakpointValue({
       base: '15%',
@@ -27,29 +20,9 @@ const RankingGlobal = ({ categories }) => {
       minW: '100px'
     });
 
-  // Usuario actual (simulado)
-  const currentUser = {
-    id: "8W4fn58QELWgMtmGMPz48hZOc2F2", // Usando un ID que existe en la respuesta
-    username: "aramis",
-    classification: "Crítico",
-    activity: {
-      interactions: {
-        likes: 2,
-        dislikes: 1,
-        comments: 2
-      },
-      content: {
-        created: 3,
-        views: 12
-      },
-      score: 24.3
-    },
-    rank: 1
-  };
-
   useEffect(() => {
     axios
-      .get("http://localhost:3020/api/v1/user/ranking")
+      .get(import.meta.env.VITE_API_URL+'/user/ranking')
       .then((res) => {
         setRanking(res.data);
         setLoading(false);
@@ -66,136 +39,186 @@ const RankingGlobal = ({ categories }) => {
 
       <Flex px={6} py={4} gap={6} direction={{ base: "column", md: "row" }}>
         <Box flex={3}>
-          <Heading size="lg" mb={4}>
+          <Heading as="h1" size="2xl" mb={6}  fontWeight="bold">
             Ranking Global
           </Heading>
-
-          {loading ? (
-            <Spinner />
-          ) : (
-            <Box>
-              <Flex fontWeight="bold" px={2} py={2}>
-                <Box flex="0.5" textAlign="center">Puesto</Box>
-                <Box flex="2" textAlign="center">Perfil</Box>
-                <Box flex="1" textAlign="center">Puntuación</Box>
-                <Box flex="1" textAlign="center">Likes</Box>
-                <Box flex="1" textAlign="center">Posts</Box>
-                <Box flex="1" textAlign="center">Vistas</Box>
-                <Box flex="1" textAlign="center">Comentarios</Box>
-              </Flex>
-
-            {ranking.map((user) => (
-                <Flex key={user.id} px={2} py={2} align="center" cursor="pointer" _hover={{ bg: "gray.50" }}>
-                  <Box flex="0.5" textAlign="center">#{user.rank}</Box>
-                  <Box flex="2">
-                    <Flex align="center" px={2} py={1}>
-                      <Image
-                        src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                        w="50px"
-                        minW="50px"
-                        objectFit="contain"
-                        mr={4}
-                      />
-                
-                      <Box>
-                        <Text 
-                          fontSize="lg" 
-                          fontWeight="bold" 
-                          color="black"
-                        >
-                          {user.username}
-                        </Text>
-                        
-                        <Flex mt={1}>
-                          <Text 
-                            fontSize="sm" 
-                            fontWeight="bold" 
-                            color="#878787"
-                          >
-                            ★ {user.classification}
-                          </Text>
-                        </Flex>
-                      </Box>
-                    </Flex>
-                  </Box>
-                  <Box flex="1" textAlign="center">{user.activity?.score?.toFixed(1) || 0}</Box>
-                  <Box flex="1" textAlign="center">{user.activity?.interactions?.likes || 0}</Box>
-                  <Box flex="1" textAlign="center">{user.activity?.content?.created || 0}</Box>
-                  <Box flex="1" textAlign="center">{user.activity?.content?.views || 0}</Box>
-                  <Box flex="1" textAlign="center">{user.activity?.interactions?.comments || 0}</Box>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <Box>
+                <Flex color={"#878787"} px={2} py={2} position="sticky" top="0" zIndex="1">
+                  <Box flex="0.5" textAlign="center">Puesto</Box>
+                  <Box flex="1" textAlign="center">Perfil</Box>
+                  <Box flex="1" textAlign="center">Nivel</Box>
+                  <Box flex="1" textAlign="center">Puntuación</Box>
+                  <Box flex="1" textAlign="center">Likes</Box>
+                  <Box flex="1" textAlign="center">Posts</Box>
+                  <Box flex="1" textAlign="center">Vistas</Box>
+                  <Box flex="1" textAlign="center">Comentarios</Box>
                 </Flex>
-            ))}
+
+                <Box 
+                  maxH="calc(100vh - 250px)" 
+                  overflowY="auto"
+                  css={{
+                    "&::-webkit-scrollbar": {
+                      width: "6px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      backgroundColor: "rgba(0, 0, 0, 0.2)",
+                      borderRadius: "3px",
+                    },
+                  }}
+                >
+              {ranking.map((user) => (
+                  <Flex fontWeight="bold" key={user.id} px={2} py={2} align="center" cursor="pointer" _hover={{ bg: "gray.50" }}>
+                    <Box flex="0.5" textAlign="center" color={"#535353"} fontSize="xl">#{user.rank}</Box>
+                    <Box flex="1">
+                      <Flex align="center" px={2} py={1}>
+                        <Image
+                          src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
+                          w="50px"
+                          minW="50px"
+                          objectFit="contain"
+                          mr={4}
+                        />
+                  
+                        <Box>
+                          <Text 
+                            fontSize="lg" 
+                            color="black"
+                          >
+                            {user.username}
+                          </Text>
+                          
+                          <Flex mt={1}>
+                            <Text 
+                              fontSize="sm"  
+                              color="#878787"
+                            >
+                              ★ {user.classification}
+                            </Text>
+                          </Flex>
+                        </Box>
+                      </Flex>
+                    </Box>
+                    <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">
+                      {user.activity?.score ? Math.floor(user.activity.score / 10) + 1 : 1}
+                    </Box>
+                    <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">{user.activity?.score?.toFixed(0) || 0} XP</Box>
+                    <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">{user.activity?.interactions?.likes || 0}</Box>
+                    <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">{user.activity?.content?.created || 0}</Box>
+                    <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">{user.activity?.content?.views || 0}</Box>
+                    <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">{user.activity?.interactions?.comments || 0}</Box>
+                  </Flex>
+              ))}
+              </Box>
             </Box>
           )}
         </Box>
 
         <Box
           flex={1}
-          p={4}
-          borderWidth="1px"
-          borderRadius="lg"
-          bg="white"
-          boxShadow="md"
+          position={{ base: "static", md: "sticky" }}
+          top="100px"
+          alignSelf="flex-start"
         >
-          <Text fontWeight="bold" fontSize="lg" mb={2}>
-            Tu Posición
-          </Text>
+          <Heading as="h1" size="2xl" mb={6}  fontWeight="bold">
+            Tu Posición  
+          </Heading>
 
-          <Stack spacing={2} align="center">
-          <Image
-            src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-            w={imageSize}
-            minW="200px"
-            objectFit="contain"
-            mr={4}
-          />
-            <Badge colorScheme="green" borderRadius="full" px={2} py={1}>
+          <Box
+            p={4}
+            borderRadius="lg"
+            border="1px solid"
+            borderColor="gray.200"
+            bg="white"
+            boxShadow="4px 4px 8px rgba(0, 0, 0, 0.1)"
+          >
+            <Box
+              position="absolute"
+              bg="white"
+              border="4px solid #14EC00"
+              borderRadius="full"
+              w="40px"
+              h="40px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              fontWeight="bold"
+              fontSize="lg"
+            >
+              {currentUser.activity?.score ? Math.floor(currentUser.activity.score / 10) + 1 : 1}
+            </Box>
+
+            <Text
+              position="absolute"
+              right="20px"
+              fontWeight="bold"
+              fontSize="lg"
+              color="black"
+            >
               #{currentUser.rank}
-            </Badge>
-            {/* <Avatar size="xl" name={currentUser.username} /> */}
-            <Text fontWeight="semibold">{currentUser.username}</Text>
-            <Text fontSize="sm" color="gray.500">
-              {currentUser.classification}
-            </Text>
-            <Text fontSize="lg" fontWeight="bold">
-              {currentUser.activity?.score?.toFixed(1)} puntos
             </Text>
 
-            <Box w="100%" h="1px" bg="gray.200" my={2} />
+            <Stack spacing={2} align="center">
+            <Image
+              src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
+              w={imageSize}
+              minW="160px"
+              objectFit="contain"
+              mr={4}
+            />
+              {/* <Avatar size="xl" name={currentUser.username} /> */}
+              <Text fontWeight="bold" fontSize="xl" color="#3D3D3D">{currentUser.username}</Text>
+              <Flex alignItems="center">
+              <Text fontWeight="bold" fontSize="xl" color="#7B7B7B" mr={1}>
+                ★
+              </Text>
+              <Text fontWeight="bold" fontSize="md" color="#7B7B7B">
+                {currentUser.classification}
+              </Text>
+              </Flex>
+              <Text fontSize="2xl" fontWeight="bold">
+                {currentUser.activity?.score?.toFixed(0)} XP
+              </Text>
+            </Stack>
 
-            <Flex justify="space-between" w="full">
-              <Box textAlign="center">
-                <Text fontSize="sm">Publicaciones</Text>
-                <Text fontWeight="bold">{currentUser.activity?.content?.created || 0}</Text>
+            <Box mt={8}>
+            <Flex justify="space-between" mb={6}>
+              <Box textAlign="center" flex={1}>
+                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Publicaciones</Text>
+                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.content?.created || 0}</Text>
               </Box>
-              <Box textAlign="center">
-                <Text fontSize="sm">Comentarios</Text>
-                <Text fontWeight="bold">{currentUser.activity?.interactions?.comments || 0}</Text>
+              <Box textAlign="center" flex={1}>
+                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Comentarios</Text>
+                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.comments || 0}</Text>
               </Box>
             </Flex>
 
-            <Flex justify="space-between" w="full">
-              <Box textAlign="center">
-                <Text fontSize="sm">Likes</Text>
-                <Text fontWeight="bold">{currentUser.activity?.interactions?.likes || 0}</Text>
+            <Flex justify="space-between" mb={2}>
+              <Box textAlign="center" flex={1} mb={6}>
+                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Likes</Text>
+                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.likes || 0}</Text>
               </Box>
-              <Box textAlign="center">
-                <Text fontSize="sm">Dislikes</Text>
-                <Text fontWeight="bold">{currentUser.activity?.interactions?.dislikes || 0}</Text>
+              <Box textAlign="center" flex={1}>
+                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Dislikes</Text>
+                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.dislikes || 0}</Text>
               </Box>
             </Flex>
 
-            <Flex justify="space-between" w="full">
-              <Box textAlign="center">
-                <Text fontSize="sm">Vistas</Text>
-                <Text fontWeight="bold">{currentUser.activity?.content?.views || 0}</Text>
+            <Flex justify="space-between">
+              <Box textAlign="center" flex={1} mb={6}>
+                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Vistas</Text>
+                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.content?.views || 0}</Text>
               </Box>
-              <Box textAlign="center">
-                <Text fontSize="sm">Puntuación</Text>
-                <Text fontWeight="bold">{currentUser.activity?.score?.toFixed(1) || 0}</Text>
+              <Box textAlign="center" flex={1} mb={6}>
+                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Insignias</Text>
+                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.badges?.count || '0/0'}</Text>
               </Box>
             </Flex>
-          </Stack>
+          </Box>
+          </Box>
         </Box>
       </Flex>
     </>

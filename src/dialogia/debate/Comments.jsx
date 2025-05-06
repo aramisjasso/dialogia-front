@@ -57,10 +57,13 @@ export default function Comments() {
         setUserPosition(isInFavor ? true : (isAgainst ? false : null));
       }
       
-      const initial = {};
-      (data.comments || []).forEach(c => {
-        initial[c.idComment] = { liked: false, disliked: false };
-      });
+            const initial = {};
+            (data.comments || []).forEach(c => {
+              initial[c.idComment] = {
+                liked: c.peopleInFavor?.includes(username),      // true si ya votó like
+                disliked: c.peopleAgaist?.includes(username)    // true si ya votó dislike
+              };
+            });
       setLikesState(initial);
     } catch (err) {
       console.error(err);
@@ -106,11 +109,13 @@ console.log(comments);
         );
         if (!res.ok) throw new Error('Error al remover like');
         const updated = await res.json();
-        setComments(prev =>
-          prev.map(c =>
-            c.idComment === idComment ? { ...c, likes: updated.likes } : c
-          )
-        );
+                setComments(prev =>
+                    prev.map(c =>
+                      c.idComment === idComment
+                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
+                        : c
+                    )
+                  );
         setLikesState(prev => ({
           ...prev,
           [idComment]: { liked: false, disliked: prev[idComment].disliked },
@@ -137,11 +142,13 @@ console.log(comments);
         );
         if (!res.ok) throw new Error('Error al agregar like');
         const updated = await res.json();
-        setComments(prev =>
-          prev.map(c =>
-            c.idComment === idComment ? { ...c, likes: updated.likes } : c
-          )
-        );
+                setComments(prev =>
+                    prev.map(c =>
+                      c.idComment === idComment
+                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
+                        : c
+                    )
+                  );
         setLikesState(prev => ({
           ...prev,
           [idComment]: { liked: true, disliked: false },
@@ -172,11 +179,13 @@ console.log(comments);
         );
         if (!res.ok) throw new Error('Error al remover dislike');
         const updated = await res.json();
-        setComments(prev =>
-          prev.map(c =>
-            c.idComment === idComment ? { ...c, dislikes: updated.dislikes } : c
-          )
-        );
+                setComments(prev =>
+                    prev.map(c =>
+                      c.idComment === idComment
+                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
+                        : c
+                    )
+                  );
         setLikesState(prev => ({
           ...prev,
           [idComment]: { disliked: false, liked: prev[idComment].liked },
@@ -203,11 +212,13 @@ console.log(comments);
         );
         if (!res.ok) throw new Error('Error al agregar dislike');
         const updated = await res.json();
-        setComments(prev =>
-          prev.map(c =>
-            c.idComment === idComment ? { ...c, dislikes: updated.dislikes } : c
-          )
-        );
+                setComments(prev =>
+                    prev.map(c =>
+                      c.idComment === idComment
+                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
+                        : c
+                    )
+                  );
         setLikesState(prev => ({
           ...prev,
           [idComment]: { disliked: true, liked: false },
@@ -353,29 +364,37 @@ console.log(comments);
         </Flex>
 
         <Box position="absolute" top={parentComment ? "15px" : "5"} right="6">
-          <Flex align="center" gap={4}>
-            <Box
-              color={likesState[c.idComment]?.disliked ? 'red.500' : 'gray.500'}
-              _hover={{
-                color: likesState[c.idComment]?.disliked ? 'red.600' : 'gray.700',
-                cursor: 'pointer',
-              }}
-              onClick={() => handleDislike(c.idComment)}
-            >
-              <FaThumbsDown />
-            </Box>
-            <Box
-              color={likesState[c.idComment]?.liked ? 'blue.500' : 'gray.500'}
-              _hover={{
-                color: likesState[c.idComment]?.liked ? 'blue.600' : 'gray.700',
-                cursor: 'pointer',
-              }}
-              onClick={() => handleLike(c.idComment)}
-            >
-              <FaThumbsUp />
-            </Box>
-          </Flex>
-        </Box>
+       <Flex align="center" gap={4}>
+         <Flex 
+           align="center" 
+           color={likesState[c.idComment]?.disliked ? 'red.500' : 'gray.500'}
+           _hover={{
+             color: likesState[c.idComment]?.disliked ? 'red.600' : 'gray.700',
+             cursor: 'pointer',
+           }}
+           onClick={() => handleDislike(c.idComment)} 
+         >
+           <FaThumbsDown />
+           <Text ml={1} fontSize="sm">
+             {c.dislikes ?? 0}
+           </Text>
+         </Flex>
+         <Flex 
+           align="center" 
+           color={likesState[c.idComment]?.liked ? 'blue.500' : 'gray.500'}
+           _hover={{
+             color: likesState[c.idComment]?.liked ? 'blue.600' : 'gray.700',
+             cursor: 'pointer',
+           }}
+           onClick={() => handleLike(c.idComment)} 
+         >
+           <FaThumbsUp />
+           <Text ml={1} fontSize="sm">
+             {c.likes ?? 0}
+           </Text>
+         </Flex>
+       </Flex>
+     </Box>
       </Box>
     );
   };

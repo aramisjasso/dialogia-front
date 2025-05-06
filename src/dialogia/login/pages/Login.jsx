@@ -26,6 +26,15 @@ const Login = () => {
     const user = userCredential.user;
     console.log("Usuario autenticado:", user);
 
+    await fetch(
+      `${import.meta.env.VITE_API_URL}/user/${user.uid}/badges`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }
+    );
     navigate("/home")
   } catch (error) {
     // Si hay un error, muestra un mensaje

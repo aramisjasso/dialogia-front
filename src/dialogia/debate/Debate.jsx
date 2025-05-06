@@ -74,6 +74,7 @@ const Debate = () => {
     );
   }
 
+  console.log("Current User", currentUser);
   if (!debate) return <Text>Debate no encontrado</Text>;
 
   const isCreator = currentUser && debate.username === currentUser.username; 
@@ -184,7 +185,7 @@ const Debate = () => {
               {debate.username}
             </Text>
             <Text fontSize="xs" color="#727272" fontWeight="bold">
-             ★ Crítico
+             ★ {currentUser.title}
             </Text>
           </Flex>
         </Box>

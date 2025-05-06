@@ -55,10 +55,12 @@ const NavTab = () => {
         status: 'warning',
         duration: 3000,
       });
+    }else if( link == '/debate/undefined'){
+       navigate('/profile');
+    }else {
+      navigate(link);
     }
-
-    // Ruta válida
-    navigate(link);
+    
   };
   // Logout
   const handleLogout = async () => {

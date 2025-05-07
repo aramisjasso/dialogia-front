@@ -263,7 +263,7 @@ const Debate = () => {
         username={currentUser?.username}
         id = {id}
       />
-      <Comments/>
+      <Comments censored={censorship}/>
       {userPosition !== null && ( 
         <Box
           position="absolute"

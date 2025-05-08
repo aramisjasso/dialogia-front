@@ -32,7 +32,7 @@ const RankingGlobal = ({ categories }) => {
 
         if (currentUserRank) {
           currentUser.rank = currentUserRank.rank;
-          currentUser.classification = currentUserRank.classification;
+          currentUser.title = currentUserRank.title;
         }
 
         setLoading(false);
@@ -106,7 +106,7 @@ const RankingGlobal = ({ categories }) => {
                               fontSize="sm"  
                               color="#878787"
                             >
-                              ★ {user.classification}
+                              ★ {user.title || 'Espectador'}
                             </Text>
                           </Flex>
                         </Box>
@@ -186,7 +186,7 @@ const RankingGlobal = ({ categories }) => {
                 ★
               </Text>
               <Text fontWeight="bold" fontSize="md" color="#7B7B7B">
-                {currentUser.classification}
+                {currentUser.title || 'Espectador'}
               </Text>
               </Flex>
               <Text fontSize="2xl" fontWeight="bold">

@@ -222,7 +222,23 @@ const Debate = () => {
           <Text color="#676767" fontSize="md" mb={6}>
             {debate.argument}
           </Text>
-          {debate.image ? <Image src={debate.image} /> : null}
+          {debate.image && (
+            <Image
+              src={debate.image}
+              alt="Imagen del debate"
+              objectFit="contain" // Mantiene la relación de aspecto y muestra la imagen completa
+              maxW="100%"       // Ancho máximo del contenedor
+              maxH={{           // Altura máxima responsiva
+                base: "200px",  // Mobile
+                md: "300px",    // Tablet
+                lg: "400px"     // Desktop
+              }}
+              mx="auto"         // Centra la imagen horizontalmente
+              my={4}            // Margen vertical
+              borderRadius="md" // Bordes redondeados opcionales
+              boxShadow="sm"    // Sombra ligera opcional
+            />
+          )}
         </Box>
       </Flex>
 

@@ -99,7 +99,7 @@ const Ranking = () => {
                     color="#878787" 
                     mr={4}
                   >
-                    ★ {user.classification}
+                    ★ {user.title || 'Espectador'}
                   </Text>
                   <Text 
                     fontSize="md" 

@@ -131,7 +131,7 @@ const RecoverReset = () => {
         />
         </Field.Root>
         <Field.Root>
-          <Field.Label textStyle="sm" m={2}>Contraseña</Field.Label>
+          <Field.Label textStyle="sm" m={2}>Confirmar Contraseña</Field.Label>
         <Input
           shadow="md"
           variant="subtle"

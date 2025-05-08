@@ -29,7 +29,12 @@ const Debate = () => {
         console.log(response.data)
         setDebate(response.data);
         console.log(response.data.bestArgument);
-
+        
+        if (response.data.followers && currentUser) {
+         const isFollowing = response.data.followers.includes(currentUser.username);
+         setFollowing(isFollowing);
+        }
+          
         if (response.data && currentUser) {
           const initialPosition = 
             response.data.peopleInFavor.includes(currentUser.username) ? "InFavor" :

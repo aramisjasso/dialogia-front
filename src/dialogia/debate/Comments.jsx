@@ -15,7 +15,7 @@ import { toaster } from '../../components/ui/toaster';
 import ReplyCommentForm from './ReplyCommentForm';
 import { useAuth } from '../../contexts/hooks/useAuth';
 
-export default function Comments() {
+export default function Comments({censored}) {
   const { id } = useParams();
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ export default function Comments() {
   const fetchDebate = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/debates/${id}`,
+        `${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censored}`,
         {
           method: 'POST',  
           headers: {

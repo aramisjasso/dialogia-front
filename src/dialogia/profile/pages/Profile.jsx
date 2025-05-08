@@ -1,5 +1,6 @@
 // src/dialogia/profile/pages/Profile.jsx
 import { useState, useEffect } from "react";
+import { useAuth } from '../../../contexts/hooks/useAuth';
 import { 
   Box, 
   Flex, 
@@ -60,7 +61,7 @@ const BADGE_DEFINITIONS = [
   { badgeId: "catPolitica",   badgeName: "Político Digital",   description: "Publicaste 5 debates en Política.",  xp: 9 },
 ];
 
-
+  const {currentUser, loading, error, refreshUser } = useAuth();//Contexto de usuario
   const [activeSection, setActiveSection] = useState("preferences");
   const [categories, setCategories] = useState([]);
   const [selectedInterests, setSelectedInterests] = useState([]);
@@ -107,27 +108,10 @@ const BADGE_DEFINITIONS = [
       
       setCategories(sortedCategories);
         // Obtener intereses del usuario
-        const user = auth.currentUser;
-        if (user) {
-          const token = await user.getIdToken();
-          const userResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/user/${user.uid}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            console.log(userData)
-            setCensorship(userData.censorship);
-            setSelectedInterests(userData.interests || []);
-            const unlocked = (userData.insignias || []).map(ins => ins.badgeId);
-            setUserUnlockedBadges(unlocked);
-          }
-        }
+        setCensorship(currentUser.censorship);
+        setSelectedInterests(currentUser.interests || []);
+        const unlocked = (currentUser.insignias || []).map(ins => ins.badgeId);
+        setUserUnlockedBadges(unlocked);
       } catch (error) {
         console.error("Error:", error);
         toaster.create({
@@ -163,12 +147,9 @@ const BADGE_DEFINITIONS = [
 
     setIsSubmitting(true);
     try {
-      const user = auth.currentUser;
-      if (!user) throw new Error("Usuario no autenticado");
-
       // const token = await user.getIdToken();
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/user/${user.uid}/interests`,
+        `${import.meta.env.VITE_API_URL}/user/${currentUser.uid}/interests`,
         {
           method: "PUT",
           headers: {
@@ -177,7 +158,7 @@ const BADGE_DEFINITIONS = [
           body: JSON.stringify({ interests: selectedInterests }),
         }
       );
-
+      await refreshUser();
       if (!response.ok) throw new Error("Error al actualizar intereses");
 
       toaster.create({
@@ -451,7 +432,7 @@ const BADGE_DEFINITIONS = [
                   <DeleteAccount 
                     auth={auth}
                   />
-                  <CensorshipToggle censorshipValue={censorship} CensorshipChange= {setCensorship}auth={auth} />
+                  <CensorshipToggle censorshipValue={censorship} CensorshipChange= {setCensorship} currentUser={currentUser} refreshUser={refreshUser}/>
                 </Box>
           
               )}

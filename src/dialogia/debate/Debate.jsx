@@ -22,20 +22,8 @@ const Debate = () => {
   useEffect(() => {
     const fetchDebate = async () => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          
-          const userResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/user/${currentUser.uid}`,
-          );
+        setCensorship(currentUser.censorship);
         
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            console.log(userData)
-
-            setCensorship(userData.censorship);
-          }
-        }
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censorship}`,
           { username: currentUser.username });
         console.log(response.data)
@@ -74,11 +62,9 @@ const Debate = () => {
     );
   }
 
-  console.log("Current User", currentUser);
   if (!debate) return <Text>Debate no encontrado</Text>;
 
   const isCreator = currentUser && debate.username === currentUser.username; 
-  //console.log(userPosition);
 
   // Función para detectar y formatear URLs
   const formatRefs = (refs) => {

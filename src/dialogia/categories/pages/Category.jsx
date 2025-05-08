@@ -3,8 +3,9 @@ import React, { useState,  } from "react";
 import { Box, Heading, Text, Image, Flex, Button } from "@chakra-ui/react";
 import { FaEye, FaCommentAlt, FaPlus, FaSearch } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import CategoryView from '../../views debate/CategoryView';
+import CategoryView from '../components/CategoryView';
 import CreateDebateDialog from "../components/CreateDebateDialog"; // Ajusta la ruta según tu estructura
+
 
 
 const Category = () => {

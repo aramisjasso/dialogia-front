@@ -3,7 +3,7 @@ import { Box, Heading, Text, Spinner, Flex, Link } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const RecommendView = ( { interests } ) => {
+const RecommendView = ( { interests, censored } ) => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ const RecommendView = ( { interests } ) => {
       console.log(interests)
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/debates/recommend`, // Quitamos el /${uid} de la URL
+          `${import.meta.env.VITE_API_URL}/debates/recommend?censored=${censored}`, // Quitamos el /${uid} de la URL
           {
             interests: interests  // Tu arreglo de intereses
           },

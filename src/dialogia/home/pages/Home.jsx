@@ -25,11 +25,13 @@ const Home = () => {
         >
           <GridItem>
             <RecommendView
-              interests={user.currentUser.interests} 
+              interests={user.currentUser.interests}
+              censored={user.currentUser.censorship} 
             />
           </GridItem>
           <GridItem>
-            <PopularView />
+            <PopularView
+              censored={user.currentUser.censorship} />
           </GridItem>
           <GridItem>
             <Ranking />

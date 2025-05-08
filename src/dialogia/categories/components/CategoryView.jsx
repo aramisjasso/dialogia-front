@@ -6,17 +6,18 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaCommentAlt } from "react-icons/fa";
-import { toaster } from "../../components/ui/toaster";
-import { auth } from "../../firebase/firebase";
+import { toaster } from "../../../components/ui/toaster";
+import { useAuth } from '../../../contexts/hooks/useAuth';
 
 const CategoryView = ({category, sortType, search, quantity }) => {
   const [allDebates, setAllDebates] = useState([]); // Todos los debates
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [censorship, setCensorship] = useState(false);
+  
   const [currentPage, setCurrentPage] = useState(1);
   const debatesPerPage = 10; // Número de debates por página
-
+  const { currentUser} = useAuth();
+  const [censorship, setCensorship] = useState(currentUser.censorship);
   const navigate = useNavigate();
   const querry = ['active','recent','popular','ancient'];
 
@@ -25,33 +26,14 @@ const CategoryView = ({category, sortType, search, quantity }) => {
     const fetchDebates = async () => {
       try {
         setLoading(true);
-        const user = auth.currentUser;
-        if (user) {
-          const token = await user.getIdToken();
-          const userResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/user/${user.uid}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            console.log(userData)
-            setCensorship(userData.censorship);
-          }
+
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/debates/category/${category}?sort=${querry[sortType]}&search=${search}&censored=${censorship}`
         );
         setAllDebates(response.data);
         quantity(response.data.length);
         // Obtener intereses del usuario
-        
-        }
       
-
       } catch (err) {
         setError("Error al cargar los debates");
         console.error(err);

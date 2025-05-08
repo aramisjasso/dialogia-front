@@ -58,7 +58,7 @@ const RankingGlobal = ({ categories }) => {
               <Box>
                 <Flex color={"#878787"} px={2} py={2} position="sticky" top="0" zIndex="1">
                   <Box flex="0.5" textAlign="center">Puesto</Box>
-                  <Box flex="1" textAlign="center">Perfil</Box>
+                  <Box flex="2" textAlign="center">Perfil</Box>
                   <Box flex="1" textAlign="center">Nivel</Box>
                   <Box flex="1" textAlign="center">Puntuación</Box>
                   <Box flex="1" textAlign="center">Likes</Box>
@@ -83,7 +83,7 @@ const RankingGlobal = ({ categories }) => {
               {ranking.map((user) => (
                   <Flex fontWeight="bold" key={user.id} px={2} py={2} align="center" cursor="pointer" _hover={{ bg: "gray.50" }}>
                     <Box flex="0.5" textAlign="center" color={"#535353"} fontSize="xl">#{user.rank}</Box>
-                    <Box flex="1">
+                    <Box flex="2">
                       <Flex align="center" px={2} py={1}>
                         <Image
                           src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"

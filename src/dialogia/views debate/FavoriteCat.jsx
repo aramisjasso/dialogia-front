@@ -9,6 +9,7 @@ import {
   Button,
   HStack,
   Image,
+  Avatar
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
@@ -222,14 +223,12 @@ const [userRanking, setUserRanking] = useState([]);
                     </HStack>
                 </Flex>
                 <Flex mb={4} mt={6}>
-                            <Image
-                              src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                              maxH="100px"
-                              maxW="100px"
-                              objectFit="cover"
-                              />
+                                <Avatar.Root style={{ width: 100, height: 100, borderRadius: '9999px', overflow: 'hidden' }} mr={3}>
+                                  <Avatar.Fallback delayMs={600}>{`A${deb.user?.id}`}</Avatar.Fallback>
+                                  <Avatar.Image src={`/avatar_${deb.user?.avatarId || "1" }.jpg`} alt={`Avatar ${deb.user?.id}`} />
+                                </Avatar.Root>
                               <Box>
-                              <Text fontWeight={500} fontSize="2xl">{deb.username}</Text>
+                              <Text fontWeight={500} fontSize="2xl">{deb.user.username}</Text>
                               <Flex gap={2}>
                                     <FaStar pt={2} color="rgb(71, 71, 71)" size={20}/>
                                   <Text fontWeight={600} fontSize="lg" color="gray.600">{deb.userTitle}</Text>

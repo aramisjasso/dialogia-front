@@ -165,7 +165,7 @@ const UserProfile = ({ currentUser, refreshUser }) => {
           size="sm"
           mt={1}
           alignSelf="flex-start"
-          onClick={() => navigate('/cambiar-contraseña')}
+          onClick={() => navigate('/change-password')}
         >
           Cambiar contraseña
         </Button>

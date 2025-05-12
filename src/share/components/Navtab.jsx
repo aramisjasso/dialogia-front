@@ -233,8 +233,8 @@ const NavTab = () => {
                 ref={menuRef}
               >
                 <Avatar.Root style={{ width: 50, height: 50, borderRadius: '9999px', overflow: 'hidden' }}>
-                  <Avatar.Fallback delayMs={600}>{`A${currentUser.id}`}</Avatar.Fallback>
-                  <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${currentUser.id}`} />
+                  <Avatar.Fallback delayMs={600}>{`A${currentUser?.id}`}</Avatar.Fallback>
+                  <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${currentUser?.id}`} />
                 </Avatar.Root>
               </Box>
             </Menu.Trigger>

@@ -8,7 +8,8 @@ import {
   VStack,
   Image,
   Heading,
-  Link
+  Link,
+  Avatar
 } from '@chakra-ui/react';
 import { FaReply, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
@@ -312,14 +313,11 @@ const handleDislike = async idComment => {
         
 
         <Flex align="flex-start" flexWrap="wrap">
-          <Image
-            src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-            maxH="60px"
-            maxW="60px"
-            objectFit="cover"
-            mr={3}
-            mt={2}
-          />
+          <Avatar.Root style={{ width: 60, height: 60, borderRadius: '9999px', overflow: 'hidden' }} mr={3}  mt={2}>
+            <Avatar.Fallback delayMs={600}>{`A${c.user?.id}`}</Avatar.Fallback>
+            <Avatar.Image src={`/avatar_${c.user?.avatarId || "1" }.jpg`} alt={`Avatar ${c.user?.id}`} />
+          </Avatar.Root>
+
           <Box flex="1" minW="200px">
             <Flex align="center" flexWrap="wrap">
               <Text fontWeight="bold" mr={2} fontSize={['sm', 'md', 'lg']}>

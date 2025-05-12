@@ -20,50 +20,38 @@ const Debate = () => {
   const [following, setFollowing] = useState(false);
 
   useEffect(() => {
-const fetchDebate = async () => {
-  try {
-    setCensorship(currentUser.censorship);
-    
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censorship}`,
-      { username: currentUser.username }
-    );
-
-    setDebate(response.data);
-
-    // Buscar el título del usuario en el ranking
-    const rankingRes = await axios.get(`${import.meta.env.VITE_API_URL}/user/rankingall`);
-    const rankedUsers = rankingRes.data;
-
-    const matchedUser = rankedUsers.find(u => u.username === response.data.username);
-
-    if (matchedUser) {
-      setDebate(prev => ({ ...prev, userTitle: matchedUser.title }));
-    }
-
-    // Seguidores
-    if (response.data.followers && currentUser) {
-      const isFollowing = response.data.followers.includes(currentUser.username);
-      setFollowing(isFollowing);
-    }
-
-    // Posición
-    if (response.data && currentUser) {
-      const initialPosition = 
-        response.data.peopleInFavor.includes(currentUser.username)
-          ? "InFavor"
-          : response.data.peopleAgaist.includes(currentUser.username)
-          ? "Agaist"
-          : null;
-      setUserPosition(initialPosition);
-    }
-
-  } catch (error) {
-    console.error('Error fetching debate:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+    const fetchDebate = async () => {
+      try {
+        setCensorship(currentUser.censorship);
+        
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censorship}`,
+          { username: currentUser.username });
+        console.log(response.data)
+        setDebate(response.data);
+        console.log(response.data.bestArgument);
+        
+        if (response.data.followers && currentUser) {
+         const isFollowing = response.data.followers.includes(currentUser.username);
+         setFollowing(isFollowing);
+        }
+          
+        if (response.data && currentUser) {
+          const initialPosition = 
+            response.data.peopleInFavor.includes(currentUser.username) ? "InFavor" :
+            response.data.peopleAgaist.includes(currentUser.username) ? "Agaist" :
+            null;
+          setUserPosition(initialPosition);
+        }
+        if (debate && currentUser) {
+          const isFollowing = Array.isArray(debate.followers) && debate.followers.includes(currentUser.username);
+          setFollowing(isFollowing);
+        }
+      } catch (error) {
+        console.error('Error fetching debate:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchDebate();
   }, [id, currentUser]);
 
@@ -176,23 +164,17 @@ const fetchDebate = async () => {
         {/* Columna izquierda (Usuario) */}
         <Box width="80px" textAlign="center">
           <Flex direction="column" align="center">
-            {/* <Avatar.Root style={{ width: 100, height: 100, borderRadius: '9999px', overflow: 'hidden' }} mr={4}> */}
-              {/* <Avatar.Fallback delayMs={600}>{`A${debate.username.id}`}</Avatar.Fallback>
-              <Avatar.Image src={`/avatar_${debate.username?.avatarId || "1" }.jpg`} alt={`Avatar ${debate.username.id}`} />
-            </Avatar.Root> */}
-            <Image
-              src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-              maxH="100px"
-              maxW="100px"
-              objectFit="cover"
-              />
+            <Avatar.Root style={{ width: 100, height: 100, borderRadius: '9999px', overflow: 'hidden' }} mr={4}>
+              <Avatar.Fallback delayMs={600}>{`A${debate.user?.id}`}</Avatar.Fallback>
+              <Avatar.Image src={`/avatar_${debate.user?.avatarId || "1" }.jpg`} alt={`Avatar ${debate.user?.id}`} />
+            </Avatar.Root>
             {/* <FaUser size={64} color="#727272" /> */}
 
             <Text size="md" fontWeight="bold" mt={2}>
-              {debate.username}
+              {debate?.username}
             </Text>
             <Text fontSize="xs" color="#727272" fontWeight="bold">
-             ★ {debate.userTitle || "Novato"}
+             ★ {debate.user?.title || "Sin título"}
             </Text>
           </Flex>
         </Box>

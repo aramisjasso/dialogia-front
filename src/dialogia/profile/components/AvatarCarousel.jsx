@@ -1,28 +1,19 @@
 import React, { useRef } from 'react';
-import {
-  Box,
-  Avatar,
-  IconButton,
-  Flex,
-  useBreakpointValue,
-} from '@chakra-ui/react';
+import { Box, IconButton, Flex, Avatar } from '@chakra-ui/react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+
 
 const AvatarCarousel = ({ avatars, selectedAvatarId, onSelect }) => {
   const scrollRef = useRef(null);
-  const visibleItems = useBreakpointValue({ base: 3, md: 5 });
 
-  const scrollAmount = 100; // Cantidad de scroll en píxeles
+  const scrollAmount = 100;
 
-  const handleScrollLeft = () => {
+  const handleScroll = (direction) => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    }
-  };
-
-  const handleScrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
     }
   };
 
@@ -30,13 +21,14 @@ const AvatarCarousel = ({ avatars, selectedAvatarId, onSelect }) => {
     <Box position="relative" width="100%" mb={4}>
       <Flex align="center">
         <IconButton
-          icon={<FaChevronLeft />}
-          onClick={handleScrollLeft}
+          onClick={() => handleScroll('left')}
           aria-label="Anterior"
           size="sm"
           variant="ghost"
           mr={2}
-        />
+        > 
+        <FaChevronLeft />
+        </IconButton>
 
         <Flex
           ref={scrollRef}
@@ -65,19 +57,23 @@ const AvatarCarousel = ({ avatars, selectedAvatarId, onSelect }) => {
                 borderColor: 'blue.300',
               }}
             >
-              <Avatar size="md" src={avatar.src} name={`Avatar ${avatar.id}`} />
+              <Avatar.Root style={{ width: 40, height: 40, borderRadius: '9999px', overflow: 'hidden' }}>
+                <Avatar.Fallback delayMs={600}>{`A${avatar.id}`}</Avatar.Fallback>
+                <Avatar.Image src={avatar.src} alt={`Avatar ${avatar.id}`} />
+              </Avatar.Root>
             </Box>
           ))}
         </Flex>
 
         <IconButton
-          icon={<FaChevronRight />}
-          onClick={handleScrollRight}
+          onClick={() => handleScroll('right')}
           aria-label="Siguiente"
           size="sm"
           variant="ghost"
           ml={2}
-        />
+        >
+        <FaChevronRight />
+        </IconButton>
       </Flex>
     </Box>
   );

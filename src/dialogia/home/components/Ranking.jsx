@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Heading, Text, Box, Flex, Image, useBreakpointValue, Spinner } from '@chakra-ui/react';
+
+import { Heading, Text, Box, Flex, Image, useBreakpointValue, Spinner, Avatar } from '@chakra-ui/react';
 import { useNavigate } from "react-router-dom";
 
 const Ranking = () => {
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -75,14 +77,12 @@ const Ranking = () => {
               cursor="pointer"
               _hover={{ bg: "gray.50" }}
             >
-              <Image
-                src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                w={imageSize}
-                minW="60px"
-                objectFit="contain"
-                mr={4}
-              />
 
+              <Avatar.Root style={{ width: 60, height: 60, borderRadius: '9999px', overflow: 'hidden' }} mr={4}>
+                <Avatar.Fallback delayMs={600}>{`A${user.id}`}</Avatar.Fallback>
+                <Avatar.Image src={`/avatar_${user?.avatarId || "1" }.jpg`} alt={`Avatar ${user.id}`} />
+              </Avatar.Root>
+              
               <Box>
                 <Text 
                   fontSize="xl" 

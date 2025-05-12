@@ -12,6 +12,7 @@ import {
   Badge,
   Menu,
   Portal,
+  Avatar,
 } from '@chakra-ui/react';
 import { auth, db } from '../../firebase/firebase';
 import { signOut } from 'firebase/auth';
@@ -36,6 +37,7 @@ import { FaBell, FaUser } from 'react-icons/fa';
 import { toaster } from "../../components/ui/toaster";
 import { FiLogOut } from 'react-icons/fi';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useAuth } from '../../contexts/hooks/useAuth';
 
 const NavTab = () => {
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ const NavTab = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [blink, setBlink] = useState(false);
+  const { currentUser } = useAuth();
 
   // Verificar estado de autenticación
   useEffect(() => {
@@ -229,13 +232,10 @@ const NavTab = () => {
                 overflow="hidden"
                 ref={menuRef}
               >
-                <Image 
-                  src={auth.currentUser?.photoURL || 'https://static-00.iconduck.com/assets.00/profile-default-icon-512x511-v4sw4m29.png'} 
-                  alt="Avatar" 
-                  objectFit="cover"
-                  w="full"
-                  h="full"
-                />
+                <Avatar.Root style={{ width: 50, height: 50, borderRadius: '9999px', overflow: 'hidden' }}>
+                  <Avatar.Fallback delayMs={600}>{`A${currentUser.id}`}</Avatar.Fallback>
+                  <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${currentUser.id}`} />
+                </Avatar.Root>
               </Box>
             </Menu.Trigger>
 

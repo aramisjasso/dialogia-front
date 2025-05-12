@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Heading, Text, Spinner, Flex, Link, Badge, Image } from '@chakra-ui/react';
+import { Box, Heading, Text, Spinner, Flex, Link, Badge, Image, Avatar} from '@chakra-ui/react';
 import axios from 'axios';
 import { FaEye, FaBell, FaUser } from "react-icons/fa";
 import ChoosePosition from './ChoosePosition';
@@ -164,6 +164,10 @@ const Debate = () => {
         {/* Columna izquierda (Usuario) */}
         <Box width="80px" textAlign="center">
           <Flex direction="column" align="center">
+            {/* <Avatar.Root style={{ width: 100, height: 100, borderRadius: '9999px', overflow: 'hidden' }} mr={4}> */}
+              {/* <Avatar.Fallback delayMs={600}>{`A${debate.username.id}`}</Avatar.Fallback>
+              <Avatar.Image src={`/avatar_${debate.username?.avatarId || "1" }.jpg`} alt={`Avatar ${debate.username.id}`} />
+            </Avatar.Root> */}
             <Image
               src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
               maxH="100px"

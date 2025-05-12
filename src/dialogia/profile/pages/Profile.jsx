@@ -230,7 +230,10 @@ const BADGE_DEFINITIONS = [
         <Box w={{ md: "250px" }} flexShrink={0}>
           <VStack align="stretch" spacing={6}>
             <Flex direction="column" align="center">
-              
+              <Avatar.Root style={{ width: 150, height: 150, borderRadius: '9999px', overflow: 'hidden' }}>
+                <Avatar.Fallback delayMs={600}>{`A${currentUser.id}`}</Avatar.Fallback>
+                <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${currentUser.id}`} />
+              </Avatar.Root>
             </Flex>
             
             <VStack align="stretch" spacing={2}>

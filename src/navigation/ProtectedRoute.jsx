@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children, requireAuth }) => {
   const { currentUser, loading, updateUserField } = useAuth();
   const [lastPath, setLastPath] = useState('');
   const [isChecking, setIsChecking] = useState(true);
-
+  
   const ALLOWED_PATHS = ['/select-interests', '/registeruser', '/'];
 
   // Efecto para manejar cambios de ruta sin ciclos

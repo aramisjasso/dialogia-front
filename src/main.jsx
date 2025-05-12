@@ -2,7 +2,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App"; // Importa el componente App
-import { ChakraProvider } from "@chakra-ui/react"; // Importa ChakraProvider
+import { ChakraProvider } from "@chakra-ui/react"
 import { system } from "@chakra-ui/react/preset";
 import { Toaster } from "./components/ui/toaster"
 import { AuthProvider } from './contexts/AuthContext'

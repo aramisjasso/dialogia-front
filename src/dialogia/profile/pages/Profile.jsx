@@ -25,6 +25,9 @@ import DeleteAccount from "./DeleteAccount";
 import CensorshipToggle from "../components/CensorshipToggle";
 import { FaLockOpen as UnlockIcon, FaLock as LockIcon, FaStar as StarIcon } from 'react-icons/fa';
 
+// importar componente de usuario
+import UserProfile from "../components/UserProfile";
+
 const Profile = () => {
 
     // Array plano de definiciones
@@ -272,7 +275,8 @@ const BADGE_DEFINITIONS = [
               {activeSection === "profile" && (
                 <Box>
                   <Heading size="lg" mb={6}>Perfil</Heading>
-                  <Text>Información del perfil (en construcción)</Text>
+
+                  <UserProfile  currentUser={currentUser} refreshUser={refreshUser}/>
                 </Box>
               )}
               

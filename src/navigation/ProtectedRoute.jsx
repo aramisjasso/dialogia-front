@@ -15,18 +15,21 @@ const ProtectedRoute = ({ children, requireAuth }) => {
     if (location.pathname !== lastPath) {
       setIsChecking(true);
       setLastPath(location.pathname);
-      
+      console.log("location pathname: ",location.pathname);
+      console.log("last Path: ", lastPath);
       // Verificación rápida del username en localStorage
       const storedUsername = localStorage.getItem("username");
+      console.log("Stored username: ", storedUsername);
       if (currentUser && !currentUser.username && storedUsername) {
         updateUserField({ username: storedUsername });
       }
-
+      console.log("hola");
       setIsChecking(false);
+      console.log("is Checking: ", isChecking);
     }
   }, [location.pathname, currentUser]);
 
-  if (loading || isChecking) {
+  if (isChecking) {
     return <div>Cargando...</div>;
   }
 

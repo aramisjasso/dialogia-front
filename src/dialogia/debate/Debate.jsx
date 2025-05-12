@@ -20,38 +20,50 @@ const Debate = () => {
   const [following, setFollowing] = useState(false);
 
   useEffect(() => {
-    const fetchDebate = async () => {
-      try {
-        setCensorship(currentUser.censorship);
-        
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censorship}`,
-          { username: currentUser.username });
-        console.log(response.data)
-        setDebate(response.data);
-        console.log(response.data.bestArgument);
-        
-        if (response.data.followers && currentUser) {
-         const isFollowing = response.data.followers.includes(currentUser.username);
-         setFollowing(isFollowing);
-        }
-          
-        if (response.data && currentUser) {
-          const initialPosition = 
-            response.data.peopleInFavor.includes(currentUser.username) ? "InFavor" :
-            response.data.peopleAgaist.includes(currentUser.username) ? "Agaist" :
-            null;
-          setUserPosition(initialPosition);
-        }
-        if (debate && currentUser) {
-          const isFollowing = Array.isArray(debate.followers) && debate.followers.includes(currentUser.username);
-          setFollowing(isFollowing);
-        }
-      } catch (error) {
-        console.error('Error fetching debate:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+const fetchDebate = async () => {
+  try {
+    setCensorship(currentUser.censorship);
+    
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censorship}`,
+      { username: currentUser.username }
+    );
+
+    setDebate(response.data);
+
+    // Buscar el título del usuario en el ranking
+    const rankingRes = await axios.get(`${import.meta.env.VITE_API_URL}/user/rankingall`);
+    const rankedUsers = rankingRes.data;
+
+    const matchedUser = rankedUsers.find(u => u.username === response.data.username);
+
+    if (matchedUser) {
+      setDebate(prev => ({ ...prev, userTitle: matchedUser.title }));
+    }
+
+    // Seguidores
+    if (response.data.followers && currentUser) {
+      const isFollowing = response.data.followers.includes(currentUser.username);
+      setFollowing(isFollowing);
+    }
+
+    // Posición
+    if (response.data && currentUser) {
+      const initialPosition = 
+        response.data.peopleInFavor.includes(currentUser.username)
+          ? "InFavor"
+          : response.data.peopleAgaist.includes(currentUser.username)
+          ? "Agaist"
+          : null;
+      setUserPosition(initialPosition);
+    }
+
+  } catch (error) {
+    console.error('Error fetching debate:', error);
+  } finally {
+    setLoading(false);
+  }
+};
     fetchDebate();
   }, [id, currentUser]);
 
@@ -176,7 +188,7 @@ const Debate = () => {
               {debate.username}
             </Text>
             <Text fontSize="xs" color="#727272" fontWeight="bold">
-             ★ {currentUser.title}
+             ★ {debate.userTitle || "Novato"}
             </Text>
           </Flex>
         </Box>

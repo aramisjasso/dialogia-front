@@ -1,5 +1,5 @@
 // src/dialogia/profile/pages/Profile.jsx
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from '../../../contexts/hooks/useAuth';
 import { 
   Box, 
@@ -10,7 +10,10 @@ import {
   Button, 
   VStack,
   Icon,
+  Grid, 
+  GridItem,
   HStack, 
+  Image,
   Wrap, 
   WrapItem,
   Center
@@ -23,6 +26,9 @@ import {
   } from "../../../components/ui/color-mode"
 import DeleteAccount from "./DeleteAccount";
 import CensorshipToggle from "../components/CensorshipToggle";
+import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { db } from '../../../firebase/firebase';
+import { useNavigate } from "react-router-dom";
 import { FaLockOpen as UnlockIcon, FaLock as LockIcon, FaStar as StarIcon } from 'react-icons/fa';
 
 const Profile = () => {
@@ -70,17 +76,26 @@ const BADGE_DEFINITIONS = [
   const [censorship, setCensorship] = useState(false);
   const [selectedId, setSelectedId] = useState(BADGE_DEFINITIONS[0].badgeId);
   const [userUnlockedBadges, setUserUnlockedBadges] = useState([]);
+  const [userDebates, setUserDebates] = useState([]);
+  const [allDebates, setAllDebates] = useState([]);
+  const [comments, setComments] = useState([]); 
+  const [notifications, setNotifications] = useState([]);
+  const [activityTab, setActivityTab] = useState('debates');
   const selectedBadge = BADGE_DEFINITIONS.find(b => b.badgeId === selectedId);
   const bgLocked   = useColorModeValue('gray.200', 'gray.700');
   const bgUnlocked = useColorModeValue('white',    'gray.600');
   const bgSelected = useColorModeValue('blue.50',  'blue.700');
   const hoverBg    = useColorModeValue('blue.100','blue.600');
   const bgBox       = useColorModeValue('white',     'gray.700');
+  const navigate = useNavigate();
+
+  const getParentComment = (paidCommentId) => {
+    return comments.find(c => c.idComment === paidCommentId);
+  };
 
   const sortedBadgeDefs = BADGE_DEFINITIONS.slice().sort((a, b) => {
     const aUnlocked = userUnlockedBadges.includes(a.badgeId);
     const bUnlocked = userUnlockedBadges.includes(b.badgeId);
-  
     // Si uno está desbloqueado y el otro no, el desbloqueado va primero
     if (aUnlocked && !bUnlocked) return -1;
     if (!aUnlocked && bUnlocked) return 1;
@@ -89,7 +104,63 @@ const BADGE_DEFINITIONS = [
     return a.badgeName.localeCompare(b.badgeName);
   });
 
+  // Obtener debates
+  useEffect(() => {
+    if (!currentUser?.username) return;
 
+    const fetchAllDebates = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/debates`);
+        if (!res.ok) throw new Error('No pude cargar los debates');
+        const all = await res.json();
+        setAllDebates(all);
+        setUserDebates(all.filter(d => d.username === currentUser.username));
+setComments(
+  all
+    .flatMap(d => d.comments)
+    .filter(c => c.username === currentUser.username)
+)
+      } catch (err) {
+        console.error(err);
+        toaster.create({ description: err.message, type: 'error' });
+      }
+    };
+
+    fetchAllDebates();
+  }, [currentUser?.username]);
+
+  // Estadísticas
+  const totalDebates = userDebates.length;
+
+  // Para todos los debates (hechos)
+  const commentsMade = allDebates.reduce(
+    (acc, deb) => acc + deb.comments.filter(c => c.username === currentUser.username).length,
+    0
+  );
+  const repliesMade = allDebates.reduce(
+    (acc, deb) => acc + deb.comments.filter(c => c.username === currentUser.username && c.paidComment !== '').length,
+    0
+  );
+
+  // Para debates propios (recibidos)
+  const commentsReceived = userDebates.reduce(
+    (acc, deb) => acc + deb.comments.filter(c => c.username !== currentUser.username).length,
+    0
+  );
+  const repliesReceived = userDebates.reduce(
+    (acc, deb) => acc + deb.comments.filter(c => c.paidComment !== '' && c.username !== currentUser.username).length,
+    0
+  );
+
+  // Likes y dislikes recibidos sobre debates propios
+  const totalLikesReceived = userDebates.reduce(
+    (acc, deb) => acc + (deb.popularity || 0),
+    0
+  );
+  const totalDislikesReceived = userDebates.reduce(
+    (acc, deb) => acc + (deb.peopleAgaist?.length || 0),
+    0
+  );
   // Obtener categorías disponibles
   useEffect(() => {
     const fetchCategoriesAndInterests = async () => {
@@ -125,6 +196,36 @@ const BADGE_DEFINITIONS = [
 
     fetchCategoriesAndInterests();
   }, []);
+
+  // Carga las notificaciones una sola vez
+useEffect(() => {
+  if (!currentUser?.username) return;
+
+  const fetchNotifications = async () => {
+    try {
+      // Usa `username` (o el campo que tengas) en lugar de `toUser`
+      const q = query(
+        collection(db, 'notifications'),
+        where('username', '==', currentUser.username)
+      );
+      const snap = await getDocs(q);
+      const notifs = snap.docs
+        .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
+        .sort((a, b) => {
+          // Ordena localmente descendente por fecha
+          const ta = a.datareg.toDate();
+          const tb = b.datareg.toDate();
+          return tb - ta;
+        })
+      setNotifications(notifs);
+    } catch (err) {
+      console.error('Error cargando notificaciones:', err);
+      toaster.create({ description: err.message, type: 'error' });
+    }
+  };
+
+  fetchNotifications();
+}, [currentUser?.username]);
 
   // Manejar selección/deselección de intereses
   const toggleInterest = (categoryId) => {
@@ -392,12 +493,275 @@ const BADGE_DEFINITIONS = [
                 </Box>
               )}
               
-              {activeSection === "activity" && (
-                <Box>
-                  <Heading size="lg" mb={6}>Actividad</Heading>
-                  <Text>Tu actividad reciente (en construcción)</Text>
+{activeSection === "activity" && (
+<Flex>
+  {/* Lista de debates en la mitad izquierda */}
+  <Box flex={1} p={4}>
+    <Heading size="lg" mb={6}>Actividad</Heading>
+
+    
+      {/* Botones de pestañas */}
+      <HStack spacing={4} mb={6}>
+        <Button
+          variant={activityTab === 'debates' ? 'solid' : 'ghost'}
+          onClick={() => setActivityTab('debates')}
+        >
+          Debates
+        </Button>
+        <Button
+          variant={activityTab === 'comments' ? 'solid' : 'ghost'}
+          onClick={() => setActivityTab('comments')}
+        >
+          Comentarios
+        </Button>
+        <Button
+          variant={activityTab === 'notifications' ? 'solid' : 'ghost'}
+          onClick={() => setActivityTab('notifications')}
+        >
+          Notificaciones
+        </Button>
+      </HStack>
+
+    <Box
+      h="60vh"
+      overflowY="auto"
+      pr={4}
+      sx={{
+        '&::-webkit-scrollbar': { width: '6px' },
+        '&::-webkit-scrollbar-thumb': { bg: 'gray.300', borderRadius: '3px' }
+      }}
+    >
+            {activityTab === 'debates' && userDebates.map((debate, idx) => (
+            <Box
+              key={debate.idDebate}
+              p={4}
+              _hover={{ bg: 'gray.50' }}
+              border="1px solid"
+              borderColor="gray.200"
+              borderRadius="md"
+              mb={idx < userDebates.length - 1 ? 2 : 0}
+            >
+              <Flex align="center" mb={2}>
+                <Box
+                  display="inline-block"
+                  border="1px solid"
+                  borderColor="gray.200"
+                  px={3}
+                  py={1}
+                  fontSize="sm"
+                  fontWeight="500"
+                >
+                  {debate.category
+                    .toLowerCase()
+                    .split(' ')
+                    .map(w => w[0].toUpperCase() + w.slice(1))
+                    .join(' ')}
                 </Box>
-              )}
+                <Text fontSize="sm" color="gray.500" ml={3}>
+                  {new Date(debate.datareg).toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </Text>
+              </Flex>
+
+              <Heading as="h3" size="md" mb={2}>
+                {debate.nameDebate}
+              </Heading>
+
+              <Text mb={2} color="#A9A9A9" fontSize="md">
+                {debate.argument}
+              </Text>
+
+              <Text
+                color="#979797"
+                textDecoration="underline"
+                fontSize="md"
+                fontWeight="bold"
+                onClick={() => navigate(`/debate/${debate.idDebate}`)}
+              >
+                Ver más
+              </Text>
+            </Box>
+          ))}
+
+              {activityTab === 'comments' && (
+                        allDebates.flatMap(d =>
+          d.comments
+            .filter(c => c.username === currentUser.username)
+            .map(c => {
+              const parentComment = c.paidComment
+                ? getParentComment(c.paidComment)
+                : null;
+              return (
+                <Box
+                  key={c.idComment}
+                  bg="gray.100"
+                  p={4}
+                  borderRadius="lg"
+                  mb={4}
+                  position="relative"
+                >
+                  {/* Comentario padre */}
+                  {parentComment && (
+                    <Box
+                      bg="gray.200"
+                      p={2}
+                      borderRadius="md"
+                      mb={3}
+                      borderLeft="4px solid"
+                      borderColor={parentComment.position ? 'blue.500' : 'red.500'}
+                    >
+                      <Text fontSize="sm" fontWeight="bold">@{parentComment.username}</Text>
+                      <Text noOfLines={1}>{parentComment.argument}</Text>
+                      <Text fontSize="xs" color="gray.600">
+                        {new Date(parentComment.datareg).toLocaleDateString('es-ES')}
+                      </Text>
+                    </Box>
+                  )}
+
+                  <Flex align="flex-start">
+                    <Image
+                      src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
+                      boxSize="60px"
+                      objectFit="cover"
+                      mr={4}
+                    />
+                    <Box flex="1">
+                      <Flex align="center" mb={2}>
+                        <Text fontWeight="bold">{c.username}</Text>
+                        <Text fontSize="sm" color="gray.500" ml={2}>
+                          {new Date(c.datareg).toLocaleDateString('es-ES')} {' '}
+                          {new Date(c.datareg).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </Text>
+                      </Flex>
+                      <Text>{c.argument}</Text>
+                      {c.image && <Image src={c.image} mt={2} />}
+                    </Box>
+                  </Flex>
+                </Box>
+              );
+            })
+        )
+      )}
+
+    {activityTab === 'notifications' && (
+      <Box>
+        {notifications.length === 0 ? (
+          <Text fontSize="sm" color="gray.500">
+            No hay notificaciones
+          </Text>
+        ) : (
+          notifications.map(n => (
+            <Box
+              key={n.id}
+              p={3}
+              borderBottom="1px solid #eee"
+              mb={2}
+            >
+              <HStack justifyContent="space-between">
+                <Text fontWeight="bold" fontSize="sm">
+                  {n.message.split(' ')[0]}
+                </Text>
+                <Text fontSize="xs" color="gray.500">
+                  {n.datareg?.toDate().toLocaleString() ?? ''}
+                </Text>
+              </HStack>
+              <Text fontSize="sm">
+                {n.message.replace(/^\S+/, '').trim()}
+              </Text>
+            </Box>
+          ))
+        )}
+      </Box>
+    )}
+    </Box>
+  </Box>
+
+  {/* Estadísticas en la mitad derecha */}
+  <Box flex={1} p={4} ml={8}>
+    {/* Heading fuera del Box con bordes */}
+    <Heading size="lg" mb={4}>Mis Estadísticas</Heading>
+
+    {/* Caja con borde, sombra y estadísticas */}
+    <Box
+      border="1px solid gray.600"
+      boxShadow="md"
+      borderRadius="md"
+      p={4}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+    >
+      <Grid templateColumns="repeat(2, 1fr)" gap={4} w="100%" mb={30}>
+        {/* Score (ocupa 2 columnas) */}
+        <Box
+          gridColumn="span 2"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          mb={4}
+        >
+          <Box
+            w={24}
+            h={24}
+            borderRadius="full"
+            borderWidth={3}
+            borderColor="green.400"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            mr={3}
+          >
+            <Text fontSize="3xl" fontWeight="bold">
+              {currentUser.activity.score}
+            </Text>
+          </Box>
+          <Text fontSize="3xl" fontWeight="700" color="gray.600">XP</Text>
+        </Box>
+
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Debates creados</Text>
+          <Text fontSize="2xl">{totalDebates}</Text>
+        </Box>
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Comentarios realizados</Text>
+          <Text fontSize="2xl">{commentsMade}</Text>
+        </Box>
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Comentarios recibidos</Text>
+          <Text fontSize="2xl">{commentsReceived}</Text>
+        </Box>
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Replies realizados</Text>
+          <Text fontSize="2xl">{repliesMade}</Text>
+        </Box>
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Replies recibidos</Text>
+          <Text fontSize="2xl">{repliesReceived}</Text>
+        </Box>
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Likes recibidos</Text>
+          <Text fontSize="2xl">{totalLikesReceived}</Text>
+        </Box>
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Dislikes recibidos</Text>
+          <Text fontSize="2xl">{totalDislikesReceived}</Text>
+        </Box>
+        <Box>
+          <Text fontSize="sm" fontWeight="500">Insignias desbloqueadas</Text>
+          <Text fontSize="2xl">{userUnlockedBadges.length}</Text>
+        </Box>
+      </Grid>
+    </Box>
+  </Box>
+</Flex>
+
+)}
               
               {activeSection === "preferences" && (
                 <Box>

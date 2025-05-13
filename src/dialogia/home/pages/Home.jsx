@@ -1,5 +1,5 @@
 import { 
-  Box, Text, Grid, GridItem, Heading
+  Box, Text, Grid, GridItem, Heading, Flex, IconButton
 } from "@chakra-ui/react";
 import {useState} from "react";
 import RecommendView from '../../views debate/RecommendView';
@@ -9,6 +9,7 @@ import FavoriteDebatesSlider from '../../views debate/FavoriteCat';
 import Ranking from '../components/Ranking';
 import { useAuth } from '../../../contexts/hooks/useAuth';
 import CategoriesBar from '../components/CategoriesBar';
+
 
 const Home = () => {
   const user = useAuth();
@@ -76,11 +77,6 @@ const Home = () => {
           >
             <Box p={4}>
               <Flex justify="space-between" align="center" mt={2} mb={2}>
-                <IconButton
-                  icon={<FiX />}
-                  variant="ghost"
-                  onClick={() => setShowRankingSidebar(false)}
-                />
               </Flex>
               <Ranking />
             </Box>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Heading, Text, Flex, Spinner, Stack, useBreakpointValue, Image } from "@chakra-ui/react";
+import { Box, Heading, Text, Flex, Spinner, Stack, useBreakpointValue, Image, Avatar } from "@chakra-ui/react";
 import CategoriesBar from "../../home/components/CategoriesBar";
 import axios from "axios";
 import { useAuth } from '../../../contexts/hooks/useAuth';
@@ -85,13 +85,10 @@ const RankingGlobal = ({ categories }) => {
                     <Box flex="0.5" textAlign="center" color={"#535353"} fontSize="xl">#{user.rank}</Box>
                     <Box flex="2">
                       <Flex align="center" px={2} py={1}>
-                        <Image
-                          src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                          w="50px"
-                          minW="50px"
-                          objectFit="contain"
-                          mr={4}
-                        />
+                        <Avatar.Root style={{ width: 50, height: 50, borderRadius: '9999px', overflow: 'hidden' }} mr={4}>
+                          <Avatar.Fallback delayMs={600}>{`A${user.id}`}</Avatar.Fallback>
+                          <Avatar.Image src={`/avatar_${user?.avatarId || "1" }.jpg`} alt={`Avatar ${user.id}`} />
+                        </Avatar.Root>
 
                         <Box>
                           <Text
@@ -172,13 +169,10 @@ const RankingGlobal = ({ categories }) => {
             </Text>
 
             <Stack spacing={2} align="center">
-              <Image
-                src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                w={imageSize}
-                minW="160px"
-                objectFit="contain"
-                mr={4}
-              />
+                            <Avatar.Root style={{ width: 160, height: 160, borderRadius: '9999px', overflow: 'hidden' }} mr={4}>
+                <Avatar.Fallback delayMs={600}>{`A${user.id}`}</Avatar.Fallback>
+                <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${user.id}`} />
+              </Avatar.Root>
               {/* <Avatar size="xl" name={currentUser.username} /> */}
               <Text fontWeight="bold" fontSize="xl" color="#3D3D3D">{currentUser.username}</Text>
               <Flex alignItems="center">

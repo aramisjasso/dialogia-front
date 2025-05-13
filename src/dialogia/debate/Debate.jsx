@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Heading, Text, Spinner, Flex, Link, Badge, Image } from '@chakra-ui/react';
+import { Box, Heading, Text, Spinner, Flex, Link, Badge, Image, Avatar} from '@chakra-ui/react';
 import axios from 'axios';
 import { FaEye, FaBell, FaUser } from "react-icons/fa";
 import ChoosePosition from './ChoosePosition';
@@ -22,26 +22,19 @@ const Debate = () => {
   useEffect(() => {
     const fetchDebate = async () => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          
-          const userResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/user/${currentUser.uid}`,
-          );
+        setCensorship(currentUser.censorship);
         
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            console.log(userData)
-
-            setCensorship(userData.censorship);
-          }
-        }
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censorship}`,
           { username: currentUser.username });
         console.log(response.data)
         setDebate(response.data);
         console.log(response.data.bestArgument);
-
+        
+        if (response.data.followers && currentUser) {
+         const isFollowing = response.data.followers.includes(currentUser.username);
+         setFollowing(isFollowing);
+        }
+          
         if (response.data && currentUser) {
           const initialPosition = 
             response.data.peopleInFavor.includes(currentUser.username) ? "InFavor" :
@@ -74,11 +67,9 @@ const Debate = () => {
     );
   }
 
-  console.log("Current User", currentUser);
   if (!debate) return <Text>Debate no encontrado</Text>;
 
   const isCreator = currentUser && debate.username === currentUser.username; 
-  //console.log(userPosition);
 
   // Función para detectar y formatear URLs
   const formatRefs = (refs) => {
@@ -173,19 +164,17 @@ const Debate = () => {
         {/* Columna izquierda (Usuario) */}
         <Box width="80px" textAlign="center">
           <Flex direction="column" align="center">
-            <Image
-              src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-              maxH="100px"
-              maxW="100px"
-              objectFit="cover"
-              />
+            <Avatar.Root style={{ width: 100, height: 100, borderRadius: '9999px', overflow: 'hidden' }} mr={4}>
+              <Avatar.Fallback delayMs={600}>{`A${debate.user?.id}`}</Avatar.Fallback>
+              <Avatar.Image src={`/avatar_${debate.user?.avatarId || "1" }.jpg`} alt={`Avatar ${debate.user?.id}`} />
+            </Avatar.Root>
             {/* <FaUser size={64} color="#727272" /> */}
 
             <Text size="md" fontWeight="bold" mt={2}>
-              {debate.username}
+              {debate?.username}
             </Text>
             <Text fontSize="xs" color="#727272" fontWeight="bold">
-             ★ {currentUser.title}
+             ★ {debate.user?.title || "Sin título"}
             </Text>
           </Flex>
         </Box>
@@ -231,7 +220,23 @@ const Debate = () => {
           <Text color="#676767" fontSize="md" mb={6}>
             {debate.argument}
           </Text>
-          {debate.image ? <Image src={debate.image} /> : null}
+          {debate.image && (
+            <Image
+              src={debate.image}
+              alt="Imagen del debate"
+              objectFit="contain" // Mantiene la relación de aspecto y muestra la imagen completa
+              maxW="100%"       // Ancho máximo del contenedor
+              maxH={{           // Altura máxima responsiva
+                base: "200px",  // Mobile
+                md: "300px",    // Tablet
+                lg: "400px"     // Desktop
+              }}
+              mx="auto"         // Centra la imagen horizontalmente
+              my={4}            // Margen vertical
+              borderRadius="md" // Bordes redondeados opcionales
+              boxShadow="sm"    // Sombra ligera opcional
+            />
+          )}
         </Box>
       </Flex>
 

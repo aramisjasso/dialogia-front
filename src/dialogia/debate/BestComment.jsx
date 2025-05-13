@@ -6,7 +6,8 @@ import {
   Flex,
   VStack,
   Image,
-  Link
+  Link,
+  Avatar,
 } from '@chakra-ui/react';
 import { FaReply, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
@@ -145,14 +146,11 @@ export default function BestComment({ comment, debateId, userPosition }) {
       position="relative"
     >
       <Flex align="flex-start" flexWrap="wrap">
-        <Image
-          src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-          maxH="60px"
-          maxW="60px"
-          objectFit="cover"
-          mr={3}
-          mt={2}
-        />
+        <Avatar.Root style={{ width: 60, height: 60, borderRadius: '9999px', overflow: 'hidden' }} mr={3}  mt={2}>
+          <Avatar.Fallback delayMs={600}>{`A${currentComment.user?.id || "1"}`}</Avatar.Fallback>
+          <Avatar.Image src={`/avatar_${comment.user?.avatarId || "1" }.jpg`} alt={`Avatar ${currentComment.user?.id || "1"}`} />
+        </Avatar.Root>
+
         <Box flex="1" minW="200px">
           <Flex align="center" flexWrap="wrap">
             <Text fontWeight="bold" mr={2} fontSize={['sm', 'md', 'lg']}>

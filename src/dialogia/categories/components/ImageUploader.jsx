@@ -223,11 +223,6 @@ const ImageUploader = forwardRef(({ folderPath = 'uploads' }, ref) => {
         </Button>
       </label>
       
-      {!currentUser && (
-        <Text mt={2} color="red.500" fontSize="sm">
-          Debes iniciar sesión para subir imágenes
-        </Text>
-      )}
       
       {previewUrl && (
         <Box mb={4} textAlign="center">
@@ -240,7 +235,7 @@ const ImageUploader = forwardRef(({ folderPath = 'uploads' }, ref) => {
             mx="auto"
           />
           <Text fontSize="sm" mt={2}>
-            {file?.name} - {(compressedFile?.size / 1024).toFixed(2)} KB
+            {(compressedFile?.size / 1024).toFixed(2)} KB
           </Text>
         </Box>
       )}

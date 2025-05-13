@@ -3,7 +3,7 @@ import { Box, Heading, Text, Spinner, Flex, Link } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const PopularView = () => {
+const PopularView = ({censored}) => {
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +12,7 @@ const PopularView = () => {
   useEffect(() => {
     const fetchDebates = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/popular`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/debates/popular?censored=${censored}`);
         setDebates(response.data);
       } catch (err) {
         setError("Error al cargar los debates");

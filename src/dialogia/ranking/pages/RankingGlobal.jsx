@@ -32,7 +32,7 @@ const RankingGlobal = ({ categories }) => {
 
         if (currentUserRank) {
           currentUser.rank = currentUserRank.rank;
-          currentUser.classification = currentUserRank.classification;
+          currentUser.title = currentUserRank.title;
         }
 
         setLoading(false);
@@ -106,7 +106,7 @@ const RankingGlobal = ({ categories }) => {
                               fontSize="sm"
                               color="#878787"
                             >
-                              ★ {user.classification}
+                              ★ {user.title || 'Espectador'}
                             </Text>
                           </Flex>
                         </Box>
@@ -182,12 +182,12 @@ const RankingGlobal = ({ categories }) => {
               {/* <Avatar size="xl" name={currentUser.username} /> */}
               <Text fontWeight="bold" fontSize="xl" color="#3D3D3D">{currentUser.username}</Text>
               <Flex alignItems="center">
-                <Text fontWeight="bold" fontSize="xl" color="#7B7B7B" mr={1}>
-                  ★
-                </Text>
-                <Text fontWeight="bold" fontSize="md" color="#7B7B7B">
-                  {currentUser.classification}
-                </Text>
+              <Text fontWeight="bold" fontSize="xl" color="#7B7B7B" mr={1}>
+                ★
+              </Text>
+              <Text fontWeight="bold" fontSize="md" color="#7B7B7B">
+                {currentUser.title || 'Espectador'}
+              </Text>
               </Flex>
               <Text fontSize="2xl" fontWeight="bold">
                 {currentUser.activity?.score?.toFixed(0)} XP

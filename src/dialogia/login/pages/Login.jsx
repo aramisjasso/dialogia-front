@@ -1,96 +1,77 @@
-// src/components/Login.jsx
 import React, { useState } from "react";
-import { Box, Heading, Input, Button, Flex,Field, Link  } from "@chakra-ui/react";
+import { Box, Heading, Input, Button, Flex, Field, Link, useBreakpointValue } from "@chakra-ui/react";
 import { login, loginWithGoogle } from "../../../firebase/auth";
-import { toaster } from "../../../components/ui/toaster"
+import { toaster } from "../../../components/ui/toaster";
 import { useNavigate } from "react-router-dom";
-
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-(false); // Para manejar el estado de carga
   const navigate = useNavigate();
 
+  // Valores responsivos ajustados
+  const boxMaxWidth = useBreakpointValue({ base: "95%", sm: "400px", md: "450px", lg: "500px" });
+  const boxPadding = useBreakpointValue({ base: 4, md: 6 });
+  const headingSize = useBreakpointValue({ base: "xl", md: "2xl" });
+  const buttonPadding = useBreakpointValue({ base: 4, md: 6 });
+  const buttonLayout = useBreakpointValue({ base: "column", md: "row" });
+
   const handleLogin = async () => {
+    try {
+      const userCredential = await login(email, password);
+      const user = userCredential.user;
+      console.log("Usuario autenticado:", user);
 
-  try {
-    // Autentica al usuario con Firebase
-    const userCredential = await login(
-      email,
-      password
-    );
-
-    // Si la autenticación es exitosa
-    const user = userCredential.user;
-    console.log("Usuario autenticado:", user);
-
-    await fetch(
-      `${import.meta.env.VITE_API_URL}/user/${user.uid}/badges`,
-      {
+      await fetch(`${import.meta.env.VITE_API_URL}/user/${user.uid}/badges`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      }
-    );
-    navigate("/home")
-  } catch (error) {
-    // Si hay un error, muestra un mensaje
-    error;
-    toaster.create({
-      title: "Error",
-      description: "Credenciales Incorectas",
-      type: "error",
-    })
-   
+        headers: { 'Content-Type': 'application/json' },
+      });
+      navigate("/home");
+    } catch (error) {
+      toaster.create({
+        title: "Error",
+        description: "Credenciales Incorrectas",
+        type: "error",
+      });
+    }
+  };
 
+  const handleRegisterWithGoogle = async () => {
+    try {
+      await loginWithGoogle();
+      navigate("/home");
+    } catch (error) {
+      console.error(error);
+      toaster.create({
+        title: "Error",
+        description: "Error al iniciar sesión con Google",
+        type: "error",
+      });
+    }
+  };
 
-  }
-};
-const handleRegisterWithGoogle = async () => {
-  try {
-    // 1. Iniciar sesión con Google
-    await loginWithGoogle();
-      
-    navigate("/home"); // Si ya está registrado, va a /home
-    
-
-  } catch (error) {
-    console.error(error);
-    toaster.create({
-      title: "Error",
-      description: "Error al iniciar sesión con Google",
-      type: "error",
-    });
-  }
-};
-  
-  // Validar si los inputs están vacíos
   const isDisabled = !email.trim() || !password.trim();
 
   return (
     <Flex
-      justifyContent="center" // Centra horizontalmente
-      alignItems="center" // Centra verticalmente
-      p={8}
+      justifyContent="center"
+      alignItems="center"
+      p={4}
+      minH="100vh"
+      w="100%"
     >
       <Box  
-        maxWidth="600px"
-        maxHeight="600px"
+        maxWidth={boxMaxWidth}
         width="100%"
-        height="100%"
         borderWidth="1px" 
         bg="bg" 
         shadow="md" 
-        p={8} >
+        p={boxPadding}
+      >
+        <Heading size={headingSize} mb={4}>Iniciar Sesión</Heading>
 
-        <Heading  size="3xl">Iniciar Sesión</Heading>
-
-        {/*<Text m={2}>Ingresa tus credenciales</Text>*/}
-        <Field.Root>
-          <Field.Label textStyle="sm" m={2}>Correo o Usuario</Field.Label>
+        <Field.Root mb={3}>
+          <Field.Label textStyle="sm" mb={1}>Correo o Usuario</Field.Label>
           <Input
             shadow="md"
             variant="subtle"
@@ -98,84 +79,80 @@ const handleRegisterWithGoogle = async () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === " ") e.preventDefault(); // 🔥 Bloquea la tecla espacio
+              if (e.key === " ") e.preventDefault();
             }}
           />
-
         </Field.Root>
 
-        <Field.Root>
-          <Field.Label textStyle="sm" m={2}>Contraseña</Field.Label>
+        <Field.Root mb={3}>
+          <Field.Label textStyle="sm" mb={1}>Contraseña</Field.Label>
           <Input
-          shadow="md"
-          variant="subtle"
-          type="password"
-          placeholder="Escribe tu contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+            shadow="md"
+            variant="subtle"
+            type="password"
+            placeholder="Escribe tu contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
-
         </Field.Root>
       
-      <Flex
-      justifyContent="right" // Centra horizontalmente
-      alignItems="center" // Centra verticalmente
-      >
-        <Link 
-          mt={4} 
-          color="teal" 
-          cursor="pointer" 
-          onClick={() => navigate("/recover")}
-        >
-          ¿Olvidaste tu contraseña?
-        </Link>
-      </Flex>
-        
-
-      <Flex
-      direction="row" 
-      gap={4} 
-      mt={6} 
-      justifyContent="center"
-      >
-        <Button 
-          colorScheme="teal"
-          variant="outline"
-          p={8}
-          onClick={handleLogin}
-          disabled = {isDisabled}
-          borderRadius="0" // Sin redondeo
-          borderColor="black" // Borde blanco para contraste
-          borderWidth="1px"
-          textStyle="md"
+        <Flex justifyContent="flex-end" mb={4}>
+          <Link 
+            color="teal" 
+            cursor="pointer" 
+            onClick={() => navigate("/recover")}
+            fontSize="sm"
           >
-          Iniciar Sesión
-        </Button>
-        <Button
-          colorScheme="teal"
-          variant="outline"
-          p={8}
-          onClick={handleRegisterWithGoogle}
-          borderRadius="0" // Sin redondeo
-          borderColor="black" // Borde blanco para contraste
-          borderWidth="1px"
-          textStyle="md"
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </Flex>
+        
+        <Flex
+          direction={buttonLayout}
+          gap={3} 
+          mb={4}
+          justifyContent="center"
         >
-        Iniciar Sesión con Google
-        </Button>
+          <Button 
+            colorScheme="teal"
+            variant="outline"
+            p={buttonPadding}
+            onClick={handleLogin}
+            disabled={isDisabled}
+            borderRadius="0"
+            borderColor="black"
+            borderWidth="1px"
+            textStyle="md"
+            width={{ base: "100%", md: "auto" }}
+            flex="1"
+          >
+            Iniciar Sesión
+          </Button>
+          <Button
+            colorScheme="teal"
+            variant="outline"
+            p={buttonPadding}
+            onClick={handleRegisterWithGoogle}
+            borderRadius="0"
+            borderColor="black"
+            borderWidth="1px"
+            textStyle="md"
+            width={{ base: "100%", md: "auto" }}
+            flex="1"
+          >
+            Iniciar con Google
+          </Button>
         </Flex>
     
-      <Flex
-      justifyContent="center" // Centra horizontalmente
-      alignItems="center" // Centra verticalmente
-      >
-        <Link 
-          mt={8} 
-          color="teal" 
-          onClick={() => navigate("/register")}
-          cursor="pointer">
-          No tengo una cuenta.
-        </Link>
+        <Flex justifyContent="center">
+          <Link 
+            color="teal" 
+            onClick={() => navigate("/register")}
+            cursor="pointer"
+            fontSize="sm"
+          >
+            No tengo una cuenta.
+          </Link>
         </Flex>
       </Box>
     </Flex>

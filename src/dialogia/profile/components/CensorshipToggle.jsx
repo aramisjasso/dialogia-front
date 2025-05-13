@@ -3,17 +3,16 @@ import { ConfirmDialog } from "../../debate/modals/ConfirmDialog";
 import { toaster } from "../../../components/ui/toaster";
 import { useState } from 'react';
 
-const CensorshipToggle = ({ auth, CensorshipChange, censorshipValue }) => {
-  
+const CensorshipToggle = ({ currentUser, CensorshipChange, censorshipValue, refreshUser }) => {
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleToggleCensorship = async () => {
-    const user = auth.currentUser;
+
     setIsLoading(true);
-    console.log(censorshipValue,localStorage.getItem("censorship"))
     try {
-      await user.getIdToken();
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/${user.uid}/censure`, {
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/${currentUser.uid}/censure`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -22,7 +21,7 @@ const CensorshipToggle = ({ auth, CensorshipChange, censorshipValue }) => {
           censorship: !censorshipValue
         })
       });
-
+      await refreshUser();
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Error al actualizar censura');

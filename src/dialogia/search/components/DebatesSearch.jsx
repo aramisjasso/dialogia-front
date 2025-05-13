@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { auth } from "../../../firebase/firebase";
+import { useAuth } from '../../../contexts/hooks/useAuth';
 
 const DebatesSearch = ({ search }) => {
   const [debates, setDebates]           = useState([]);
@@ -21,30 +21,15 @@ const DebatesSearch = ({ search }) => {
   const [sortFavor, setSortFavor]       = useState("recent");
   const debatesPerPage                  = 10;
   const navigate                        = useNavigate();
+  const { currentUser} = useAuth();
 
   // 1) Traer debates cada vez que cambia el término
   useEffect(() => {
     const fetchDebates = async () => {
       try {
-        setLoading(true);
-        const user = auth.currentUser;
-        if (user) {
-          const token = await user.getIdToken();
-          const userResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/user/${user.uid}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+        setLoading(true);  
+        setCensorship(currentUser.censorship);
         
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            console.log(userData)
-            setCensorship(userData.censorship);
-          }
-        }
         const { data } = await axios.get(
           `${import.meta.env.VITE_API_URL}/debates/search?term=${search}&censored=${censorship}`
         );

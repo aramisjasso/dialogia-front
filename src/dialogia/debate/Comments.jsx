@@ -8,7 +8,8 @@ import {
   VStack,
   Image,
   Heading,
-  Link
+  Link,
+  Avatar
 } from '@chakra-ui/react';
 import { FaReply, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
@@ -57,13 +58,13 @@ export default function Comments({censored}) {
         setUserPosition(isInFavor ? true : (isAgainst ? false : null));
       }
       
-            const initial = {};
-            (data.comments || []).forEach(c => {
-              initial[c.idComment] = {
-                liked: c.peopleInFavor?.includes(username),      // true si ya votó like
-                disliked: c.peopleAgaist?.includes(username)    // true si ya votó dislike
-              };
-            });
+          const initial = {};
+          (data.comments || []).forEach(c => {
+            initial[c.idComment] = {
+              liked:    c.peopleInFavor?.includes(username),     // true si este usuario hizo “like”
+              disliked: c.peopleAgainst?.includes(username)      // true si hizo “dislike”
+            };
+          });
       setLikesState(initial);
     } catch (err) {
       console.error(err);
@@ -96,145 +97,184 @@ export default function Comments({censored}) {
 
 console.log(comments);
 
-  const handleLike = async idComment => {
-    try {
-      if (likesState[idComment]?.liked) {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'like', method: 'remove', username: username }),
-          }
-        );
-        if (!res.ok) throw new Error('Error al remover like');
-        const updated = await res.json();
-                setComments(prev =>
-                    prev.map(c =>
-                      c.idComment === idComment
-                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
-                        : c
-                    )
-                  );
-        setLikesState(prev => ({
-          ...prev,
-          [idComment]: { liked: false, disliked: prev[idComment].disliked },
-        }));
-        toaster.create({ title: 'Like removido', status: 'success', duration: 2000 });
-      } else {
-        if (likesState[idComment]?.disliked) {
-          await fetch(
-            `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
-            {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'dislike', method: 'remove', username: username  }),
-            }
-          );
-        }
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'like', method: 'add', username: username }),
-          }
-        );
-        if (!res.ok) throw new Error('Error al agregar like');
-        const updated = await res.json();
-                setComments(prev =>
-                    prev.map(c =>
-                      c.idComment === idComment
-                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
-                        : c
-                    )
-                  );
-        setLikesState(prev => ({
-          ...prev,
-          [idComment]: { liked: true, disliked: false },
-        }));
-        toaster.create({ title: 'Like agregado', status: 'success', duration: 2000 });
-      }
-    } catch (err) {
-      console.error(err);
-      toaster.create({
-        title: 'Error al actualizar like',
-        description: err.message,
-        status: 'error',
-        duration: 3000,
-      });
+const handleLike = async idComment => {
+  // 1) Guarda el estado previo
+  const wasLiked    = likesState[idComment]?.liked;
+  const wasDisliked = likesState[idComment]?.disliked;
+
+  // 2) Calcula el nuevo estado optimista
+  const optimisticLikesState = {
+    ...likesState,
+    [idComment]: {
+      liked:    !wasLiked,
+      disliked: false
     }
   };
 
-  const handleDislike = async idComment => {
-    try {
-      if (likesState[idComment]?.disliked) {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'dislike', method: 'remove', username: username  }),
-          }
-        );
-        if (!res.ok) throw new Error('Error al remover dislike');
-        const updated = await res.json();
-                setComments(prev =>
-                    prev.map(c =>
-                      c.idComment === idComment
-                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
-                        : c
-                    )
-                  );
-        setLikesState(prev => ({
-          ...prev,
-          [idComment]: { disliked: false, liked: prev[idComment].liked },
-        }));
-        toaster.create({ title: 'Dislike removido', status: 'success', duration: 2000 });
-      } else {
-        if (likesState[idComment]?.liked) {
-          await fetch(
-            `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
-            {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'like', method: 'remove', username: username  }),
-            }
-          );
+  const optimisticComments = comments.map(c => {
+    if (c.idComment !== idComment) return c;
+    // Ajusta los contadores provisionalmente
+    const deltaLike    = wasLiked    ? -1 : +1;
+    const deltaDislike = wasDisliked ? -1 :  0;
+    return {
+      ...c,
+      likes:    (c.likes    || 0) + deltaLike,
+      dislikes: (c.dislikes || 0) + deltaDislike
+    };
+  });
+
+  // 3) Aplica el estado optimista
+  setLikesState(optimisticLikesState);
+  setComments(optimisticComments);
+
+  // 4) Lanza la petición al servidor
+  try {
+    // Si había dislike previo, quitarlo primero
+    if (wasDisliked) {
+      await fetch(
+        `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'dislike', method: 'remove', username }),
         }
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'dislike', method: 'add', username: username  }),
-          }
-        );
-        if (!res.ok) throw new Error('Error al agregar dislike');
-        const updated = await res.json();
-                setComments(prev =>
-                    prev.map(c =>
-                      c.idComment === idComment
-                        ? { ...c, likes: updated.likes, dislikes: updated.dislikes }
-                        : c
-                    )
-                  );
-        setLikesState(prev => ({
-          ...prev,
-          [idComment]: { disliked: true, liked: false },
-        }));
-        toaster.create({ title: 'Dislike agregado', status: 'success', duration: 2000 });
+      );
+    }
+
+    // Agregar o quitar like según corresponda
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'like',
+          method: wasLiked ? 'remove' : 'add',
+          username
+        }),
       }
-    } catch (err) {
-      console.error(err);
-      toaster.create({
-        title: 'Error al actualizar dislike',
-        description: err.message,
-        status: 'error',
-        duration: 3000,
-      });
+    );
+    if (!res.ok) throw new Error(res.statusText);
+
+    // (Opcional) Si quieres, repones con el comment real del servidor:
+    // const updated = await res.json();
+    // setComments(prev => prev.map(c => c.idComment === idComment ? updated : c));
+
+    toaster.create({
+      title: wasLiked ? 'Like removido' : 'Like agregado',
+      status: 'success',
+      duration: 2000
+    });
+
+  } catch (err) {
+    // 5) Rollback en caso de fallo
+    console.error('Error al actualizar like:', err);
+    toaster.create({
+      title: 'Error al actualizar like',
+      description: err.message,
+      status: 'error',
+      duration: 3000
+    });
+
+    // Restaurar estado previo
+    setLikesState(prev => ({
+      ...prev,
+      [idComment]: {
+        liked:    wasLiked,
+        disliked: wasDisliked
+      }
+    }));
+    setComments(comments);
+  }
+};
+
+
+const handleDislike = async idComment => {
+  // 1) Guarda el estado previo
+  const wasDisliked = likesState[idComment]?.disliked;
+  const wasLiked    = likesState[idComment]?.liked;
+
+  // 2) Construye el estado optimista
+  const optimisticLikesState = {
+    ...likesState,
+    [idComment]: {
+      disliked: !wasDisliked,
+      liked: false
     }
   };
+
+  const optimisticComments = comments.map(c => {
+    if (c.idComment !== idComment) return c;
+    // Ajusta contadores provisionalmente
+    const deltaDislike = wasDisliked ? -1 : +1;
+    const deltaLike    = wasLiked    ? -1 :  0;
+    return {
+      ...c,
+      dislikes: (c.dislikes || 0) + deltaDislike,
+      likes:    (c.likes    || 0) + deltaLike
+    };
+  });
+
+  // 3) Aplica el estado optimista
+  setLikesState(optimisticLikesState);
+  setComments(optimisticComments);
+
+  // 4) Lanza la petición al servidor
+  try {
+    // Si había like previo, quítalo primero en el servidor
+    if (wasLiked) {
+      await fetch(
+        `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'like', method: 'remove', username }),
+        }
+      );
+    }
+
+    // Agregar o quitar dislike según corresponda
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/debates/${id}/comments/${idComment}/like`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'dislike',
+          method: wasDisliked ? 'remove' : 'add',
+          username
+        }),
+      }
+    );
+    if (!res.ok) throw new Error(res.statusText);
+
+    toaster.create({
+      title: wasDisliked ? 'Dislike removido' : 'Dislike agregado',
+      status: 'success',
+      duration: 2000
+    });
+
+  } catch (err) {
+    // 5) Rollback en caso de fallo
+    console.error('Error al actualizar dislike:', err);
+    toaster.create({
+      title: 'Error al actualizar dislike',
+      description: err.message,
+      status: 'error',
+      duration: 3000
+    });
+
+    // Restaurar estado previo
+    setLikesState(prev => ({
+      ...prev,
+      [idComment]: {
+        disliked: wasDisliked,
+        liked:    wasLiked
+      }
+    }));
+    setComments(comments);
+  }
+};
 
   if (loading) {
     return (
@@ -273,14 +313,11 @@ console.log(comments);
         
 
         <Flex align="flex-start" flexWrap="wrap">
-          <Image
-            src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-            maxH="60px"
-            maxW="60px"
-            objectFit="cover"
-            mr={3}
-            mt={2}
-          />
+          <Avatar.Root style={{ width: 60, height: 60, borderRadius: '9999px', overflow: 'hidden' }} mr={3}  mt={2}>
+            <Avatar.Fallback delayMs={600}>{`A${c.user?.id}`}</Avatar.Fallback>
+            <Avatar.Image src={`/avatar_${c.user?.avatarId || "1" }.jpg`} alt={`Avatar ${c.user?.id}`} />
+          </Avatar.Root>
+
           <Box flex="1" minW="200px">
             <Flex align="center" flexWrap="wrap">
               <Text fontWeight="bold" mr={2} fontSize={['sm', 'md', 'lg']}>

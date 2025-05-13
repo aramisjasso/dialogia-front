@@ -20,6 +20,7 @@ import Profile from "../dialogia/profile/pages/Profile";
 import AboutUs from "../dialogia/company/pages/AboutUs";
 import Policies from "../dialogia/company/pages/Policies";
 import RankingGlobal from "../dialogia/ranking/pages/RankingGlobal";
+import ChangePassword from "@/dialogia/profile/pages/ChangePassword";
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // import ImageUploader from "../dialogia/testing/ImageUploader";
@@ -194,6 +195,15 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={true}>
           <Layout>
             <RankingGlobal />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },{
+      path: "/change-password",
+      element: (
+        <ProtectedRoute requireAuth={true}>
+          <Layout>
+            <ChangePassword />
           </Layout>
         </ProtectedRoute>
       ),

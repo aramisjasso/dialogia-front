@@ -168,7 +168,6 @@ const [userRanking, setUserRanking] = useState([]);
             categoriesMap[deb.category] ||
             "/default-category.jpg";
           const userObj = userRanking.find((u) => u.username === deb.username);
-
           deb.userTitle = userObj?.title || "Novato";
           return (
             <Box
@@ -228,7 +227,7 @@ const [userRanking, setUserRanking] = useState([]);
                                   <Avatar.Image src={`/avatar_${deb.user?.avatarId || "1" }.jpg`} alt={`Avatar ${deb.user?.id}`} />
                                 </Avatar.Root>
                               <Box>
-                              <Text fontWeight={500} fontSize="2xl">{deb.user.username}</Text>
+                              <Text fontWeight={500} fontSize="2xl">{deb.username}</Text>
                               <Flex gap={2}>
                                     <FaStar pt={2} color="rgb(71, 71, 71)" size={20}/>
                                   <Text fontWeight={600} fontSize="lg" color="gray.600">{deb.userTitle}</Text>

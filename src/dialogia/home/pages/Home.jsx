@@ -1,6 +1,7 @@
 import { 
   Box, Text, Grid, GridItem, Heading
 } from "@chakra-ui/react";
+import {useState} from "react";
 import RecommendView from '../../views debate/RecommendView';
 import PopularView from '../../views debate/PopularView';
 import FavoriteDebatesSlider from '../../views debate/FavoriteCat';

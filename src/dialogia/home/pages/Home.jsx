@@ -1,11 +1,9 @@
-import { 
-  Box, Text, Grid, GridItem, Heading
-} from "@chakra-ui/react";
-import RecommendView from '../../views debate/RecommendView';
-import PopularView from '../../views debate/PopularView';
-import Ranking from '../components/Ranking';
-import { useAuth } from '../../../contexts/hooks/useAuth';
-import CategoriesBar from '../components/CategoriesBar';
+import { Box, Text, Grid, GridItem, Heading } from "@chakra-ui/react";
+import RecommendView from "../../views debate/RecommendView";
+import PopularView from "../../views debate/PopularView";
+import Ranking from "../components/Ranking";
+import { useAuth } from "../../../contexts/hooks/useAuth";
+import CategoriesBar from "../components/CategoriesBar";
 
 const Home = () => {
   const user = useAuth();
@@ -19,14 +17,12 @@ const Home = () => {
           templateColumns={{
             base: "1fr",
             sm: "repeat(2, 1fr)",
-            md: "45% 35% 20%"
+            md: "45% 35% 20%",
           }}
           gap={{ base: 4, md: 6 }}
         >
           <GridItem>
-            <RecommendView
-              interests={user.currentUser.interests} 
-            />
+            <RecommendView interests={user.currentUser.interests} />
           </GridItem>
           <GridItem>
             <PopularView />

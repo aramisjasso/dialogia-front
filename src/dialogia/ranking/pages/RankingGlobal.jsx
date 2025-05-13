@@ -11,22 +11,22 @@ const RankingGlobal = ({ categories }) => {
   const currentUser = user.currentUser;
 
   const imageSize = useBreakpointValue({
-      base: '15%',
-      md: '10%',
-      lg: '8%',
-      xl: '5%'
-    }, {
-      fallback: 'md',
-      minW: '100px'
-    });
+    base: '15%',
+    md: '10%',
+    lg: '8%',
+    xl: '5%'
+  }, {
+    fallback: 'md',
+    minW: '100px'
+  });
 
   useEffect(() => {
     axios
-      .get(import.meta.env.VITE_API_URL+'/user/ranking')
+      .get(import.meta.env.VITE_API_URL + '/user/ranking')
       .then((res) => {
         setRanking(res.data);
-        const currentUserRank = res.data.find(user => 
-          user.uid === currentUser.uid || 
+        const currentUserRank = res.data.find(user =>
+          user.uid === currentUser.uid ||
           user.username === currentUser.username
         );
 
@@ -49,38 +49,38 @@ const RankingGlobal = ({ categories }) => {
 
       <Flex px={6} py={4} gap={6} direction={{ base: "column", md: "row" }}>
         <Box flex={3}>
-          <Heading as="h1" size="2xl" mb={6}  fontWeight="bold">
+          <Heading as="h1" size="2xl" mb={6} fontWeight="bold">
             Ranking Global
           </Heading>
-            {loading ? (
-              <Spinner />
-            ) : (
-              <Box>
-                <Flex color={"#878787"} px={2} py={2} position="sticky" top="0" zIndex="1">
-                  <Box flex="0.5" textAlign="center">Puesto</Box>
-                  <Box flex="2" textAlign="center">Perfil</Box>
-                  <Box flex="1" textAlign="center">Nivel</Box>
-                  <Box flex="1" textAlign="center">Puntuación</Box>
-                  <Box flex="1" textAlign="center">Likes</Box>
-                  <Box flex="1" textAlign="center">Posts</Box>
-                  <Box flex="1" textAlign="center">Vistas</Box>
-                  <Box flex="1" textAlign="center">Comentarios</Box>
-                </Flex>
+          {loading ? (
+            <Spinner />
+          ) : (
+            <Box>
+              <Flex color={"#878787"} px={2} py={2} position="sticky" top="0" zIndex="1">
+                <Box flex="0.5" textAlign="center">Puesto</Box>
+                <Box flex="2" textAlign="center">Perfil</Box>
+                <Box flex="1" textAlign="center">Nivel</Box>
+                <Box flex="1" textAlign="center">Puntuación</Box>
+                <Box flex="1" textAlign="center">Likes</Box>
+                <Box flex="1" textAlign="center">Posts</Box>
+                <Box flex="1" textAlign="center">Vistas</Box>
+                <Box flex="1" textAlign="center">Comentarios</Box>
+              </Flex>
 
-                <Box 
-                  maxH="calc(100vh - 250px)" 
-                  overflowY="auto"
-                  css={{
-                    "&::-webkit-scrollbar": {
-                      width: "6px",
-                    },
-                    "&::-webkit-scrollbar-thumb": {
-                      backgroundColor: "rgba(0, 0, 0, 0.2)",
-                      borderRadius: "3px",
-                    },
-                  }}
-                >
-              {ranking.map((user) => (
+              <Box
+                maxH="calc(100vh - 250px)"
+                overflowY="auto"
+                css={{
+                  "&::-webkit-scrollbar": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "rgba(0, 0, 0, 0.2)",
+                    borderRadius: "3px",
+                  },
+                }}
+              >
+                {ranking.map((user) => (
                   <Flex fontWeight="bold" key={user.id} px={2} py={2} align="center" cursor="pointer" _hover={{ bg: "gray.50" }}>
                     <Box flex="0.5" textAlign="center" color={"#535353"} fontSize="xl">#{user.rank}</Box>
                     <Box flex="2">
@@ -92,18 +92,18 @@ const RankingGlobal = ({ categories }) => {
                           objectFit="contain"
                           mr={4}
                         />
-                  
+
                         <Box>
-                          <Text 
-                            fontSize="lg" 
+                          <Text
+                            fontSize="lg"
                             color="black"
                           >
                             {user.username}
                           </Text>
-                          
+
                           <Flex mt={1}>
-                            <Text 
-                              fontSize="sm"  
+                            <Text
+                              fontSize="sm"
                               color="#878787"
                             >
                               ★ {user.classification}
@@ -121,7 +121,7 @@ const RankingGlobal = ({ categories }) => {
                     <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">{user.activity?.content?.views || 0}</Box>
                     <Box flex="1" textAlign="center" color={"#878787"} fontSize="lg">{user.activity?.interactions?.comments || 0}</Box>
                   </Flex>
-              ))}
+                ))}
               </Box>
             </Box>
           )}
@@ -133,8 +133,8 @@ const RankingGlobal = ({ categories }) => {
           top="100px"
           alignSelf="flex-start"
         >
-          <Heading as="h1" size="2xl" mb={6}  fontWeight="bold">
-            Tu Posición  
+          <Heading as="h1" size="2xl" mb={6} fontWeight="bold">
+            Tu Posición
           </Heading>
 
           <Box
@@ -172,22 +172,22 @@ const RankingGlobal = ({ categories }) => {
             </Text>
 
             <Stack spacing={2} align="center">
-            <Image
-              src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-              w={imageSize}
-              minW="160px"
-              objectFit="contain"
-              mr={4}
-            />
+              <Image
+                src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
+                w={imageSize}
+                minW="160px"
+                objectFit="contain"
+                mr={4}
+              />
               {/* <Avatar size="xl" name={currentUser.username} /> */}
               <Text fontWeight="bold" fontSize="xl" color="#3D3D3D">{currentUser.username}</Text>
               <Flex alignItems="center">
-              <Text fontWeight="bold" fontSize="xl" color="#7B7B7B" mr={1}>
-                ★
-              </Text>
-              <Text fontWeight="bold" fontSize="md" color="#7B7B7B">
-                {currentUser.classification}
-              </Text>
+                <Text fontWeight="bold" fontSize="xl" color="#7B7B7B" mr={1}>
+                  ★
+                </Text>
+                <Text fontWeight="bold" fontSize="md" color="#7B7B7B">
+                  {currentUser.classification}
+                </Text>
               </Flex>
               <Text fontSize="2xl" fontWeight="bold">
                 {currentUser.activity?.score?.toFixed(0)} XP
@@ -195,39 +195,39 @@ const RankingGlobal = ({ categories }) => {
             </Stack>
 
             <Box mt={8}>
-            <Flex justify="space-between" mb={6}>
-              <Box textAlign="center" flex={1}>
-                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Publicaciones</Text>
-                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.content?.created || 0}</Text>
-              </Box>
-              <Box textAlign="center" flex={1}>
-                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Comentarios</Text>
-                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.comments || 0}</Text>
-              </Box>
-            </Flex>
+              <Flex justify="space-between" mb={6}>
+                <Box textAlign="center" flex={1}>
+                  <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Publicaciones</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.content?.created || 0}</Text>
+                </Box>
+                <Box textAlign="center" flex={1}>
+                  <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Comentarios</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.comments || 0}</Text>
+                </Box>
+              </Flex>
 
-            <Flex justify="space-between" mb={2}>
-              <Box textAlign="center" flex={1} mb={6}>
-                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Likes</Text>
-                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.likes || 0}</Text>
-              </Box>
-              <Box textAlign="center" flex={1}>
-                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Dislikes</Text>
-                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.dislikes || 0}</Text>
-              </Box>
-            </Flex>
+              <Flex justify="space-between" mb={2}>
+                <Box textAlign="center" flex={1} mb={6}>
+                  <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Likes</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.likes || 0}</Text>
+                </Box>
+                <Box textAlign="center" flex={1}>
+                  <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Dislikes</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.interactions?.dislikes || 0}</Text>
+                </Box>
+              </Flex>
 
-            <Flex justify="space-between">
-              <Box textAlign="center" flex={1} mb={6}>
-                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Vistas</Text>
-                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.content?.views || 0}</Text>
-              </Box>
-              <Box textAlign="center" flex={1} mb={6}>
-                <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Insignias</Text>
-                <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.badges?.count || '0/0'}</Text>
-              </Box>
-            </Flex>
-          </Box>
+              <Flex justify="space-between">
+                <Box textAlign="center" flex={1} mb={6}>
+                  <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Vistas</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.content?.views || 0}</Text>
+                </Box>
+                <Box textAlign="center" flex={1} mb={6}>
+                  <Text fontSize="md" fontWeight="semibold" color="#3D3D3D">Insignias</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{currentUser.activity?.badges?.count || '0/0'}</Text>
+                </Box>
+              </Flex>
+            </Box>
           </Box>
         </Box>
       </Flex>

@@ -45,7 +45,7 @@ const RankingGlobal = ({ categories }) => {
 
   return (
     <>
-      <CategoriesBar categories={categories} />
+      <CategoriesBar showRankingButton={false} />
 
       <Flex px={6} py={4} gap={6} direction={{ base: "column", md: "row" }}>
         <Box flex={3}>

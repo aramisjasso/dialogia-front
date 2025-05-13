@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Box, Link, Stack, Text, Button, Flex, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Link, Stack, Text, Button, Flex, useBreakpointValue, IconButton } from "@chakra-ui/react";
 import { FiMenu } from "react-icons/fi";
 import CreateDebateDialog from '../../categories/components/CreateDebateDialog';
+import { FaChartLine } from "react-icons/fa"; 
 
-const CategoriesBar = () => {
+const CategoriesBar = ({ showRankingSidebar, setShowRankingSidebar, showRankingButton  }) => {
   const [categories, setCategories] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -135,7 +136,19 @@ const CategoriesBar = () => {
       )}
 
       {/* Botón Crear Debate */}
-      <Box minW="120px" textAlign="right">
+      <Flex minW="120px" justify="flex-end" gap={2}>
+        {/* Botón de Ranking */}
+        {showRankingButton && (
+        <Button
+          size={{ base: "sm", md: "md" }}
+          width={{ base: "full", md: "auto" }}
+          onClick={() => setShowRankingSidebar(!showRankingSidebar)}
+        >
+          ★ Ranking
+        </Button>
+        )}
+
+        {/* Botón Crear Debate */}
         <CreateDebateDialog
           triggerButton={
             <Button 
@@ -147,7 +160,7 @@ const CategoriesBar = () => {
             </Button>
           }
         />
-      </Box>
+      </Flex>
     </Flex>
   );
 };

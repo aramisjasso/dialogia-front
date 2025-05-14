@@ -71,14 +71,14 @@ const Category = () => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         cursor="pointer"
-        mb={[4, 6, 8]}
-        m={[4, 6, 8]}
+        mb={[0, 6, 6]}
+        m={[0, 6, 6]}
       >
         {/* Category Image */}
         <Image
           src= {category.background}
           alt={category.name}
-          maxH={["40vh", "50vh", "70vh"]}
+          maxH={["40vh", "40vh", "60vh"]}
           objectFit="cover"
           width="100%"
           height="auto"
@@ -94,15 +94,15 @@ const Category = () => {
           p={[2, 4, 6]}
         >
           <Heading
-            fontSize={["40px", "50px", "60px"]}
-            mt={["20px", "40px", "60px"]}
+            fontSize={["xl", "2xl", "4xl"]}
+            mt={[1, 1, 2]}
             ml={["20px", "30px", "40px"]}
-            mb={["20px", "30px", "40px"]}
+            mb={[1, 1, 4]}
           >
             {category.name.toUpperCase()}
           </Heading>
           <Text
-            fontSize={["14px", "16px", "18px"]}
+            fontSize={["sm", "md", "lg"]}
             mt="10px"
             ml={["20px", "30px", "45px"]}
             maxW={["300px", "350px", "400px"]}
@@ -121,14 +121,15 @@ const Category = () => {
           bg="rgba(20, 20, 20, 0.4)"
           align="center"
           borderRadius="full"
-          mb={4}
+          mb={[1, 2, 4]}
+          
           width="fit-content"
         >
           {buttons.map((btn, index) => (
             <Button
               key={btn}
-              fontSize="md"
-              p={[4, 6, 8]}
+              fontSize={["2xs", "xs", "sm"]}
+              p={[2, 4, 6]}
               bg={activeButton === btn ? "rgba(5, 5, 5, 0.7)" : "transparent"}
               color="white"
               _hover={{ bg: "rgba(10, 10, 10, 0.4)" }}
@@ -137,6 +138,7 @@ const Category = () => {
               borderBottomLeftRadius={index === 0 ? "full" : 0}
               borderTopRightRadius={index === buttons.length - 1 ? "full" : 0}
               borderBottomRightRadius={index === buttons.length - 1 ? "full" : 0}
+              mb={[0, 0, 0]}
             >
               {btn.toUpperCase()}
             </Button>
@@ -145,112 +147,100 @@ const Category = () => {
       </Box>
 
       {/* Management Bar */}
-      <Box ml={[4, 6, 8]} mb={[4, 6, 8]}>
-        <Flex align="center" justifyContent="space-between" flexWrap="wrap">
-          {/* Left group */}
-          <Flex align="center" gap={4} mb={[2, 0]}>
-            <Text fontWeight="bold" fontSize={["sm", "md", "lg"]}>
-              Publicaciones encontradas
-            </Text>
-            <Text fontWeight="bold" color="gray.500" fontSize={["sm", "md", "lg"]}>
-              {quantity} resultados.
-            </Text>
-            <CreateDebateDialog
-            triggerButton={
-              <Button
+<Box mx={[4, 6, 6]}>
+  <Flex 
+    align="center" 
+    justifyContent="space-between" 
+    flexWrap="nowrap"
+    width="100%"
+    gap={3}
+  >
+    {/* Left group - Modificado para permitir saltos de línea */}
+    <Flex 
+      align="center" 
+      gap={3}
+      flexShrink={1}
+      minWidth="min-content"
+      flex="1 1 auto"
+      overflow="hidden"
+      flexWrap="wrap" 
+      rowGap={1} 
+    >
+      <Text 
+        fontWeight="bold" 
+        fontSize={["2xs", "xs", "sm"]}
+        whiteSpace="normal" 
+        textOverflow="unset" 
+        overflow="visible"
+        flexShrink={1}
+      >
+        Publicaciones encontradas
+      </Text>
+      <Text 
+        fontWeight="bold" 
+        color="gray.500" 
+        fontSize={["2xs", "xs", "sm"]}
+        whiteSpace="normal" 
+        flexShrink={1}
+      >
+        {quantity} resultados.
+      </Text>
+      
+      <Box flexShrink={0} alignSelf="center"> 
+        <CreateDebateDialog
+          triggerButton={
+            <Button
               bg="black"
               color="white"
               _hover={{ bg: "gray.800" }}
-              fontSize={["sm", "md", "lg"]}
-              mb={[2, 0]}
-              >
-                Agregar debate <FaPlus color="white" style={{ marginLeft: "4px" }} />
-              </Button>
-            }
-            categoryId={id}
-          />
-            
-          </Flex>
-          {/* Right search bar */}
-          <form onSubmit={handleSearch}>
-            <Box display="flex" alignItems="center">
-              <button type="submit">
-                <FaSearch color="gray" style={{ marginRight: "8px" }} />
-              </button>
-              <Box
-                as="input"
-                placeholder="Buscar un debate"
-                border="1px solid"
-                borderColor="gray.300"
-                borderRadius="md"
-                px={4}
-                py={1}
-                width={["70vw", "30vw", "50vw"]}
-                textAlign="left"
-                fontSize={["sm", "md", "lg"]}
-                value={inputValue} // Usa inputValue, no searchQuery
-                onChange={(e) => setInputValue(e.target.value)} // Actualiza solo el estado temporal
-                onKeyDown={handleKeyDown}
-              />
-            </Box>
-          </form>
-        </Flex>
+              fontSize={["2xs", "xs", "sm"]}
+              whiteSpace="nowrap"
+              size="sm"
+            >
+              <Box as="span" display={["none", "inline"]}>Agregar </Box>
+              debate <FaPlus color="white" style={{ marginLeft: "4px" }} />
+            </Button>
+          }
+          categoryId={id}
+        />
       </Box>
+    </Flex>
 
-      {/* Posts */}
+    {/* Search bar - Sin cambios */}
+    <Box 
+      as="form" 
+      onSubmit={handleSearch}
+      flex="2 1 150px"
+      minWidth="100px"
+      maxWidth={["200px", "300px", "500px"]}
+    >
+      <Flex align="center" width="100%">
+        <button type="submit">
+          <FaSearch color="gray" style={{ marginRight: "4px" }} />
+        </button>
+        <Box
+          as="input"
+          placeholder="Buscar..."
+          border="1px solid"
+          borderColor="gray.300"
+          borderRadius="md"
+          px={3}
+          py={1}
+          width="100%"
+          textAlign="left"
+          fontSize={["2xs", "xs", "sm"]}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </Flex>
+    </Box>
+  </Flex>
+</Box>
+
+      {/* debates */}
       <CategoryView category ={category.id} sortType = {index} search={searchQuery} quantity= {setQuantity} />
-      {/* <Box ml={[4, 6, 8]}>
-        {posts.map((post) => (
-          <Box
-            key={post.id}
-            bg="gray.100"
-            p={4}
-            borderRadius="lg"
-            mb={1}
-            m={2}
-            transition="background-color 0.3s ease-in-out, opacity 0.3s ease-in-out"
-            _hover={{ bg: "rgba(183, 183, 183, 0.67)", opacity: 0.8 }}
-          >
-            <Flex align="center" flexWrap="wrap">
-              <Image
-                src={post.avatar}
-                maxH="60px"
-                maxW="60px"
-                objectFit="cover"
-                mr={3}
-                mb={[2, 0]}
-              />
-              <Box flex="1" minW="200px">
-                <Flex align="center" flexWrap="wrap">
-                  <Text fontWeight="bold" mr={2} fontSize={["sm", "md", "lg"]}>
-                    {post.user}
-                  </Text>
-                  <Text fontSize="sm" color="gray.500" fontWeight="bold">
-                    {post.date}
-                  </Text>
-                </Flex>
-                <Text mt={1} color="gray.700" fontSize={["sm", "md", "lg"]}>
-                  {post.text}
-                </Text>
-              </Box>
-              <Flex align="center" color="gray.600" fontSize={["sm", "md", "lg"]}>
-                <FaEye style={{ marginRight: "4px" }} />
-                <Text>{post.views}</Text>
-              </Flex>
-            </Flex>
-            <Flex mt={2} justifyContent="flex-end" alignItems="center" color="gray.600" fontSize={["sm", "md", "lg"]}>
-              <Flex align="center" mr={4}>
-                <FaCommentAlt style={{ marginRight: "4px", color: "rgba(25, 174, 255, 0.75)" }} />
-                <Text>{post.favor} respuestas a favor</Text>
-              </Flex>
-              <Flex align="center">
-                <FaCommentAlt style={{ marginRight: "4px", color: "red" }} />
-                <Text>{post.against} respuestas en contra</Text>
-              </Flex>
-            </Flex>
-          </Box>
-        ))}
-      </Box> */}
+
     </Box>
   );
 };

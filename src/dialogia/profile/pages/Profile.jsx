@@ -629,12 +629,12 @@ useEffect(() => {
                   )}
 
                   <Flex align="flex-start">
-                    <Image
-                      src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                      boxSize="60px"
-                      objectFit="cover"
-                      mr={4}
-                    />
+                    <Flex direction="column" align="center">
+                      <Avatar.Root style={{ width: 40, height: 40, borderRadius: '9999px', overflow: 'hidden' }} mr={3}>
+                        <Avatar.Fallback delayMs={600}>{`A${currentUser?.id}`}</Avatar.Fallback>
+                        <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${currentUser?.id}`} />
+                      </Avatar.Root>
+                    </Flex>
                     <Box flex="1">
                       <Flex align="center" mb={2}>
                         <Text fontWeight="bold">{c.username}</Text>

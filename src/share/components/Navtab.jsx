@@ -44,7 +44,7 @@ const NavTab = () => {
   const menuRef = useRef();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const avatarBoxSize = useBreakpointValue({ base: '32px', md: '48px' });
+  const avatarBoxSize = useBreakpointValue({ base: '28px', md: '38px' });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [notifications, setNotifications] = useState([]);
@@ -101,19 +101,7 @@ const NavTab = () => {
       path: '/categories', 
       icon: <LuList size={16} />,
       alwaysShow: false 
-    },
-    { 
-      name: 'ACERCA DE NOSOTROS', 
-      path: '/aboutus', 
-      icon: <LuInfo size={16} />,
-      alwaysShow: true 
-    },
-    { 
-      name: 'POLITICAS DE USO', 
-      path: '/policies', 
-      icon: <LuFile size={16} />,
-      alwaysShow: true 
-    },
+    }
   ];
 
   // Filtrar tabs según autenticación
@@ -170,12 +158,18 @@ const NavTab = () => {
   
 
   return (
-    <Flex bg="gray.800" p={2} alignItems="center" position="relative">
+    <Flex 
+      bg="gray.800" 
+      p={1} 
+      alignItems="center"
+      position="relative"
+      flexWrap="wrap" // Permite que los elementos se ajusten en móviles
+    >
       {/* Logo */}
       <Image 
         src="LOGO_NAV.png" 
         alt="Dialogia" 
-        w="100px" 
+        w={{base: "55px", md: "75px"}} // Tamaño responsivo
         objectFit="contain" 
         cursor="pointer"
         onClick={() => navigate(isLoggedIn ? '/home' : '/')}
@@ -188,7 +182,7 @@ const NavTab = () => {
             <Link
               key={i}
               color="white"
-              fontSize="sm"
+              fontSize="xs"
               onClick={() => navigate(tab.path)}
               _hover={{ opacity: 0.8 }}
               display="flex"
@@ -206,22 +200,22 @@ const NavTab = () => {
 
       {/* Mobile menu button */}
       {isMobile && (
-        <Button variant="ghost" size="sm" onClick={() => setShowMobileMenu(!showMobileMenu)}>
-          <LuMenu size={20} />
+        <Button variant="ghost" size="xs" color="white" _hover={{bg:"white", color:"black"}}   onClick={() => setShowMobileMenu(!showMobileMenu)}>
+          <LuMenu size={14} />
         </Button>
       )}
 
       {/* User actions - solo muestra si está logueado */}
       {isLoggedIn && (
-        <Flex gap={2} alignItems="center">
+        <Flex gap={{base: 1, md: 1}} alignItems="center">
           <Button 
             variant="ghost" 
-            size="sm" 
+            size="xs" 
             color="white" 
             _hover={{bg:"white", color:"black"}} 
             onClick={() => navigate('/search')}
           >
-            <LuSearch size={18} />
+            <LuSearch size={14} />
           </Button>
 
           <Menu.Root>
@@ -232,13 +226,34 @@ const NavTab = () => {
                 borderRadius="full"
                 overflow="hidden"
                 ref={menuRef}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                bg="gray.600" // Color de fondo por defecto
               >
-                <Avatar.Root style={{ width: 50, height: 50, borderRadius: '9999px', overflow: 'hidden' }}>
-                  <Avatar.Fallback delayMs={600}>{`A${currentUser?.id}`}</Avatar.Fallback>
-                  <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${currentUser?.id}`} />
-                </Avatar.Root>
+                <Image
+                  src={`/avatar_${currentUser?.avatarId || "1"}.jpg`}
+                  alt={`Avatar ${currentUser?.id}`}
+                  objectFit="cover"
+                  width="100%"
+                  height="100%"
+                  fallback={
+                    <Box 
+                      w="full" 
+                      h="full" 
+                      display="flex" 
+                      justifyContent="center" 
+                      alignItems="center"
+                      bg="gray.600"
+                      color="white"
+                    >
+                      {currentUser?.username?.charAt(0).toUpperCase() || 'U'}
+                    </Box>
+                  }
+                />
               </Box>
             </Menu.Trigger>
+
 
             <Portal>
               <Menu.Positioner>
@@ -265,13 +280,13 @@ const NavTab = () => {
 
           <Button 
             variant="ghost" 
-            size="sm" 
+            size="xs" 
             color="white" 
             _hover={{bg:"white", color:"black"}} 
             onClick={handleBellClick}
           >
             <Box position="relative" color={blink ? 'lime' : undefined}>
-              <FaBell size={18} style={{ color: 'inherit' }}  />
+              <FaBell size={14} style={{ color: 'inherit' }}  />
               {unreadCount > 0 && (
                 <Badge
                   pos="absolute"
@@ -291,7 +306,19 @@ const NavTab = () => {
 
       {/* Mobile menu dropdown */}
       {isMobile && showMobileMenu && (
-        <Box pos="absolute" top="60px" left="0" right="0" bg="gray.700" p={2} zIndex="dropdown">
+
+        <Box 
+          pos="absolute" 
+          top="100%" // Aparece justo debajo de la barra
+          left="0" 
+          right="0" 
+          bg="gray.700" 
+          p={2} 
+          zIndex="dropdown"
+          borderTop="1px solid"
+          borderColor="gray.600"
+        >
+
           <VStack align="stretch" spacing={1}>
             {filteredTabs.map((tab, i) => (
               <Box

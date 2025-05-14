@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { 
   Box, Heading, Text, Spinner, Flex, Stack, 
-  Button, ButtonGroup 
+  Button, ButtonGroup, Avatar, Grid, GridItem,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -84,56 +84,82 @@ const CategoryView = ({category, sortType, search, quantity }) => {
   }
 
   return (
-    <Box maxW="auto" mx="auto" p={4}>
-      <Stack spacing={6}>
-        {paginatedDebates.map((debate) => {
-          let countTrue = 0;
-          let countFalse = 0;
-  
-          debate.comments.forEach((comment) => {
-            if (comment.position === true) countTrue++;
-            else if (comment.position === false) countFalse++;
-          });
-  
-          return (
-            <Box 
-              key={debate.idDebate}
-              borderRadius="3xl"
-              bg="#F0F0F0"
-              p={2}
-              onClick={() => navigate(`/debate/${debate.idDebate}`)}
-              cursor="pointer"
-            >
-              <Flex justify="space-between">
-                <Flex>
-                  <Text fontSize="sm" fontWeight="bold">{debate.username}</Text>
-                  <Text fontSize="sm" color="#727272" ml={3}> 
-                    {new Date(debate.datareg).toLocaleDateString('es-ES')}
+<Box maxW="auto" mx="auto" p={6}>
+  <Stack spacing={4}>
+    {paginatedDebates.map((debate) => {
+      let countTrue = 0;
+      let countFalse = 0;
+
+      debate.comments.forEach((comment) => {
+        if (comment.position === true) countTrue++;
+        else if (comment.position === false) countFalse++;
+      });
+
+      return (
+        <Box
+          key={debate.idDebate}
+          bg="gray.100"
+          p={2}
+          borderRadius="xl"  // Redondeo más pronunciado
+        
+          
+          transition="background-color 0.3s ease-in-out, opacity 0.3s ease-in-out"
+          _hover={{ bg: "rgba(183, 183, 183, 0.67)", opacity: 0.8 }}
+          onClick={() => navigate(`/debate/${debate.idDebate}`)}
+        >
+          <Grid templateColumns="1fr auto" gap={4} alignItems="center">  {/* Grid con dos columnas */}
+            {/* Columna de la izquierda: Avatar, Username, Argumento */}
+            <Flex align="center" flexWrap="wrap" fontSize="sm">
+              <Avatar.Root size="sm" mr={2}>  {/* Avatar más pequeño */}
+                <Avatar.Fallback delayMs={600}>{`A${debate?.user?.id}`}</Avatar.Fallback>
+                <Avatar.Image
+                  src={`/avatar_${debate?.user?.avatarId || "1"}.jpg`}
+                  alt={`Avatar ${debate?.user?.id}`}
+                />
+              </Avatar.Root>
+              <Box flex="1" minW="150px">  {/* Ajustar el tamaño del contenedor */}
+                <Flex align="center" flexWrap="wrap">
+                  <Text fontWeight="bold" mr={2} fontSize="sm">
+                    {debate.username}
+                  </Text>
+                  <Text fontSize="xs" color="gray.500" fontWeight="bold">
+                    {new Date(debate.datareg).toLocaleDateString("es-ES")}
                   </Text>
                 </Flex>
-  
-                <Flex align="center">
-                  <FaEye style={{ marginRight: "4px" }} /> 
-                  <Text color="#727272">{debate.popularity}</Text>
-                </Flex>
-              </Flex>
-  
-              <Flex justify="space-between" alignItems="flex-end">
-                <Heading as="h1" size="lg" fontWeight="bold" mb={0}>
+                <Text mt={1} color="gray.700" fontSize="sm">
                   {debate.nameDebate}
-                </Heading>
-  
-                <Flex mt={4}>
-                  <FaCommentAlt style={{ marginRight: "4px", color: "rgba(25, 174, 255, 0.75)" }} />  
-                  <Text fontSize="sm" mr={4} color="#727272">{countTrue} respuestas a favor</Text>
-                  <FaCommentAlt style={{ marginRight: "4px", color: "red" }} />  
-                  <Text fontSize="sm" color="#727272">{countFalse} respuestas en contra</Text>
+                </Text>
+              </Box>
+            </Flex>
+
+            {/* Columna de la derecha: Visualizaciones y Comentarios */}
+            <Flex direction="column" align="flex-end" fontSize="sm">
+              {/* Visualizaciones - arriba a la derecha */}
+              <Flex align="center" color="gray.600" mb={2}>
+                <FaEye style={{ marginRight: "4px" }} />
+                {debate.popularity}
+              </Flex>
+
+              {/* Comentarios - abajo a la derecha */}
+              <Flex justify="flex-end" align="center" color="gray.600" fontSize="sm">
+                <Flex align="center" mr={4}>
+                  <FaCommentAlt style={{ marginRight: "4px", color: "rgba(25, 174, 255, 0.75)" }} />
+                  <Text>{countTrue} a favor</Text>
+                </Flex>
+                <Flex align="center">
+                  <FaCommentAlt style={{ marginRight: "4px", color: "red" }} />
+                  <Text>{countFalse}  en contra</Text>
                 </Flex>
               </Flex>
-            </Box>
-          );
-        })}
-      </Stack>
+            </Flex>
+          </Grid>
+        </Box>
+      );
+    })}
+  </Stack>
+
+
+
 
       {/* Paginación */}
       {totalPages > 1 && (

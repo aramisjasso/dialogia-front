@@ -9,7 +9,8 @@ import {
   HStack,
   CloseButton,
   VStack,
-  Image,Link
+  Image,Link,
+  Avatar,
 } from "@chakra-ui/react";
 import { toaster } from "../../components/ui/toaster";
 import ImageUploader from "../categories/components/ImageUploader";
@@ -202,13 +203,12 @@ export default function ReplyCommentForm({
           borderColor={parentComment.position ? "blue.500" : "red.500"}
         >
           <Flex align="flex-start" flexWrap="wrap">
-            <Image
-              src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-              maxH="40px"
-              maxW="40px"
-              objectFit="cover"
-              mr={3}
-            />
+            <Avatar.Root style={{  borderRadius: '9999px', overflow: 'hidden' } } mr={4} size="lg">
+              <Avatar.Fallback delayMs={600}>{`A${parentComment.user?.id}`}</Avatar.Fallback>
+              <Avatar.Image src={`/avatar_${parentComment.user?.avatarId || "1" }.jpg`} alt={`Avatar ${parentComment.user?.id}`} objectFit="cover" />
+            </Avatar.Root>
+            
+            
             <Box flex="1" minW="200px">
               <Flex align="center" flexWrap="wrap">
                 <Text fontWeight="bold" mr={2} fontSize="sm">

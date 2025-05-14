@@ -5,35 +5,30 @@ import { useAuth } from '../contexts/hooks/useAuth';
 const ProtectedRoute = ({ children, requireAuth }) => {
   const location = useLocation();
   const { currentUser, loading, updateUserField } = useAuth();
-  const [lastPath, setLastPath] = useState('');
-  const [isChecking, setIsChecking] = useState(true);
+  const [isReady, setIsReady] = useState(false);
   
   const ALLOWED_PATHS = ['/select-interests', '/registeruser', '/'];
 
-  // Efecto para manejar cambios de ruta sin ciclos
   useEffect(() => {
-    if (location.pathname !== lastPath) {
-      setIsChecking(true);
-      setLastPath(location.pathname);
-      console.log("location pathname: ",location.pathname);
-      console.log("last Path: ", lastPath);
-      // Verificación rápida del username en localStorage
+    const verifyAuth = async () => {
+      // Verificación del username en localStorage
       const storedUsername = localStorage.getItem("username");
-      console.log("Stored username: ", storedUsername);
       if (currentUser && !currentUser.username && storedUsername) {
-        updateUserField({ username: storedUsername });
+        await updateUserField({ username: storedUsername });
       }
-      console.log("hola");
-      setIsChecking(false);
-      console.log("is Checking: ", isChecking);
-    }
-  }, [location.pathname, currentUser]);
+      setIsReady(true);
+    };
 
-  if (isChecking) {
+    if (!loading) {
+      verifyAuth();
+    }
+  }, [currentUser, loading]);
+
+  if (loading || !isReady) {
     return <div>Cargando...</div>;
   }
 
-  // Lógica de redirección optimizada
+  // Lógica de redirección
   const shouldRedirectToRegister = 
     currentUser && 
     (!currentUser.username || currentUser.username === '') && 
@@ -52,7 +47,7 @@ const ProtectedRoute = ({ children, requireAuth }) => {
     return <Navigate to="/" replace />;
   }
 
-  if (!requireAuth && currentUser) {
+  if (!requireAuth && currentUser && location.pathname === "/") {
     return <Navigate to="/home" replace />;
   }
 

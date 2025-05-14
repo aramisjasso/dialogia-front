@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Flex,
@@ -7,6 +7,7 @@ import {
   Button,
   IconButton,
   InputGroup,
+  Group,
 } from '@chakra-ui/react';
 import { MdEdit } from 'react-icons/md';
 import AvatarCarousel from './AvatarCarousel';
@@ -28,7 +29,7 @@ const UserProfile = ({ currentUser, refreshUser }) => {
     { id: 9, src: '/avatar_9.jpg' },
   ];
 
-  const [editFields, setEditFields] = useState({ username: false, email: false });
+  const [editFields, setEditFields] = useState({ username: false });
   const [formData, setFormData] = useState({
     username: currentUser.username,
     email: currentUser.email,
@@ -49,7 +50,7 @@ const UserProfile = ({ currentUser, refreshUser }) => {
       email: currentUser.email,
       avatarId: currentUser.avatarId,
     });
-    setEditFields({ username: false, email: false });
+    setEditFields({ username: false });
   };
 
   const handleSave = async () => {
@@ -57,14 +58,15 @@ const UserProfile = ({ currentUser, refreshUser }) => {
       let respuesta = await fetch(`${import.meta.env.VITE_API_URL}/user/${currentUser.uid}/updatedata`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          username: formData.username,
+          avatarId: formData.avatarId
+        }),
       });
-      console.log('User updated successfully',formData);
+      
       if (!respuesta.ok) {
         console.error('Error al actualizar el usuario', respuesta);
         throw new Error('Error al actualizar el usuario');
-      }else {
-        console.log('User updated successfully');
       }
       
       toaster.create({
@@ -75,7 +77,7 @@ const UserProfile = ({ currentUser, refreshUser }) => {
       });
 
       refreshUser();
-      setEditFields({ username: false, email: false });
+      setEditFields({ username: false });
     } catch (err) {
       toaster.create({
         title: 'Error al actualizar',
@@ -87,64 +89,53 @@ const UserProfile = ({ currentUser, refreshUser }) => {
   };
 
   const hasChanges =
-    formData.username !== currentUser.username
-    formData.email !== currentUser.email
+    formData.username !== currentUser.username ||
     formData.avatarId !== currentUser.avatarId;
 
   return (
     <Box maxW="600px" mx="auto" mt="40px" p={6} borderWidth="1px" borderRadius="lg" boxShadow="sm">
       <Text fontSize="sm" fontWeight="medium" mb={2}>Avatar</Text>
-      {/* Avatar Carousel */}
       <AvatarCarousel
         avatars={avatars}
         selectedAvatarId={formData.avatarId}
         onSelect={handleAvatarSelect}
       />
 
-
       {/* Username */}
       <Flex direction="column" mb={4}>
         <Text fontSize="sm" mb={1}>Usuario</Text>
-        <InputGroup endElement={
-          <IconButton
-            size="xs"
-            variant="ghost"
-            aria-label="Editar usuario"
-            onClick={() => setEditFields((prev) => ({ ...prev, username: true }))}
-          >
-          <MdEdit />
-          </IconButton>
-        }>
+        <Group attached w="full">
           <Input
+            flex="1"
             value={formData.username}
-            onChange={handleChange('username')}
+            onChange={editFields.username ? handleChange('username') : undefined}
             isReadOnly={!editFields.username}
             variant={editFields.username ? 'outline' : 'filled'}
             bg={!editFields.username ? 'gray.50' : undefined}
+            _readOnly={{ cursor: 'default' }}
           />
-        </InputGroup>
+          {!editFields.username && (
+            <Button
+              bg="gray.50"
+              variant="ghost"
+              px={2}
+              onClick={() => setEditFields((prev) => ({ ...prev, username: true }))}
+            >
+              <MdEdit />
+            </Button>
+          )}
+        </Group>
       </Flex>
 
       {/* Email */}
       <Flex direction="column" mb={4}>
         <Text fontSize="sm" mb={1}>Correo</Text>
-        <InputGroup endElement={
-          <IconButton
-            size="xs"
-            variant="ghost"
-            
-            aria-label="Editar correo"
-            onClick={() => setEditFields((prev) => ({ ...prev, email: true }))}
-          >
-          <MdEdit />
-          </IconButton>
-          }>
+        <InputGroup>
           <Input
             value={formData.email}
-            onChange={handleChange('email')}
-            isReadOnly={!editFields.email}
-            variant={editFields.email ? 'outline' : 'filled'}
-            bg={!editFields.email ? 'gray.50' : undefined}
+            isReadOnly
+            variant="filled"
+            bg="gray.50"
           />
         </InputGroup>
       </Flex>

@@ -187,12 +187,15 @@ const Categories = () => {
 
   }, []);
   return (
-    <Box p={[4, 8, 12]}>
+    <Box p={[1, 2, 4]}>
       {/* Sección del título */}
-      <Flex justify="center" mb={[6, 10, 12]} mt={[6, 10, 12]}>
+      <Flex justify="center" mb={[1, 2, 4]} mt={[1, 2, 4]}>
         <Heading
-          fontFamily="Times New Roman, serif"
-          fontSize={["40px", "60px", "80px"]}
+
+          // fontFamily= "Times New Roman, serif"
+          fontWeight= {300} // ExtraLight
+
+          fontSize={["xl", "2xl", "6xl"]}
           textAlign="center"
         >
           CATEGORIAS
@@ -205,7 +208,7 @@ const Categories = () => {
         bg="gray.400"
         width="100%"
         mx="auto"
-        mb={[6, 10, 20]}
+        mb={[6, 4, 8]}
       />
 
       {/* Grid de categorías */}

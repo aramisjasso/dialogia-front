@@ -1,5 +1,6 @@
 // BestComment.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Text,
@@ -19,7 +20,7 @@ export default function BestComment({ comment, debateId, userPosition }) {
   const [selectedComment, setSelectedComment] = useState(null);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [comments, setComments] = useState([]);
-
+  const navigate = useNavigate();
   const handleReplyClick = (comment) => {
     setSelectedComment(comment);
     setShowReplyForm(true);
@@ -153,7 +154,7 @@ export default function BestComment({ comment, debateId, userPosition }) {
 
         <Box flex="1" minW="200px">
           <Flex align="center" flexWrap="wrap">
-            <Text fontWeight="bold" mr={2} fontSize={['sm', 'md', 'lg']}>
+            <Text fontWeight="bold" mr={2} fontSize={['sm', 'md', 'lg']} cursor="pointer" _hover={{ color: 'blue.600' }} onClick={() => navigate(`/profile/${currentComment.username}`)} >
               {currentComment.username}
             </Text>
             <Text fontSize="sm" color="gray.500" fontWeight="bold">

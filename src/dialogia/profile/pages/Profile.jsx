@@ -82,6 +82,7 @@ const BADGE_DEFINITIONS = [
   const [userDebates, setUserDebates] = useState([]);
   const [allDebates, setAllDebates] = useState([]);
   const [comments, setComments] = useState([]); 
+  const [currentBadge, setCurrentBadge] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [activityTab, setActivityTab] = useState('debates');
   const selectedBadge = BADGE_DEFINITIONS.find(b => b.badgeId === selectedId);
@@ -91,7 +92,7 @@ const BADGE_DEFINITIONS = [
   const hoverBg    = useColorModeValue('blue.100','blue.600');
   const bgBox       = useColorModeValue('white',     'gray.700');
   const navigate = useNavigate();
-
+  const activeBadgeName = currentUser.title;
   const getParentComment = (paidCommentId) => {
     return comments.find(c => c.idComment === paidCommentId);
   };
@@ -111,26 +112,50 @@ const BADGE_DEFINITIONS = [
   useEffect(() => {
     if (!currentUser?.username) return;
 
-    const fetchAllDebates = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/debates`);
-        if (!res.ok) throw new Error('No pude cargar los debates');
-        const all = await res.json();
-        setAllDebates(all);
-        setUserDebates(all.filter(d => d.username === currentUser.username));
-setComments(
-  all
-    .flatMap(d => d.comments)
-    .filter(c => c.username === currentUser.username)
-)
-      } catch (err) {
-        console.error(err);
-        toaster.create({ description: err.message, type: 'error' });
-      }
-    };
+  const fetchAllDebates = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/debates`);
+      if (!res.ok) throw new Error('No pude cargar los debates');
+      const all = await res.json();
 
-    fetchAllDebates();
-  }, [currentUser?.username]);
+      // 1) guarda todo en el estado
+      setAllDebates(all);
+      // 2) filtra tus debates de usuario sobre la variable local
+      const userDs = all.filter(d => d.username === currentUser.username);
+      setUserDebates(userDs);
+
+      // 3) infiere el campo ID correcto (aquí uso `d.id`)
+const commentsWithDebate = all
+  .flatMap(d => {
+    return (d.comments || []).map(c => {
+      console.log(`Debate ${d.idDebate} → comment ${c.idComment}:`, c);
+      return {
+        ...c,
+        debateId: d.idDebate
+      };
+    });
+  })
+  .filter(c => c.username === currentUser.username);
+
+// Aquí añades el console.log para cada comentario ya filtrado:
+commentsWithDebate.forEach(c => {
+  console.log(`Filtered comment ${c.idComment} from debate ${c.debateId}:`, c);
+});
+
+setComments(commentsWithDebate);
+
+      // para depurar:
+      console.log('Primer debate:', all[0]);
+      console.log('UserDebates:', userDs);
+      console.log('CommentsWithDebate:', commentsWithDebate);
+    } catch (err) {
+      console.error(err);
+      toaster.create({ description: err.message, type: 'error' });
+    }
+  };
+
+  fetchAllDebates();
+}, [currentUser?.username]);
 
   // Estadísticas
   const totalDebates = userDebates.length;
@@ -305,7 +330,8 @@ useEffect(() => {
       if (!res.ok) throw new Error('Error al aplicar insignia');
   
       toaster.create({ description: 'Insignia aplicada correctamente', type: 'success' });
-  
+      await refreshUser();
+      console.log("Insignia actual: ", currentUser.title);
       // Opcional: actualizar tu estado local para reflejar el nuevo title
       // p.ej. setUserTitle(selected.badgeName);
     } catch (err) {
@@ -397,29 +423,34 @@ useEffect(() => {
   >
     <VStack spacing={1} align="stretch">
       <Heading size="md" mb={2}>Tus Insignias</Heading>
-      {sortedBadgeDefs.map(badge => {
-        const unlocked   = userUnlockedBadges.includes(badge.badgeId);
-        const isSelected = badge.badgeId === selectedId;
-        return (
-          <HStack
-            key={badge.badgeId}
-            p={2}
-            borderRadius="md"
-            bg={ isSelected ? bgSelected : (unlocked ? bgUnlocked : bgLocked) }
-            cursor="pointer"
-            _hover={{ bg: hoverBg }}
-            onClick={() => setSelectedId(badge.badgeId)}
-          >
-            <Icon
-              as={unlocked ? UnlockIcon : LockIcon}
-              color={unlocked ? 'green.500' : 'gray.500'}
-            />
-            <Text flex="1" fontWeight={isSelected ? 'semibold' : 'normal'}>
-              {badge.badgeName}
-            </Text>
-          </HStack>
-        );
-      })}
+{sortedBadgeDefs.map(badge => {
+  const unlocked   = userUnlockedBadges.includes(badge.badgeId);
+  const isActive   = badge.badgeName === activeBadgeName;
+
+  return (
+    <HStack
+      key={badge.badgeId}
+      p={2}
+      borderRadius="md"
+      bg={
+        isActive
+          ? 'green.100'               // verde claro si es la activa
+          : (unlocked ? bgUnlocked : bgLocked)
+      }
+      cursor="pointer"
+      _hover={{ bg: hoverBg }}
+      onClick={() => setSelectedId(badge.badgeId)}  // sigue usando selectedId para el detalle
+    >
+      <Icon
+        as={unlocked ? UnlockIcon : LockIcon}
+        color={unlocked ? 'green.500' : 'gray.500'}
+      />
+      <Text flex="1" fontWeight={isActive ? 'semibold' : 'normal'}>
+        {badge.badgeName}
+      </Text>
+    </HStack>
+  );
+})}
     </VStack>
   </Box>
   {/* Columna Derecha: Detalle centrado, altura 60vh */}
@@ -482,18 +513,25 @@ useEffect(() => {
 
 
 
-      <Button
-        colorScheme="blue"
-        isDisabled={!userUnlockedBadges.includes(selectedBadge.badgeId)}
-        onClick={() => onApplyBadge(selectedBadge.badgeId)}
-        isLoading={isSubmitting}
-        loadingText="Aplicando..."
-        w="60%"
-        mx="auto"
-        mt="10v"
-      >
-        Aplicar
-      </Button>
+<Button
+    background={
+    selectedBadge.badgeName === activeBadgeName
+      ? 'blue.600'    // botón verde si esa insignia ya está activa
+      : 'black'
+  }
+  isDisabled={!userUnlockedBadges.includes(selectedBadge.badgeId)}
+  onClick={() => onApplyBadge(selectedBadge.badgeId)}
+  isLoading={isSubmitting}
+  loadingText="Aplicando..."
+  w="60%"
+  mx="auto"
+  mt="10vh"
+>
+  {selectedBadge.badgeName === activeBadgeName
+    ? 'Seleccionada'   // texto alternativo
+    : 'Aplicar'
+  }
+</Button>
     </Flex>
   )}
     </Flex>
@@ -547,6 +585,8 @@ useEffect(() => {
               borderColor="gray.200"
               borderRadius="md"
               mb={idx < userDebates.length - 1 ? 2 : 0}
+              cursor="pointer"
+                              onClick={() => navigate(`/debate/${debate.idDebate}`)}
             >
               <Flex align="center" mb={2}>
                 <Box
@@ -581,15 +621,6 @@ useEffect(() => {
                 {debate.argument}
               </Text>
 
-              <Text
-                color="#979797"
-                textDecoration="underline"
-                fontSize="md"
-                fontWeight="bold"
-                onClick={() => navigate(`/debate/${debate.idDebate}`)}
-              >
-                Ver más
-              </Text>
             </Box>
           ))}
 
@@ -609,6 +640,8 @@ useEffect(() => {
                   borderRadius="lg"
                   mb={4}
                   position="relative"
+                  cursor="pointer"
+                  onClick={() => navigate(`/debate/${d.idDebate}`)}  // Aquí navegamos al debate
                 >
                   {/* Comentario padre */}
                   {parentComment && (
@@ -625,17 +658,16 @@ useEffect(() => {
                       <Text fontSize="xs" color="gray.600">
                         {new Date(parentComment.datareg).toLocaleDateString('es-ES')}
                       </Text>
+                      
                     </Box>
                   )}
 
                   <Flex align="flex-start">
-                    <Image
-                      src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                      boxSize="60px"
-                      objectFit="cover"
-                      mr={4}
-                    />
-                    <Box flex="1">
+              <Avatar.Root style={{ width: 60, height: 60, borderRadius: '9999px', overflow: 'hidden' }}>
+                <Avatar.Fallback delayMs={600}>{`A${currentUser?.id}`}</Avatar.Fallback>
+                <Avatar.Image src={`/avatar_${currentUser?.avatarId || "1" }.jpg`} alt={`Avatar ${currentUser?.id}`} />
+              </Avatar.Root>
+                    <Box flex="1" ml={2}>
                       <Flex align="center" mb={2}>
                         <Text fontWeight="bold">{c.username}</Text>
                         <Text fontSize="sm" color="gray.500" ml={2}>
@@ -725,7 +757,7 @@ useEffect(() => {
             mr={3}
           >
             <Text fontSize="3xl" fontWeight="bold">
-              {currentUser.activity.score}
+              {Math.round(currentUser.activity.score)}
             </Text>
           </Box>
           <Text fontSize="3xl" fontWeight="700" color="gray.600">XP</Text>

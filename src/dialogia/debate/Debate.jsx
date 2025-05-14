@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Heading, Text, Spinner, Flex, Link, Badge, Image, Avatar} from '@chakra-ui/react';
 import axios from 'axios';
 import { FaEye, FaBell, FaUser } from "react-icons/fa";
@@ -18,7 +18,7 @@ const Debate = () => {
   const [censorship, setCensorship] = useState(false);
   const [userPosition, setUserPosition] = useState(null);
   const [following, setFollowing] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchDebate = async () => {
       try {
@@ -170,7 +170,7 @@ const Debate = () => {
             </Avatar.Root>
             {/* <FaUser size={64} color="#727272" /> */}
 
-            <Text size="md" fontWeight="bold" mt={2}>
+            <Text size="md" fontWeight="bold" mt={2} cursor="pointer" _hover={{ color: 'blue.600' }} onClick={() => navigate(`/profile/${debate.username}`)}>
               {debate?.username}
             </Text>
             <Text fontSize="xs" color="#727272" fontWeight="bold">
@@ -202,6 +202,7 @@ const Debate = () => {
                   onClick={handleFollowToggle}
                   style={{ color: following ? 'blue' : 'gray' }}
                   cursor='pointer'
+
               />
 
             </Flex>

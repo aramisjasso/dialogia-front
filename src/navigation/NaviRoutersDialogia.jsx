@@ -21,6 +21,7 @@ import AboutUs from "../dialogia/company/pages/AboutUs";
 import Policies from "../dialogia/company/pages/Policies";
 import RankingGlobal from "../dialogia/ranking/pages/RankingGlobal";
 import ChangePassword from "@/dialogia/profile/pages/ChangePassword";
+import OthersProfile from "@/dialogia/profile/pages/OthersProfile";
 
 import Pruebas_CDAS from "../dialogia/categories/pages/PruebasCDAS";
 // import ImageUploader from "../dialogia/testing/ImageUploader";
@@ -175,6 +176,16 @@ const NaviRoutersDialogia = () => {
         <ProtectedRoute requireAuth={true} checkInterests={true}>
           <Layout>
             <Profile />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/profile/:username",
+      element: (
+        <ProtectedRoute requireAuth={true} checkInterests={true}>
+          <Layout>
+            <OthersProfile />
           </Layout>
         </ProtectedRoute>
       ),

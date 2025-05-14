@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Flex,
   Box,
@@ -27,6 +27,7 @@ export default function Comments({censored}) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
   const [userPosition, setUserPosition] = useState(null);
+  const navigate = useNavigate();
   const user = useAuth();
   const username = user.currentUser.username; 
 
@@ -320,7 +321,7 @@ const handleDislike = async idComment => {
 
           <Box flex="1" minW="200px">
             <Flex align="center" flexWrap="wrap">
-              <Text fontWeight="bold" mr={2} fontSize={['sm', 'md', 'lg']}>
+              <Text fontWeight="bold" mr={2} fontSize={['sm', 'md', 'lg']} cursor="pointer" _hover={{ color: 'blue.600' }} onClick={() => navigate(`/profile/${c.username}`)}>
                 {c.username}
               </Text>
               <Text fontSize="sm" color="gray.500" fontWeight="bold">

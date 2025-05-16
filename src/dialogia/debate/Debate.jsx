@@ -156,106 +156,190 @@ const Debate = () => {
   return (
     <Box  maxW="100vw" mx="auto" p={6} position={"relative"} overflowX="hidden"> 
 
-    <Box maxW="auto" mx="auto" p={6} borderWidth="1px" mb={6}
-      borderRadius="3xl" position={"relative"}>
+      <Box 
+        maxW="100%" 
+        mx="auto" 
+        p={{ base: 4, md: 6 }} 
+        borderWidth="1px" 
+        mb={6}
+        borderRadius="3xl" 
+        position="relative"
+        overflow="hidden"
+      >
 
-      {/* Sección superior */}
-      <Flex justify="space-between" align="flex-start" mb={6}>
-        {/* Columna izquierda (Usuario) */}
-        <Box width="80px" textAlign="center">
-          <Flex direction="column" align="center">
-            <Avatar.Root style={{ width: 100, height: 100, borderRadius: '9999px', overflow: 'hidden' }} mr={4}>
-              <Avatar.Fallback delayMs={600}>{`A${debate.user?.id}`}</Avatar.Fallback>
-              <Avatar.Image src={`/avatar_${debate.user?.avatarId || "1" }.jpg`} alt={`Avatar ${debate.user?.id}`} />
-            </Avatar.Root>
-            {/* <FaUser size={64} color="#727272" /> */}
-
-            <Text size="md" fontWeight="bold" mt={2} cursor="pointer" _hover={{ color: 'blue.600' }} onClick={() => navigate(`/profile/${debate.username}`)}>
-              {debate?.username}
-            </Text>
-            <Text fontSize="xs" color="#727272" fontWeight="bold">
-             ★ {debate.user?.title || "Sin título"}
-            </Text>
-          </Flex>
-        </Box>
-
-        {/* Columna derecha (Contenido principal) */}
-        <Box flex={1} ml={6}>
-          {/* Primera línea (Categoría, fecha, hora, iconos) */}
-          <Flex justify="space-between" align="center" mb={4} >
-            <Flex align="center">
-              <Heading as="h1" size="3xl" textTransform="uppercase" fontWeight="bold" mr={6}>
-              {debate.category.replace("id", "")}
+        {/* Sección superior - Reorganizada */}
+        <Flex 
+          direction="column"
+          mb={6}
+        >
+          {/* Primera fila (iconos y metadatos) */}
+          <Flex 
+            justify="space-between" 
+            align="center" 
+            mb={4}
+            direction={{ base: "column", sm: "row" }}
+            gap={{ base: 3, sm: 0 }}
+          >
+            {/* Categoría y fecha/hora */}
+            <Flex 
+              direction={{ base: "column", sm: "row" }}
+              align={{ base: "flex-start", sm: "center" }}
+              order={{ base: 2, sm: 1 }}
+              width={{ base: "100%", sm: "auto" }}
+            >
+              <Heading 
+                as="h1" 
+                size={{ base: "xl", md: "3xl" }} 
+                textTransform="uppercase" 
+                fontWeight="bold" 
+                mr={{ base: 0, sm: 6 }}
+                mb={{ base: 2, sm: 0 }}
+                whiteSpace="nowrap"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                maxWidth="100%"
+              >
+                {debate.category.replace("id", "")}
               </Heading>
-              <Text fontSize="md" color="#727272" mr={4} fontWeight="bold" mt={3}>
-                {new Date(debate.datareg).toLocaleDateString('es-ES')}
-              </Text>
-              <Text fontSize="md" color="#727272" fontWeight="bold" mr={8} mt={3}>
-                {new Date(debate.datareg).toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  hour12: true
-                }).toLowerCase()}
-              </Text>
-              <FaBell
-                  className={'bell-icon'}
-                  onClick={handleFollowToggle}
-                  style={{ color: following ? 'blue' : 'gray' }}
-                  cursor='pointer'
-
-              />
-
+              
+              <Flex 
+                direction={{ base: "column", sm: "row" }}
+                align={{ base: "flex-start", sm: "center" }}
+                gap={{ base: 1, sm: 4 }}
+              >
+                <Text fontSize={{ base: "sm", md: "md" }} color="#727272" fontWeight="bold">
+                  {new Date(debate.datareg).toLocaleDateString('es-ES')}
+                </Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="#727272" fontWeight="bold">
+                  {new Date(debate.datareg).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  }).toLowerCase()}
+                </Text>
+              </Flex>
             </Flex>
-            <Flex align="center">
+
+            {/* Iconos (campana y ojo) */}
+            <Flex 
+              align="center" 
+              justify="flex-end"
+              width={{ base: "100%", sm: "auto" }}
+              order={{ base: 1, sm: 2 }}
+              gap={6}
+            >
+              <FaBell
+                className={'bell-icon'}
+                onClick={handleFollowToggle}
+                style={{ 
+                  color: following ? 'blue' : 'gray',
+                  fontSize: "clamp(18px, 2vw, 24px)"
+                }}
+                cursor='pointer'
+              />
+              
               <Flex align="center">
-                <FaEye size={24} style={{ marginRight: "4px", color: "#727272" }} />
-                <Text fontSize="sm" color="#727272" ml={2}>0</Text>
+                <FaEye style={{ 
+                  color: "#727272", 
+                  marginRight: "4px", 
+                  fontSize: "clamp(18px, 2vw, 24px)"
+                }} />
+                <Text fontSize={{ base: "sm", md: "md" }} color="#727272">
+                  {debate.popularity}
+                </Text>
               </Flex>
             </Flex>
           </Flex>
 
+          {/* Segunda fila (usuario) - Ahora debajo de los iconos */}
+          <Flex 
+            justify="flex-start" 
+            align="center"
+            mb={4}
+            gap={4}
+            direction={{ base: "column", sm: "row" }}
+          >
+            <Avatar.Root style={{ 
+              width: 80, 
+              height: 80, 
+              borderRadius: '9999px', 
+              overflow: 'hidden',
+              flexShrink: 0
+            }}>
+              <Avatar.Fallback delayMs={600}>{`A${debate.user?.id}`}</Avatar.Fallback>
+              <Avatar.Image src={`/avatar_${debate.user?.avatarId || "1" }.jpg`} alt={`Avatar ${debate.user?.id}`} />
+            </Avatar.Root>
+
+            <Box textAlign={{ base: "center", sm: "left" }}>
+              <Text 
+                size="md" 
+                fontWeight="bold" 
+                cursor="pointer" 
+                _hover={{ color: 'blue.600' }} 
+                onClick={() => navigate(`/profile/${debate.username}`)}
+              >
+                {debate?.username}
+              </Text>
+              <Text fontSize="xs" color="#727272" fontWeight="bold">
+                ★ {debate.user?.title || "Sin título"}
+              </Text>
+            </Box>
+          </Flex>
+
           {/* Título y argumento */}
-          <Heading as="h2" size="xl" mb={4}>
-            {debate.nameDebate}
+          <Box width="100%">
+            <Heading 
+              as="h2" 
+              size={{ base: "lg", md: "xl" }} 
+              mb={4}
+              wordBreak="break-word"
+            >
+              {debate.nameDebate}
+            </Heading>
+            
+            <Text 
+              color="#676767" 
+              fontSize={{ base: "sm", md: "md" }} 
+              mb={6}
+              wordBreak="break-word"
+            >
+              {debate.argument}
+            </Text>
+            
+            {debate.image && (
+              <Image
+                src={debate.image}
+                alt="Imagen del debate"
+                objectFit="contain"
+                maxW="100%"
+                maxH={{
+                  base: "200px",
+                  md: "300px",
+                  lg: "400px"
+                }}
+                mx="auto"
+                my={4}
+                borderRadius="md"
+                boxShadow="sm"
+              />
+            )}
+          </Box>
+        </Flex>
+
+        <Box h="1px" bg="#8F8F8F" my={2} />
+
+        {/* Referencias */}
+        <Box>
+          <Heading as="h3" size={{ base: "sm", md: "md" }} color="#676767">
+            Referencias
           </Heading>
-          <Text color="#676767" fontSize="md" mb={6}>
-            {debate.argument}
-          </Text>
-          {debate.image && (
-            <Image
-              src={debate.image}
-              alt="Imagen del debate"
-              objectFit="contain" // Mantiene la relación de aspecto y muestra la imagen completa
-              maxW="100%"       // Ancho máximo del contenedor
-              maxH={{           // Altura máxima responsiva
-                base: "200px",  // Mobile
-                md: "300px",    // Tablet
-                lg: "400px"     // Desktop
-              }}
-              mx="auto"         // Centra la imagen horizontalmente
-              my={4}            // Margen vertical
-              borderRadius="md" // Bordes redondeados opcionales
-              boxShadow="sm"    // Sombra ligera opcional
-            />
-          )}
+          {formatRefs(debate.refs)}
         </Box>
-      </Flex>
-
-      <Box h="1px" bg="#8F8F8F" my={2} />
-
-      {/* Referencias */}
-      <Box>
-        <Heading as="h3" size="md" color="#676767">
-          Referencias
-        </Heading>
-        {formatRefs(debate.refs)}
       </Box>
-      </Box>
+
       {debate.bestArgument && (
         <BestComment 
           comment={debate.bestArgument} 
-          debateId={id} 
-          userPosition={userPosition === "InFavor" ? true : userPosition === "Against" ? false : null} 
         />
       )}
       <ChoosePosition
@@ -291,7 +375,7 @@ const Debate = () => {
             borderRadius="full"
             boxShadow="md"
           >
-            {userPosition === "InFavor" ? "A FAVOR" : "EN CONTRA"}
+            {userPosition === "InFavor" ? "A favor" : "En contra"}
           </Badge>
         </Box>
       )}

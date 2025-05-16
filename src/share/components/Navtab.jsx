@@ -33,11 +33,12 @@ import {
   LuInfo,
   LuFile,
 } from 'react-icons/lu';
-import { FaBell, FaUser } from 'react-icons/fa';
+import { FaBell, FaUser, FaStar } from 'react-icons/fa';
 import { toaster } from "../../components/ui/toaster";
 import { FiLogOut } from 'react-icons/fi';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useAuth } from '../../contexts/hooks/useAuth';
+import Ranking from '../../dialogia/home/components/Ranking';
 
 const NavTab = () => {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ const NavTab = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [blink, setBlink] = useState(false);
   const { currentUser } = useAuth();
+  const [showRankingSidebar, setShowRankingSidebar] = useState(false);
 
   // Verificar estado de autenticación
   useEffect(() => {
@@ -208,6 +210,19 @@ const NavTab = () => {
       {/* User actions - solo muestra si está logueado */}
       {isLoggedIn && (
         <Flex gap={{base: 1, md: 1}} alignItems="center">
+
+          <Button 
+            variant="ghost" 
+            size="xs" 
+            color="white" 
+            _hover={{bg:"white", color:"black"}} 
+            onClick={() => setShowRankingSidebar(!showRankingSidebar)}
+          >
+            <Box position="relative" color={blink ? 'lime' : undefined}>
+              <FaStar size={14} style={{ color: 'inherit' }} />
+            </Box>
+          </Button>
+
           <Button 
             variant="ghost" 
             size="xs" 
@@ -372,6 +387,41 @@ const NavTab = () => {
             )}
           </VStack>
         </Box>
+      )}
+
+              {/* Sidebar de ranking */}
+        {showRankingSidebar && (
+          <Box
+            position="fixed"
+            right="0"
+            top="0"
+            h="100vh"
+            w={{ base: "100%", md: "20%" }}
+            bg="white"
+            boxShadow="lg"
+            zIndex="overlay"
+            overflowY="auto"
+            transition="all 0.3s ease"
+          >
+            <Box p={4}>
+              <Flex justify="space-between" align="center" mt={2} mb={2}>
+              </Flex>
+              <Ranking />
+            </Box>
+          </Box>
+        )}
+
+        {showRankingSidebar && (
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          w={{ base: "0", md: "80%" }} // En móviles no se muestra, en desktop cubre 80%
+          h="100vh"
+          bg="blackAlpha.400"
+          zIndex="overlay"
+          onClick={() => setShowRankingSidebar(false)}
+        />
       )}
     </Flex>
   );

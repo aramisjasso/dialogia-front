@@ -45,52 +45,50 @@ const DeleteAccount = ({ auth }) => {
   };
 
   return (
-    <Box mt={12}>
-      <Text fontSize="lg" color="#3D3D3D" fontWeight="bold">
-        Datos
-      </Text>
-      <Flex alignItems="center" gap={6} mt={6}>
-        <Button
-          bg="black"
-          color="white"
-          borderRadius="lg"
-          borderWidth="1px"
-          borderColor="black"
-          minWidth="180px"
-          size="lg"
-          w="fit-content"
-          alignSelf="center"
-        >
-          BORRAR
-        </Button>
-        <Text fontSize="lg" color="#6C6C6C" fontWeight="bold">
-          Borrar Historial
-        </Text>
-      </Flex>
-      <ConfirmDialog
-        title="Eliminar Cuenta"
-        message="¿Estás seguro de eliminar tu cuenta?"
-        confirmText="Eliminar"
-        onConfirm={handleDeleteAccount}
+<Box mt={12} width="100%">
+  <Text fontSize="lg" color="#3D3D3D" fontWeight="bold">
+    Datos
+  </Text>
+  
+  {/* Contenedor Flex con alineación estable */}
+  <Flex 
+    alignItems="center" 
+    gap={6} 
+    mt={6}
+    wrap="nowrap" // Evita saltos de línea
+    width="fit-content" // Ajusta al contenido
+  >
+    {/* Botón con ConfirmDialog */}
+    <ConfirmDialog
+      title="Eliminar Cuenta"
+      message="¿Estás seguro de eliminar tu cuenta?"
+      confirmText="Eliminar"
+      onConfirm={handleDeleteAccount}
+    >
+      <Button
+        bg="#C90000"
+        color="white"
+        borderRadius="lg"
+        minWidth="180px"
+        size="lg"
+        flexShrink={0} // Evita que el botón se encoja
       >
-        <Flex alignItems="center" gap={6} mt={6}>
-          <Button
-            bg="#C90000"
-            color="white"
-            borderRadius="lg"
-            minWidth="180px"
-            size="lg"
-            w="fit-content"
-            alignSelf="center"
-          >
-            ELIMINAR
-          </Button>
-          <Text fontSize="lg" color="#6C6C6C" fontWeight="bold">
-            Eliminar Cuenta
-          </Text>
-        </Flex>
-      </ConfirmDialog>
-    </Box>
+        Eliminar
+      </Button>
+    </ConfirmDialog>
+
+    {/* Texto fijo */}
+    <Text 
+      fontSize="lg" 
+      color="#6C6C6C" 
+      fontWeight="bold"
+      whiteSpace="nowrap" // Evita saltos de línea
+      flexShrink={0} // Fija el ancho del texto
+    >
+      Eliminar Cuenta
+    </Text>
+  </Flex>
+</Box>
   );
 };
 

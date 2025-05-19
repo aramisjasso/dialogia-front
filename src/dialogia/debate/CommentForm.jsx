@@ -13,8 +13,10 @@ import {
 import { toaster } from "../../components/ui/toaster";
 import ImageUploader from "../categories/components/ImageUploader";
 
+
 const MAX_REFERENCES = 5;
 const REFERENCE_MAX_LENGTH = 200;
+
 
 export default function CommentForm({
   isVisible,
@@ -30,24 +32,30 @@ export default function CommentForm({
   const uploaderRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
 
+
   const getUsername = () => {
     return localStorage.getItem("username") || "usuario-ejemplo";
   };
 
+
   if (!isVisible) return null;
+
 
   const bgColor = isInFavor ? "white" : "gray.800";
   const textColor = isInFavor ? "black" : "white";
 
+
   const handleArgumentChange = (e) => {
     setArgument(e.target.value);
   };
+
 
   const handleNewRefChange = (e) => {
     if (e.target.value.length <= REFERENCE_MAX_LENGTH) {
       setNewRef(e.target.value);
     }
   };
+
 
   const handleAddRef = () => {
     const trimmed = newRef.trim();
@@ -72,9 +80,11 @@ export default function CommentForm({
     setNewRef("");
   };
 
+
   const handleRemoveRef = (index) => {
     setRefs(refs.filter((_, i) => i !== index));
   };
+
 
   const handlePublish = async () => {
     if (!argument.trim()) {
@@ -86,9 +96,10 @@ export default function CommentForm({
       return;
     }
 
+
     setIsLoading(true);
     let finalImage = image; // Valor por defecto (puede ser '')
-    
+   
     if (uploaderRef.current?.hasFile) {
       try {
         const fileData = await uploaderRef.current.uploadFile();
@@ -100,6 +111,8 @@ export default function CommentForm({
     }
 
 
+
+
     // Incluir 'position' según isInFavor
     const payload = {
       username: getUsername(),
@@ -109,7 +122,9 @@ export default function CommentForm({
       image: finalImage, // Aquí sí tendrá el valor correcto
     };
 
+
     console.debug("DEBUG: Payload a enviar al API:", payload);
+
 
     try {
       const response = await fetch(
@@ -125,7 +140,7 @@ export default function CommentForm({
       if (!response.ok) {
         // Intentamos parsear el error como JSON para ver si es el caso específico
         const errorData = await response.json().catch(() => null);
-        
+       
         if (errorData?.error.includes("viola nuestras normas") ) {
           throw new Error(errorData.reason || errorData.error);
         } else {
@@ -133,7 +148,9 @@ export default function CommentForm({
         }
       }
 
+
       const newComment = await response.json(); // comentario creado
+
 
       toaster.create({
         title: "Comentario publicado",
@@ -141,19 +158,19 @@ export default function CommentForm({
         duration: 2000,
       });
 
+
       // Limpia el formulario
       setArgument("");
       setRefs([]);
       onCancel();
 
+
       // Notifica al padre para actualizar contadores
       onNewComment(newComment);
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+
     } catch (error) {
-      
+     
       toaster.create({
         title: `Error al publicar`,
         description: error.message,
@@ -165,6 +182,7 @@ export default function CommentForm({
       setIsLoading(false);
     }
   };
+
 
   return (
     <Flex
@@ -190,6 +208,7 @@ export default function CommentForm({
         <Text fontSize="2xl" mb={4} fontWeight="bold">
           Deja un comentario
         </Text>
+
 
         <VStack spacing={4} align="stretch">
           <Box>
@@ -242,6 +261,7 @@ export default function CommentForm({
             )}
           </Box>
         </VStack>
+
 
         <Flex justifyContent="flex-end" gap={3} mt={4}>
           <Button onClick={onCancel} isDisabled={isLoading}>

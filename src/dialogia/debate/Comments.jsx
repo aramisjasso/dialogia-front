@@ -13,8 +13,11 @@ import {
 } from '@chakra-ui/react';
 import { FaReply, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase/firebase';
 import ReplyCommentForm from './ReplyCommentForm';
 import { useAuth } from '../../contexts/hooks/useAuth';
+
 
 export default function Comments({censored}) {
   const { id } = useParams();
@@ -29,53 +32,74 @@ export default function Comments({censored}) {
   const [userPosition, setUserPosition] = useState(null);
   const navigate = useNavigate();
   const user = useAuth();
-  const username = user.currentUser.username; 
+  const username = user.currentUser.username;
+
 
   const handleReplyClick = (comment) => {
     setSelectedComment(comment);
     setShowReplyForm(true);
   };
-  useEffect(() => {
-  const fetchDebate = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/debates/${id}?censored=${censored}`,
-        {
-          method: 'POST',  
-          headers: {
-            'Content-Type': 'application/json',  
-          },
-          body: '{}' 
-        }
-      );
-      if (!response.ok) throw new Error('Error al obtener debate');
-      const data = await response.json();
-      setComments(data.comments || []);
-      
-      // Verifica si el usuario actual ha votado y su posición
-      if (username) {
-        const isInFavor = data.peopleInFavor.includes(username);
-        const isAgainst = data.peopleAgaist.includes(username);
-        setUserPosition(isInFavor ? true : (isAgainst ? false : null));
-      }
-      
-          const initial = {};
-          (data.comments || []).forEach(c => {
-            initial[c.idComment] = {
-              liked:    c.peopleInFavor?.includes(username),     // true si este usuario hizo “like”
-              disliked: c.peopleAgainst?.includes(username)      // true si hizo “dislike”
-            };
-          });
-      setLikesState(initial);
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+useEffect(() => {
+  const debateRef = doc(db, 'debates', id);
+  const unsubscribe = onSnapshot(debateRef, snap => {
+    if (!snap.exists()) {
+      setError('Debate no encontrado');
+      return;
     }
-  };
-  fetchDebate();
-}, [id]);
+     const data = snap.data();
+      const debate = {
+        idDebate: snap.id,
+        nameDebate: data.nameDebate,
+        argument: data.argument,
+        category: data.category,
+        datareg: data.datareg?.toDate?.() || new Date(),
+        username: data.username,
+        image: data.image,
+        refs: data.refs || [],
+        comments: data.comments || [],
+        popularity: data.popularity || 0,
+        peopleInFavor: data.peopleInFavor || [],
+        peopleAgaist: data.peopleAgaist || [],
+        moderationStatus: data.moderationStatus || 'PENDING',
+        moderationReason: data.moderationReason || '',
+        followers: data.followers || []
+      };
+    // filtro de censura:
+    let comments = debate.comments || [];
+    if (censored === 'true') {
+      comments = comments.filter(c => c.moderationStatus === 'APPROVED');
+    }
+    setComments(comments);
+
+
+    // posición del usuario
+    if (username) {
+      const inFavor = debate.peopleInFavor.includes(username);
+      const against = debate.peopleAgaist.includes(username);
+      setUserPosition(inFavor ? true : (against ? false : null));
+    }
+
+
+    // estado de likes/dislikes
+    const initial = {};
+    comments.forEach(c => {
+      initial[c.idComment] = {
+        liked:    c.peopleInFavor?.includes(username),
+        disliked: c.peopleAgainst?.includes(username)
+      };
+    });
+    setLikesState(initial);
+    setLoading(false);
+  }, err => {
+    console.error(err);
+    setError(err.message);
+    setLoading(false);
+  });
+
+
+  return () => unsubscribe();
+}, [id, censored, username]);
+
 
   const sortComments = (arr, mode) => {
     const a = [...arr];
@@ -92,16 +116,20 @@ export default function Comments({censored}) {
     return a.sort((x, y) => new Date(y.datareg) - new Date(x.datareg));
   };
 
+
   const getParentComment = (paidCommentId) => {
     return comments.find(c => c.idComment === paidCommentId);
   };
 
+
 console.log(comments);
+
 
 const handleLike = async idComment => {
   // 1) Guarda el estado previo
   const wasLiked    = likesState[idComment]?.liked;
   const wasDisliked = likesState[idComment]?.disliked;
+
 
   // 2) Calcula el nuevo estado optimista
   const optimisticLikesState = {
@@ -111,6 +139,7 @@ const handleLike = async idComment => {
       disliked: false
     }
   };
+
 
   const optimisticComments = comments.map(c => {
     if (c.idComment !== idComment) return c;
@@ -124,9 +153,11 @@ const handleLike = async idComment => {
     };
   });
 
+
   // 3) Aplica el estado optimista
   setLikesState(optimisticLikesState);
   setComments(optimisticComments);
+
 
   // 4) Lanza la petición al servidor
   try {
@@ -141,6 +172,7 @@ const handleLike = async idComment => {
         }
       );
     }
+
 
     // Agregar o quitar like según corresponda
     const res = await fetch(
@@ -157,15 +189,18 @@ const handleLike = async idComment => {
     );
     if (!res.ok) throw new Error(res.statusText);
 
+
     // (Opcional) Si quieres, repones con el comment real del servidor:
     // const updated = await res.json();
     // setComments(prev => prev.map(c => c.idComment === idComment ? updated : c));
+
 
     toaster.create({
       title: wasLiked ? 'Like removido' : 'Like agregado',
       status: 'success',
       duration: 2000
     });
+
 
   } catch (err) {
     // 5) Rollback en caso de fallo
@@ -176,6 +211,7 @@ const handleLike = async idComment => {
       status: 'error',
       duration: 3000
     });
+
 
     // Restaurar estado previo
     setLikesState(prev => ({
@@ -190,10 +226,13 @@ const handleLike = async idComment => {
 };
 
 
+
+
 const handleDislike = async idComment => {
   // 1) Guarda el estado previo
   const wasDisliked = likesState[idComment]?.disliked;
   const wasLiked    = likesState[idComment]?.liked;
+
 
   // 2) Construye el estado optimista
   const optimisticLikesState = {
@@ -203,6 +242,7 @@ const handleDislike = async idComment => {
       liked: false
     }
   };
+
 
   const optimisticComments = comments.map(c => {
     if (c.idComment !== idComment) return c;
@@ -216,9 +256,11 @@ const handleDislike = async idComment => {
     };
   });
 
+
   // 3) Aplica el estado optimista
   setLikesState(optimisticLikesState);
   setComments(optimisticComments);
+
 
   // 4) Lanza la petición al servidor
   try {
@@ -233,6 +275,7 @@ const handleDislike = async idComment => {
         }
       );
     }
+
 
     // Agregar o quitar dislike según corresponda
     const res = await fetch(
@@ -249,11 +292,13 @@ const handleDislike = async idComment => {
     );
     if (!res.ok) throw new Error(res.statusText);
 
+
     toaster.create({
       title: wasDisliked ? 'Dislike removido' : 'Dislike agregado',
       status: 'success',
       duration: 2000
     });
+
 
   } catch (err) {
     // 5) Rollback en caso de fallo
@@ -264,6 +309,7 @@ const handleDislike = async idComment => {
       status: 'error',
       duration: 3000
     });
+
 
     // Restaurar estado previo
     setLikesState(prev => ({
@@ -277,6 +323,7 @@ const handleDislike = async idComment => {
   }
 };
 
+
   if (loading) {
     return (
       <Flex justify="center" align="center" height="100vh">
@@ -284,6 +331,7 @@ const handleDislike = async idComment => {
       </Flex>
     );
   }
+
 
   if (error) {
     return (
@@ -293,14 +341,16 @@ const handleDislike = async idComment => {
     );
   }
 
+
   const rawFavor = comments.filter(c => c.position);
   const rawAgainst = comments.filter(c => !c.position);
   const inFavor = sortComments(rawFavor, sortFavor);
   const against = sortComments(rawAgainst, sortAgainst);
 
+
   const renderComment = (c) => {
     const parentComment = c.paidComment ? getParentComment(c.paidComment) : null;
-    
+   
     return (
       <Box
         key={c.idComment}
@@ -311,13 +361,15 @@ const handleDislike = async idComment => {
         position="relative"
       >
         {/* Mostrar comentario padre citado si es una respuesta */}
-        
+       
+
 
         <Flex align="flex-start" flexWrap="wrap">
           <Avatar.Root style={{ width: 60, height: 60, borderRadius: '9999px', overflow: 'hidden' }} mr={3}  mt={2}>
             <Avatar.Fallback delayMs={600}>{`A${c.user?.id}`}</Avatar.Fallback>
             <Avatar.Image src={`/avatar_${c.user?.avatarId || "1" }.jpg`} alt={`Avatar ${c.user?.id}`} />
           </Avatar.Root>
+
 
           <Box flex="1" minW="200px">
             <Flex align="center" flexWrap="wrap">
@@ -342,15 +394,15 @@ const handleDislike = async idComment => {
                   Responder
                 </Text>
             </Flex >
-                
+               
               </Flex>
             </Flex>
             {/*RESPUESTA A COMENTARIO*/}
             {parentComment && (
-          <Box 
-            bg="gray.200" 
-            p={2} 
-            borderRadius="md" 
+          <Box
+            bg="gray.200"
+            p={2}
+            borderRadius="md"
             mb={3}
             borderLeft="4px solid"
             borderColor={parentComment.position ? "blue.500" : "red.500"}
@@ -371,6 +423,7 @@ const handleDislike = async idComment => {
                   })
                   .toLowerCase()}
             </Text>
+
 
           </Box>
         )}
@@ -401,30 +454,31 @@ const handleDislike = async idComment => {
           </Box>
         </Flex>
 
+
         <Box position="absolute" top={parentComment ? "15px" : "5"} right="6">
        <Flex align="center" gap={4}>
-         <Flex 
-           align="center" 
+         <Flex
+           align="center"
            color={likesState[c.idComment]?.disliked ? 'red.500' : 'gray.500'}
            _hover={{
              color: likesState[c.idComment]?.disliked ? 'red.600' : 'gray.700',
              cursor: 'pointer',
            }}
-           onClick={() => handleDislike(c.idComment)} 
+           onClick={() => handleDislike(c.idComment)}
          >
            <FaThumbsDown />
            <Text ml={1} fontSize="sm">
              {c.dislikes ?? 0}
            </Text>
          </Flex>
-         <Flex 
-           align="center" 
+         <Flex
+           align="center"
            color={likesState[c.idComment]?.liked ? 'blue.500' : 'gray.500'}
            _hover={{
              color: likesState[c.idComment]?.liked ? 'blue.600' : 'gray.700',
              cursor: 'pointer',
            }}
-           onClick={() => handleLike(c.idComment)} 
+           onClick={() => handleLike(c.idComment)}
          >
            <FaThumbsUp />
            <Text ml={1} fontSize="sm">
@@ -436,9 +490,9 @@ const handleDislike = async idComment => {
       </Box>
     );
   };
-  
+ 
   return (
-    
+   
     <Box p={6}>
       <hr
         style={{
@@ -453,7 +507,7 @@ const handleDislike = async idComment => {
           <Flex align="center" justify="space-between">
             <Heading size="md" mb={2}>Comentarios a favor</Heading>
             <select
-              style={{ 
+              style={{
                 marginLeft: 16,
                 padding: '4px 8px',
                 border: '1px solid #CBD5E0',
@@ -480,7 +534,7 @@ const handleDislike = async idComment => {
             )}
           </VStack>
         </Box>
-        
+       
         {/* Línea vertical separadora */}
         <Box
           style={{
@@ -489,12 +543,12 @@ const handleDislike = async idComment => {
             margin: '0 16px',
           }}
         />
-        
+       
         {/* Columna Derecha: Comentarios en contra */}
         <Box flex={1} pr={4} mt={6}>
           <Flex align="center" justify="space-between">
             <select
-              style={{ 
+              style={{
                 marginRight: 16,
                 padding: '4px 8px',
                 border: '1px solid #CBD5E0',
@@ -528,12 +582,14 @@ const handleDislike = async idComment => {
 
 
 
+
+
+
       <ReplyCommentForm
       isVisible={showReplyForm}
       onCancel={() => setShowReplyForm(false)}
       isInFavor={userPosition}
       onNewComment={(newComment) => {
-        setComments(prev => [...prev, newComment]);
         setShowReplyForm(false);
       }}
       parentComment={selectedComment}

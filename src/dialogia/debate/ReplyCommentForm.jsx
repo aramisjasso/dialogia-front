@@ -9,48 +9,57 @@ import {
   HStack,
   CloseButton,
   VStack,
-  Image,Link,
+  Image,
+  Link,
   Avatar,
 } from "@chakra-ui/react";
 import { toaster } from "../../components/ui/toaster";
 import ImageUploader from "../categories/components/ImageUploader";
 
+
 const MAX_REFERENCES = 5;
 const REFERENCE_MAX_LENGTH = 200;
+
 
 export default function ReplyCommentForm({
   isVisible,
   onCancel,
   isInFavor,
   onNewComment,
-  parentComment  // Comentario al que se está respondiendo
+  parentComment, // Comentario al que se está respondiendo
 }) {
   const { id } = useParams();
   const [argument, setArgument] = useState("");
   const [newRef, setNewRef] = useState("");
   const [refs, setRefs] = useState([]);
-  const [image, setImage] = useState("");  
+  const [image, setImage] = useState("");
   const uploaderRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
+
 
   const getUsername = () => {
     return localStorage.getItem("username") || "usuario-ejemplo";
   };
 
+
   if (!isVisible || !parentComment) return null;
+
 
   const bgColor = isInFavor ? "white" : "gray.800";
   const textColor = isInFavor ? "black" : "white";
 
+
   const handleArgumentChange = (e) => {
     setArgument(e.target.value);
   };
+
 
   const handleNewRefChange = (e) => {
     if (e.target.value.length <= REFERENCE_MAX_LENGTH) {
       setNewRef(e.target.value);
     }
   };
+
 
   const handleAddRef = () => {
     const trimmed = newRef.trim();
@@ -75,9 +84,11 @@ export default function ReplyCommentForm({
     setNewRef("");
   };
 
+
   const handleRemoveRef = (index) => {
     setRefs(refs.filter((_, i) => i !== index));
   };
+
 
   const handlePublish = async () => {
     if (!argument.trim()) {
@@ -89,18 +100,21 @@ export default function ReplyCommentForm({
       return;
     }
 
+
     setIsLoading(true);
     let finalImage = image;
-    
+
+
     if (uploaderRef.current?.hasFile) {
       try {
         const fileData = await uploaderRef.current.uploadFile();
         finalImage = fileData.url;
         setImage(finalImage);
       } catch (error) {
-        console.error('Error al subir:', error);
+        console.error("Error al subir:", error);
       }
     }
+
 
     const payload = {
       paidComment: parentComment.idComment,
@@ -111,7 +125,9 @@ export default function ReplyCommentForm({
       image: finalImage,
     };
 
+
     console.debug("DEBUG: Payload para respuesta:", payload);
+
 
     try {
       const response = await fetch(
@@ -127,15 +143,18 @@ export default function ReplyCommentForm({
       if (!response.ok) {
         // Intentamos parsear el error como JSON para ver si es el caso específico
         const errorData = await response.json().catch(() => null);
-        
-        if (errorData?.error.includes("viola nuestras normas") ) {
+
+
+        if (errorData?.error.includes("viola nuestras normas")) {
           throw new Error(errorData.reason || errorData.error);
         } else {
           throw new Error("Error al publicar la respuesta");
         }
       }
 
+
       const newReply = await response.json();
+
 
       toaster.create({
         title: "Respuesta publicada",
@@ -143,19 +162,16 @@ export default function ReplyCommentForm({
         duration: 2000,
       });
 
+
       // Limpia el formulario
       setArgument("");
       setRefs([]);
       onCancel();
 
+
       // Notifica al padre para actualizar contadores
       onNewComment(newReply);
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
     } catch (error) {
-      
       toaster.create({
         title: `Error al responder`,
         description: error.message,
@@ -167,6 +183,7 @@ export default function ReplyCommentForm({
       setIsLoading(false);
     }
   };
+
 
   return (
     <Flex
@@ -193,33 +210,44 @@ export default function ReplyCommentForm({
           Responder comentario
         </Text>
 
+
         {/* Mostrar el comentario padre completo */}
-        <Box 
-          bg="gray.100" 
-          p={4} 
-          borderRadius="md" 
+        <Box
+          bg="gray.100"
+          p={4}
+          borderRadius="md"
           mb={4}
           borderLeft="4px solid"
           borderColor={parentComment.position ? "blue.500" : "red.500"}
         >
           <Flex align="flex-start" flexWrap="wrap">
-            <Avatar.Root style={{  borderRadius: '9999px', overflow: 'hidden' } } mr={4} size="lg">
-              <Avatar.Fallback delayMs={600}>{`A${parentComment.user?.id}`}</Avatar.Fallback>
-              <Avatar.Image src={`/avatar_${parentComment.user?.avatarId || "1" }.jpg`} alt={`Avatar ${parentComment.user?.id}`} objectFit="cover" />
+            <Avatar.Root
+              style={{ borderRadius: "9999px", overflow: "hidden" }}
+              mr={4}
+              size="lg"
+            >
+              <Avatar.Fallback
+                delayMs={600}
+              >{`A${parentComment.user?.id}`}</Avatar.Fallback>
+              <Avatar.Image
+                src={`/avatar_${parentComment.user?.avatarId || "1"}.jpg`}
+                alt={`Avatar ${parentComment.user?.id}`}
+                objectFit="cover"
+              />
             </Avatar.Root>
-            
-            
+
+
             <Box flex="1" minW="200px">
               <Flex align="center" flexWrap="wrap">
                 <Text fontWeight="bold" mr={2} fontSize="sm">
                   {parentComment.username}
                 </Text>
                 <Text fontSize="xs" color="gray.500" fontWeight="bold">
-                  {new Date(parentComment.datareg).toLocaleDateString('es-ES')}{' '}
+                  {new Date(parentComment.datareg).toLocaleDateString("es-ES")}{" "}
                   {new Date(parentComment.datareg)
-                    .toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit',
+                    .toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
                       hour12: true,
                     })
                     .toLowerCase()}
@@ -228,7 +256,9 @@ export default function ReplyCommentForm({
               <Text mt={1} color="gray.700" fontSize="sm">
                 {parentComment.argument}
               </Text>
-              {parentComment.image && <Image src={parentComment.image} mt={2} maxH="150px" />}
+              {parentComment.image && (
+                <Image src={parentComment.image} mt={2} maxH="150px" />
+              )}
               {parentComment.refs && parentComment.refs.length > 0 && (
                 <Box mt={2}>
                   <Text fontSize="xs" fontWeight="semibold">
@@ -241,7 +271,10 @@ export default function ReplyCommentForm({
                         href={r}
                         fontSize="xs"
                         isExternal
-                        _hover={{ textDecoration: 'underline', color: 'blue.500' }}
+                        _hover={{
+                          textDecoration: "underline",
+                          color: "blue.500",
+                        }}
                       >
                         • {r}
                       </Link>
@@ -253,6 +286,7 @@ export default function ReplyCommentForm({
           </Flex>
         </Box>
 
+
         <VStack spacing={4} align="stretch">
           <Box>
             <Text fontWeight="bold">Tu respuesta</Text>
@@ -262,17 +296,17 @@ export default function ReplyCommentForm({
               onChange={handleArgumentChange}
             />
           </Box>
-          
+
+
           {/* Imagen */}
           <Box fontWeight={"bold"}>
             Imagen (opcional)
-            <ImageUploader ref={uploaderRef} folderPath="debate"/>
+            <ImageUploader ref={uploaderRef} folderPath="debate" />
           </Box>
-          
+
+
           <Box>
-            <Text fontWeight="bold">
-              Referencias (máx. {MAX_REFERENCES})
-            </Text>
+            <Text fontWeight="bold">Referencias (máx. {MAX_REFERENCES})</Text>
             <HStack spacing={2}>
               <Input
                 placeholder={`Agregar referencia (máx. ${REFERENCE_MAX_LENGTH} caracteres)`}
@@ -287,12 +321,7 @@ export default function ReplyCommentForm({
             {refs.length > 0 && (
               <Box mt={2} borderWidth="1px" p={2} borderRadius="md">
                 {refs.map((r, idx) => (
-                  <Flex
-                    key={idx}
-                    justify="space-between"
-                    align="center"
-                    py={1}
-                  >
+                  <Flex key={idx} justify="space-between" align="center" py={1}>
                     <Text isTruncated maxW="80%">
                       {r}
                     </Text>
@@ -306,6 +335,7 @@ export default function ReplyCommentForm({
             )}
           </Box>
         </VStack>
+
 
         <Flex justifyContent="flex-end" gap={3} mt={4}>
           <Button onClick={onCancel} isDisabled={isLoading}>
@@ -323,3 +353,5 @@ export default function ReplyCommentForm({
     </Flex>
   );
 }
+
+

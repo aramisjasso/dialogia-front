@@ -32,11 +32,9 @@ const NaviRoutersDialogia = () => {
     {
       path: "/",
       element: (
-        <ProtectedRoute  requireAuth={false}>
           <Layout>
             <Root /> {/* Renderiza Root si el usuario no está autenticado */}
           </Layout>
-        </ProtectedRoute>
       ),
       errorElement: (
         <Layout>
@@ -47,21 +45,17 @@ const NaviRoutersDialogia = () => {
     {
       path: "/register",
       element: (
-        <ProtectedRoute  requireAuth={false}>
           <Layout>
             <Register />
           </Layout>
-        </ProtectedRoute>
       ),
     },
     {
       path: "/login",
       element: (
-        <ProtectedRoute requireAuth={false}>
           <Layout>
             <Login />
           </Layout>
-        </ProtectedRoute>
       ),
     },
     {
@@ -93,21 +87,17 @@ const NaviRoutersDialogia = () => {
     {
       path: "/recover",
       element: (
-        <ProtectedRoute requireAuth={false}>
           <Layout>
             <Recover />
           </Layout>
-        </ProtectedRoute>
       ),
     },
     {
       path: "/recover-reset",
       element: (
-        <ProtectedRoute requireAuth={false}>
           <Layout>
             <RecoverReset />
           </Layout>
-        </ProtectedRoute>
       ),
     },
     {

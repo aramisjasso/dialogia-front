@@ -11,7 +11,6 @@ const RecommendView = ( { interests, censored } ) => {
 
   useEffect(() => {
     const fetchDebates = async () => {
-      console.log(interests)
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/debates/recommend?censored=${censored}`, // Quitamos el /${uid} de la URL
@@ -33,7 +32,7 @@ const RecommendView = ( { interests, censored } ) => {
       }
     };
     fetchDebates();
-  }, []);
+  }, [censored, interests]);
 
   if (loading) {
     return (
@@ -57,7 +56,11 @@ const RecommendView = ( { interests, censored } ) => {
         Recomendados para ti
       </Heading>
 
-      {debates.map((debate, index) => (
+      {(!debates || debates.length === 0) ? (
+      <Text textAlign="center" color="gray.600" fontSize="lg" mt={4}>
+        No hay debates recomendados en este momento.
+      </Text>
+    ) : debates.map((debate, index) => (
 
         <React.Fragment key={debate.idDebate}>
 

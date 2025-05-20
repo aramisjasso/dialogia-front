@@ -90,7 +90,7 @@ const [userRanking, setUserRanking] = useState([]);
 
  useEffect(() => {
     axios
-      .get("http://localhost:3020/api/v1/user/rankingall")
+      .get("http://localhost:3020/api/v1/user/ranking")
       .then((res) => {
         setUserRanking(res.data);
       })

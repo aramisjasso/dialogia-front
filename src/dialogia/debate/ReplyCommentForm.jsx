@@ -227,7 +227,7 @@ export default function ReplyCommentForm({
               size="lg"
             >
               <Avatar.Fallback
-                delayMs={600}
+                delayms={600}
               >{`A${parentComment.user?.id}`}</Avatar.Fallback>
               <Avatar.Image
                 src={`/avatar_${parentComment.user?.avatarId || "1"}.jpg`}

@@ -66,10 +66,15 @@ useEffect(() => {
       };
     // filtro de censura:
     let comments = debate.comments || [];
-    if (censored === 'true') {
+    console.log('after filter, comments:', comments.map(c => c.idComment));
+    console.log('censored or not:', censored);
+    if (censored === true) {
+      
       comments = comments.filter(c => c.moderationStatus === 'APPROVED');
     }
     setComments(comments);
+    console.log('render, comments state:', comments.map(c => c.idComment));
+
 
 
     // posición del usuario

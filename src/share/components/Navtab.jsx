@@ -52,7 +52,7 @@ const NavTab = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [blink, setBlink] = useState(false);
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const [showRankingSidebar, setShowRankingSidebar] = useState(false);
 
   // Verificar estado de autenticación
@@ -79,10 +79,14 @@ const NavTab = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      navigate('/');
+      await logout();
+      
+      
     } catch (error) {
       console.error(error);
+    }
+    finally {
+      await navigate('/');
     }
   };
 

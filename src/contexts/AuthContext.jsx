@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState, useCallback, useRef } from 'react';
 import { auth, db } from '../firebase/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 
 export const AuthContext = createContext();
 
@@ -9,15 +10,14 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const pendingRefresh = useRef(false);
+  const unsubscribeRef = useRef(null);
 
-  // Función para actualizar campos específicos sin recargar todo
   const updateUserField = useCallback((fieldUpdates) => {
     setCurrentUser(prev => {
       if (!prev) return null;
       return { ...prev, ...fieldUpdates };
     });
     
-    // Actualizar localStorage si corresponde
     if ('username' in fieldUpdates) {
       localStorage.setItem("username", fieldUpdates.username || '');
     }
@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Refresh completo solo cuando es realmente necesario
   const refreshUser = useCallback(async (force = false) => {
     if (pendingRefresh.current && !force) return;
     pendingRefresh.current = true;
@@ -63,10 +62,31 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const logout = useCallback(async () => {
+    try {
+      await signOut(auth);
+      // Limpiar el estado
+      setCurrentUser(null);
+      setError(null);
+      // Limpiar localStorage
+      localStorage.removeItem("username");
+      localStorage.removeItem("censorship");
+      
+      // Desuscribir el listener de autenticación si existe
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+      setError("Error al cerrar sesión");
+    }
+  }, []);
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    // Guardar la función de desuscripción en la ref
+    unsubscribeRef.current = auth.onAuthStateChanged((user) => {
       if (user) {
-        // Solo refrescar si no tenemos datos o si el usuario cambió
         if (!currentUser || user.uid !== currentUser.uid) {
           refreshUser();
         }
@@ -75,15 +95,21 @@ export const AuthProvider = ({ children }) => {
       }
     });
 
-    return unsubscribe;
-  }, [currentUser?.uid]); // Solo dependemos del UID
+    // Función de limpieza
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, [currentUser?.uid]);
 
   const value = {
     currentUser,
     loading,
     error,
     refreshUser,
-    updateUserField // Nueva función para actualizaciones parciales
+    updateUserField,
+    logout 
   };
 
   return (

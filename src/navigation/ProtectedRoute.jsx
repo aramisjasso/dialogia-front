@@ -1,69 +1,90 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from '../contexts/hooks/useAuth';
+import { auth } from "@/firebase/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
-const ProtectedRoute = ({ children, requireAuth }) => {
+const ProtectedRoute = ({ children, requireAuth = false }) => {
   const location = useLocation();
   const { currentUser, loading, updateUserField } = useAuth();
+  const [firebaseReady, setFirebaseReady] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  
-  const ALLOWED_PATHS = ['/select-interests', '/registeruser', '/'];
+
+  const ONBOARDING_PATHS = ['/select-interests', '/registeruser'];
+
+  // Escuchar el estado de Firebase Auth directamente
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, () => {
+      setFirebaseReady(true);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
-    const verifyAuth = async () => {
-      // Verificación del username en localStorage
-      const storedUsername = localStorage.getItem("username");
-      if (currentUser && !currentUser.username && storedUsername) {
-        await updateUserField({ username: storedUsername });
+    if (!firebaseReady) return;
+
+    if (auth?.currentUser || requireAuth) {
+      const verifyAuth = async () => {
+        const storedUsername = localStorage.getItem("username");
+        if (currentUser && !currentUser.username && storedUsername) {
+          await updateUserField({ username: storedUsername });
+        }
+        setIsReady(true);
+      };
+
+      if (!loading) {
+        verifyAuth();
       }
+    } else {
       setIsReady(true);
-    };
-
-    if (!loading) {
-      verifyAuth();
     }
-  }, [currentUser, loading]);
+  }, [firebaseReady, currentUser, loading, requireAuth]);
 
-  if (loading || !isReady) {
+  // Esperar a que Firebase inicialice
+  if (!firebaseReady) {
     return <div>Cargando...</div>;
   }
 
-  // Lógica de redirección
-  const shouldRedirectToRegister = 
-    currentUser && 
-    (!currentUser.username || currentUser.username === '') && 
-    location.pathname !== "/registeruser";
+  // Esperar a que se verifique todo lo demás
+  if ((loading || !isReady) && auth?.currentUser) {
+    return <div>Cargando...</div>;
+  }
 
-  const shouldRedirectToHome = 
-    currentUser?.username && 
-    location.pathname === "/registeruser";
+  // --- Reglas de navegación ---
 
-  const shouldRedirectToInterests = 
-    currentUser?.username && 
-    (!currentUser.interests || currentUser.interests.length === 0) && 
-    !ALLOWED_PATHS.includes(location.pathname);
+  if (!requireAuth && !auth?.currentUser) {
+    return children;
+  }
 
-  if (requireAuth && !currentUser) {
+  if (!requireAuth && auth?.currentUser) {
+    return <Navigate to="/home" replace />;
+  }
+
+  if (requireAuth && !auth?.currentUser) {
     return <Navigate to="/" replace />;
   }
 
-  if (!requireAuth && currentUser && location.pathname === "/") {
-    return <Navigate to="/home" replace />;
-  }
+  const shouldRedirectToRegister = 
+    currentUser && 
+    !currentUser.username && 
+    !ONBOARDING_PATHS.includes(location.pathname);
+
+  const shouldRedirectToInterests = 
+    currentUser?.username && 
+    !currentUser.interests?.length && 
+    !ONBOARDING_PATHS.includes(location.pathname);
 
   if (shouldRedirectToRegister) {
     return <Navigate to="/registeruser" replace />;
-  }
-
-  if (shouldRedirectToHome) {
-    return <Navigate to="/home" replace />;
   }
 
   if (shouldRedirectToInterests) {
     return <Navigate to="/select-interests" replace />;
   }
 
-  if (location.pathname === "/select-interests" && currentUser?.interests?.length > 0) {
+  if (ONBOARDING_PATHS.includes(location.pathname) && 
+      currentUser?.username && 
+      currentUser?.interests?.length) {
     return <Navigate to="/home" replace />;
   }
 

@@ -30,7 +30,7 @@ const AboutUs = () => {
             Entendemos que el debate es fundamental para la democracia y el progreso social. Por ello, nuestra plataforma está comprometida con la libertad de expresión, siempre equilibrada con el respeto hacia todas las opiniones. Creemos que cada voz cuenta y que, a través del diálogo, se pueden descubrir soluciones innovadoras a los desafíos contemporáneos.
           </Text>
 
-          <Text fontSize="md" mb={8} color="#676767" lineHeight="tall" mb={16}>
+          <Text fontSize="md" mb={24} color="#676767" lineHeight="tall">
             Te invitamos a formar parte de esta nueva era en la que el intercambio de ideas se convierte en el motor de cambio. Descubre un espacio donde la diversidad de pensamientos se celebra y cada discusión es una oportunidad para aprender, crecer y transformar la realidad.
           </Text>
 

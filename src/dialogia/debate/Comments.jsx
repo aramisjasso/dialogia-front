@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { FaReply, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import ReplyCommentForm from './ReplyCommentForm';
 import { useAuth } from '../../contexts/hooks/useAuth';
@@ -41,59 +41,72 @@ export default function Comments({censored}) {
   };
 useEffect(() => {
   const debateRef = doc(db, 'debates', id);
-  const unsubscribe = onSnapshot(debateRef, snap => {
+
+  const unsubscribe = onSnapshot(debateRef, async (snap) => {
     if (!snap.exists()) {
       setError('Debate no encontrado');
       return;
     }
-     const data = snap.data();
-      const debate = {
-        idDebate: snap.id,
-        nameDebate: data.nameDebate,
-        argument: data.argument,
-        category: data.category,
-        datareg: data.datareg?.toDate?.() || new Date(),
-        username: data.username,
-        image: data.image,
-        refs: data.refs || [],
-        comments: data.comments || [],
-        popularity: data.popularity || 0,
-        peopleInFavor: data.peopleInFavor || [],
-        peopleAgaist: data.peopleAgaist || [],
-        moderationStatus: data.moderationStatus || 'PENDING',
-        moderationReason: data.moderationReason || '',
-        followers: data.followers || []
-      };
-    // filtro de censura:
+
+    const data = snap.data();
+    const debate = {
+      idDebate: snap.id,
+      nameDebate: data.nameDebate,
+      argument: data.argument,
+      category: data.category,
+      datareg: data.datareg?.toDate?.() || new Date(),
+      username: data.username,
+      image: data.image,
+      refs: data.refs || [],
+      comments: data.comments || [],
+      popularity: data.popularity || 0,
+      peopleInFavor: data.peopleInFavor || [],
+      peopleAgaist: data.peopleAgaist || [],
+      moderationStatus: data.moderationStatus || 'PENDING',
+      moderationReason: data.moderationReason || '',
+      followers: data.followers || [],
+    };
+
     let comments = debate.comments || [];
-    console.log('after filter, comments:', comments.map(c => c.idComment));
-    console.log('censored or not:', censored);
     if (censored === true) {
-      
       comments = comments.filter(c => c.moderationStatus === 'APPROVED');
     }
-    setComments(comments);
-    console.log('render, comments state:', comments.map(c => c.idComment));
 
+    const updatedComments = await Promise.all(
+      comments.map(async (comment) => {
+        if (comment.username) {
+          const usersRef = collection(db, 'users');
+          const q = query(usersRef, where('username', '==', comment.username));
+          const querySnapshot = await getDocs(q);
 
+          if (!querySnapshot.empty) {
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+            return { ...comment, user: userData };
+          }
+        }
+        return { ...comment, user: null };
+      })
+    );
 
-    // posición del usuario
+    setComments(updatedComments);
+    console.log('render, comments state:', updatedComments.map(c => c.idComment));
+
     if (username) {
       const inFavor = debate.peopleInFavor.includes(username);
       const against = debate.peopleAgaist.includes(username);
       setUserPosition(inFavor ? true : (against ? false : null));
     }
 
-
-    // estado de likes/dislikes
-    const initial = {};
-    comments.forEach(c => {
-      initial[c.idComment] = {
-        liked:    c.peopleInFavor?.includes(username),
-        disliked: c.peopleAgainst?.includes(username)
+    const initialLikesState = {};
+    updatedComments.forEach(c => {
+      initialLikesState[c.idComment] = {
+        liked: c.peopleInFavor?.includes(username),
+        disliked: c.peopleAgainst?.includes(username),
       };
     });
-    setLikesState(initial);
+
+    setLikesState(initialLikesState);
     setLoading(false);
   }, err => {
     console.error(err);
@@ -101,9 +114,9 @@ useEffect(() => {
     setLoading(false);
   });
 
-
   return () => unsubscribe();
 }, [id, censored, username]);
+
 
 
   const sortComments = (arr, mode) => {
@@ -374,7 +387,6 @@ const handleDislike = async idComment => {
             <Avatar.Fallback delayMs={600}>{`A${c.user?.id}`}</Avatar.Fallback>
             <Avatar.Image src={`/avatar_${c.user?.avatarId || "1" }.jpg`} alt={`Avatar ${c.user?.id}`} />
           </Avatar.Root>
-
 
           <Box flex="1" minW="200px">
             <Flex align="center" flexWrap="wrap">
